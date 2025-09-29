@@ -1,0 +1,82 @@
+{% extends 'webs/base.html' %}
+
+{% block title %}GENIAHUB | Vista General{% endblock %} 
+
+{% block content %}
+    <h2 class="fs-4 mb-4">Vista General del Dashboard</h2>
+
+    <div class="row g-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="p-3 bg-primary text-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                <div>
+                    <h3 class="fs-2">24</h3>
+                    <p class="fs-5 mb-0">Proyectos Activos</p>
+                </div>
+                <i class="bi bi-list-task fs-1"></i>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="p-3 bg-success text-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                <div>
+                    <h3 class="fs-2">15</h3>
+                    <p class="fs-5 mb-0">Nuevos Clientes</p>
+                </div>
+                <i class="bi bi-people fs-1"></i>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="p-3 bg-warning text-dark shadow-sm d-flex justify-content-around align-items-center rounded">
+                <div>
+                    <h3 class="fs-2">02</h3>
+                    <p class="fs-5 mb-0">Mensajes Pendientes</p>
+                </div>
+                <i class="bi bi-chat-dots fs-1"></i>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="p-3 bg-danger text-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                <div>
+                    <h3 class="fs-2">85%</h3>
+                    <p class="fs-5 mb-0">Tasa de Conversión</p>
+                </div>
+                <i class="bi bi-graph-up-arrow fs-1"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-lg-8">
+            <h3 class="fs-5 mb-3">Rendimiento Mensual</h3>
+            <div class="card p-4 shadow-sm">
+                <div class="text-center py-5 bg-light border rounded">
+                    <p class="mb-0 text-muted">Contenedor para Gráfico de Rendimiento (Placeholder)</p>
+                    <i class="bi bi-bar-chart fs-3 text-secondary"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h3 class="fs-5 mb-3">Últimas Actividades</h3>
+            <ul class="list-group shadow-sm">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Proyecto "Alpha" completado
+                    <span class="badge bg-success rounded-pill">hace 1h</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Nuevo cliente registrado
+                    <span class="badge bg-info rounded-pill">hace 3h</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Mensaje de soporte recibido
+                    <span class="badge bg-warning rounded-pill">hace 5h</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Factura N° 1001 enviada
+                    <span class="badge bg-secondary rounded-pill">hace 1d</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

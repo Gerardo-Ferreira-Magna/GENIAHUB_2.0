@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GENIAHUB | Dashboard{% endblock title %}</title> 
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    {% block extra_css %}
+    <style>
+        /* Estilos base del contenedor principal */
+        .main-container { min-height: 100vh; }
+
+        /* Estilos para el sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #212429;
+            transition: all 0.3s;
+            flex-shrink: 0; 
+        }
+
+        /* Estilo para ocultar/mostrar el sidebar en pantallas pequeñas */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 1000;
+            }
+            .sidebar.active { margin-left: 0; }
+        }
+
+        /* Contenedor de contenido */
+        .content { flex-grow: 1; }
+        .header-box h3 { color: #fff; }
+
+        /* Estilos de los enlaces del menú */
+        .sidebar ul li a { color: #ccc; }
+        .sidebar ul li a:hover {
+            background-color: #444;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        /* Estilo para el elemento de menú activo */
+        .sidebar ul li.active a {
+            background-color: #0d6efd;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        /* Estilo del separador */
+        .h-color { border-top: 1px solid #666; opacity: 0.5; }
+
+        /* Estilo para el contenido de la dashboard */
+        .dashboard-content { padding-bottom: 50px; }
+    </style>
+    {% endblock extra_css %}
+</head>
+<body>
+
+    <div class="main-container d-flex">
+        
+        <div class="sidebar" id="side_nav">
+            <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">
+                <h3 class="fs-4"><span class="text-white">GENIAHUB</span></h3>
+                <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i
+                        class="bi bi-list"></i></button>
+            </div>
+
+            <ul class="list-unstyled px-2">
+                <li class="active">
+                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-house-door"></i> Dashboard
+                    </a>
+                </li>
+                <li class="">
+                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-list-task"></i> Projects
+                    </a>
+                </li>
+                <li class="">
+                    <a href="{}" class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
+                        <span><i class="bi bi-chat-dots"></i> Messages</span>
+                        <span class="bg-dark rounded-pill text-white py-0 px-2">02</span>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-gear"></i> Services
+                    </a>
+                </li>
+                <li class="">
+                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-people"></i> Customers
+                    </a>
+                </li>
+            </ul>
+
+            <hr class="h-color mx-2">
+
+            <ul class="list-unstyled px-2">
+                <li class="">
+                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-sliders"></i> Settings
+                    </a>
+                </li>
+                <li class="">
+                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-bell"></i> Notifications
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="content">
+            
+            <nav class="navbar navbar-expand-md navbar-light bg-light">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between d-md-none d-block">
+                        <button class="btn px-1 py-0 open-btn me-2"><i class="bi bi-list"></i></button>
+                        <a class="navbar-brand fs-4" href="#"><span class="bg-dark rounded px-2 py-0 text-white">GH</span></a>
+                    </div>
+
+                    <button class="navbar-toggler p-0 border-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                        <ul class="navbar-nav mb-2 mb-lg-0">
+                            {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{}">Hola, {{ user.username }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{}">Cerrar Sesión</a>
+                            </li>
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{}">Login</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Contenido específico de cada página -->
+            <div class="dashboard-content p-4">
+                {% block content %}
+                <!-- Contenido específico de cada página -->
+                {% endblock content %}
+            </div>
+            
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('side_nav');
+            // Selectores para los botones de abrir y cerrar
+            const openBtn = document.querySelector('.open-btn');
+            const closeBtn = document.querySelector('.close-btn');
+
+            // Toggle Sidebar al hacer clic en el botón de abrir (móvil)
+            if (openBtn) {
+                openBtn.addEventListener('click', function () {
+                    sidebar.classList.add('active');
+                });
+            }
+
+            // Ocultar Sidebar al hacer clic en el botón de cerrar (móvil)
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    sidebar.classList.remove('active');
+                });
+            }
+        });
+    </script>
+    {% endblock extra_js %}
+</body>
+</html>
