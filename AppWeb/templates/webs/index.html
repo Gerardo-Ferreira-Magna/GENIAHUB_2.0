@@ -2,95 +2,212 @@
 
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/estilo_index.css' %}">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GENIAHUB</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/estilo_index.css' %}" />
+    <style>
+      /* Ajustes navbar */
+      .navbar {
+        position: relative;
+        z-index: 1000; /* queda encima del slider */
+      }
+      .navbar-toggler {
+        border-color: rgba(255,255,255,0.5);
+      }
+      .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30'
+        xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,1%29'
+        stroke-width='2' stroke-linecap='round' stroke-miterlimit='10'
+        d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+      }
+      body {
+        padding-top: 56px; /* espacio para la navbar */
+      }
+      .slider {
+        margin-top: 0; /* quitamos el desplazamiento negativo */
+      }
+    </style>
+  </head>
 
-<body>
+  <body>
     <main>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">GENIAHUB</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>   <!-- 👈 aquí sí se verá -->
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto"> <!-- ms-auto para alinear a la derecha -->
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Features</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Login</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+      <!-- NAVBAR -->
 
-        <section class="slider">
-            <div class="list">
-                <div class="item active">
-                    <div class="image" style="--url: url('img/1.jpg')"></div>
-                    <div class="content">
-                        <h2>SLIDER IMAGE MAGIC</h2>
-                        <p>
-                            Nulla magna irure incididunt irure nisi laboris adipisicing adipisicing ad aliquip exercitation sit duis.
-                        </p>
-                        <p>
-                            Ex irure minim eiusmod tempor cillum consectetur ullamco.
-                        </p>
-                    </div>
-                </div>
-                <div class="item ">
-                    <div class="image" style="--url: url('img/2.jpg')"></div>
-                    <div class="content">
-                        <h2>SLIDER IMAGE MAGIC</h2>
-                        <p>
-                            Nulla magna irure incididunt irure nisi laboris adipisicing adipisicing ad aliquip exercitation sit duis.
-                        </p>
-                        <p>
-                            Ex irure minim eiusmod tempor cillum consectetur ullamco.
-                        </p>
-                    </div>
-                </div>
-                <div class="item">
-                    <div class="image" style="--url: url('img/3.jpg')"></div>
-                    <div class="content">
-                        <h2>SLIDER IMAGE MAGIC</h2>
-                        <p>
-                            Nulla magna irure incididunt irure nisi laboris adipisicing adipisicing ad aliquip exercitation sit duis.
-                        </p>
-                        <p>
-                            Ex irure minim eiusmod tempor cillum consectetur ullamco.
-                        </p>
-                    </div>
-                </div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+        <div class="container-fluid">
+          <a class="navbar-brand d-flex align-items-center" href="#">
+            <i class="bi bi-kanban me-2"></i> GENIAHUB
+          </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">
+                  <i class="bi bi-house-door-fill me-1"></i> Inicio
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="bi bi-people-fill me-1"></i> Nosotros
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+
+      <!-- SLIDER -->
+      <section class="slider">
+        <div class="list">
+          <div class="item active">
+            <div class="image" style="--url: url('{% static 'img/1.jpg' %}')"></div>
+            <div class="content">
+              <h2>Proyectos con IA</h2>
+              <p>
+                Nulla magna irure incididunt irure nisi laboris adipisicing
+                adipisicing ad aliquip exercitation sit duis.
+              </p>
+              <p>Ex irure minim eiusmod tempor cillum consectetur ullamco.</p>
             </div>
-            <div class="arrows">
-                <button id="prev">
-                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12l4-4m-4 4 4 4"/>
-                    </svg>
-                </button>
-                <button id="next">
-                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4"/>
-                    </svg>
-                </button>
+          </div>
+          <div class="item">
+            <div class="image" style="--url: url('{% static 'img/2.jpg' %}')"></div>
+            <div class="content">
+              <h2>Titulo 2</h2>
+              <p>
+                Nulla magna irure incididunt irure nisi laboris adipisicing
+                adipisicing ad aliquip exercitation sit duis.
+              </p>
+              <p>Ex irure minim eiusmod tempor cillum consectetur ullamco.</p>
             </div>
-        </section>
+          </div>
+          <div class="item">
+            <div class="image" style="--url: url('{% static 'img/3.jpg' %}')"></div>
+            <div class="content">
+              <h2>Titulo 3</h2>
+              <p>
+                Nulla magna irure incididunt irure nisi laboris adipisicing
+                adipisicing ad aliquip exercitation sit duis.
+              </p>
+              <p>Ex irure minim eiusmod tempor cillum consectetur ullamco.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrows">
+          <button id="prev">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 12h14M5 12l4-4m-4 4 4 4"
+              />
+            </svg>
+          </button>
+          <button id="next">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 12H5m14 0-4 4m4-4-4-4"
+              />
+            </svg>
+          </button>
+        </div>
+      </section>
     </main>
 
+    <!-- BOOTSTRAP JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'js/app.js' %}"></script>
 
-</body>
+   
+    <script>
+      let items = document.querySelectorAll('.slider .list .item');
+      let prevBtn = document.getElementById('prev');
+      let nextBtn = document.getElementById('next');
+      let lastPosition = items.length - 1;
+      let firstPosition = 0;
+      let active = 0;
+
+      nextBtn.onclick = () => {
+          active = active + 1;
+          setSlider();
+      }
+      prevBtn.onclick = () => {
+          active = active - 1;
+          setSlider();
+      }
+
+      const setSlider = () => {
+          let oldActive = document.querySelector('.slider .list .item.active');
+          if(oldActive) oldActive.classList.remove('active');
+          items[active].classList.add('active');
+          nextBtn.classList.remove('d-none');
+          prevBtn.classList.remove('d-none');
+          if(active == lastPosition) nextBtn.classList.add('d-none');
+          if(active == firstPosition) prevBtn.classList.add('d-none');
+      }
+      setSlider();
+
+      // set diameter
+      const setDiameter = () => {
+          let slider = document.querySelector('.slider');
+          let widthSlider = slider.offsetWidth;
+          let heightSlider = slider.offsetHeight;
+          let diameter = Math.sqrt(Math.pow(widthSlider, 2) + Math.pow(heightSlider, 2));
+          document.documentElement.style.setProperty('--diameter', diameter+'px');
+      }
+      setDiameter();
+      window.addEventListener('resize', () => {
+          setDiameter();
+      });
+
+      // --- AUTO-PLAY SLIDER ---
+      const autoPlay = () => {
+        active++;
+        if (active > lastPosition) {
+          active = 0; // vuelve al primer slide
+        }
+        setSlider();
+      };
+
+      // Avanza cada 5 segundos (5000 ms)
+      let autoPlayInterval = setInterval(autoPlay, 5000);
+
+      // Opcional: Pausar autoplay al pasar el mouse por el slider
+      const sliderElement = document.querySelector('.slider');
+      sliderElement.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+      sliderElement.addEventListener('mouseleave', () => {
+        autoPlayInterval = setInterval(autoPlay, 5000);
+      });
+
+    </script>
+  </body>
 </html>
+

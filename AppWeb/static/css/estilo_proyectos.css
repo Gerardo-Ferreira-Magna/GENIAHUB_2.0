@@ -1,0 +1,284 @@
+/* =====================================================
+🎯 ESTILOS GENERALES
+===================================================== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #1e293b;
+  scroll-behavior: smooth;
+}
+
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* =====================================================
+📦 TARJETAS DE PROYECTOS
+===================================================== */
+.project-card {
+  border: none !important;
+  border-radius: 14px;
+  background-color: #fff;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeUp 0.8s ease-out forwards;
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.project-card i {
+  opacity: 0.95;
+  transition: transform 0.2s ease-in-out;
+}
+
+.project-card:hover i {
+  transform: scale(1.1);
+}
+
+.project-card h6 {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.project-card small {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Animación fadeUp */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Delay escalonado para suavidad visual */
+.project-card:nth-child(1) { animation-delay: 0.1s; }
+.project-card:nth-child(2) { animation-delay: 0.2s; }
+.project-card:nth-child(3) { animation-delay: 0.3s; }
+.project-card:nth-child(4) { animation-delay: 0.4s; }
+.project-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* Botones dentro de las tarjetas */
+.project-card .btn {
+  transition: all 0.2s ease-in-out;
+  border-radius: 20px;
+}
+
+.project-card .btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* =====================================================
+🔒 ÍCONOS DE ESTADO
+===================================================== */
+.bi-lock-fill {
+  color: #dc2626; /* rojo cerrado */
+}
+
+.bi-unlock-fill,
+.bi-unlock {
+  color: #16a34a; /* verde abierto */
+}
+
+.bi-hourglass-split {
+  color: #eab308; /* amarillo proceso */
+}
+
+/* =====================================================
+🧠 MODALES
+===================================================== */
+.modal-content {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  animation: fadeUp 0.5s ease-out;
+}
+
+.modal-header {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.modal-body p {
+  margin-bottom: 0.7rem;
+  color: #374151;
+}
+
+.modal-footer {
+  border-top: 1px solid #f1f5f9;
+}
+
+/* =====================================================
+🎯 PANEL DERECHO DE INFORMACIÓN (IA + NOTIFICACIONES)
+===================================================== */
+.list-unstyled li {
+  padding: 6px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.list-unstyled li:last-child {
+  border-bottom: none;
+}
+
+.ai-suggestion {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
+  border-radius: 12px;
+  padding: 1.2rem;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeUp 0.9s ease-out forwards;
+  animation-delay: 0.6s;
+}
+
+.ai-suggestion h6 {
+  color: #fff;
+  font-weight: 600;
+}
+
+.ai-suggestion p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.ai-suggestion ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+/* =====================================================
+✨ EFECTOS Y DETALLES INTERACTIVOS
+===================================================== */
+button:focus, .btn:focus {
+  box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.3);
+  outline: none;
+}
+
+h5.text-primary, h6.text-primary {
+  color: #2563eb !important;
+}
+
+/* Hover general de botones */
+.btn-outline-primary:hover {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+/* Transiciones suaves para todos los elementos interactivos */
+.btn, .project-card, .ai-suggestion {
+  transition: all 0.25s ease-in-out;
+}
+
+/* =====================================================
+📱 RESPONSIVE DESIGN
+===================================================== */
+
+/* Pantallas grandes y laptops medianas */
+@media (max-width: 1200px) {
+  .project-card h6 {
+    font-size: 0.95rem;
+  }
+  .project-card small {
+    font-size: 0.8rem;
+  }
+}
+
+/* Tablets medianas */
+@media (max-width: 992px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+  .ai-suggestion {
+    margin-top: 12px;
+  }
+}
+
+/* Dispositivos pequeños */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.3rem;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+  }
+
+  .project-card {
+    padding: 1rem;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .project-card h6 {
+    font-size: 0.9rem;
+  }
+
+  .project-card small {
+    font-size: 0.75rem;
+  }
+
+  .project-card i {
+    font-size: 1.1rem !important;
+  }
+
+  .project-card .d-flex.gap-2 {
+    margin-top: 10px;
+  }
+
+  .ai-suggestion {
+    padding: 1rem;
+  }
+}
+
+/* Celulares pequeños */
+@media (max-width: 576px) {
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .project-card {
+    margin-bottom: 1rem;
+  }
+
+  .list-unstyled li {
+    font-size: 0.85rem;
+  }
+
+  .ai-suggestion h6 {
+    font-size: 1rem;
+  }
+
+  .ai-suggestion ul {
+    padding-left: 1rem;
+  }
+}
+
+
+
+

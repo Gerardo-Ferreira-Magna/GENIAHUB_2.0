@@ -1,0 +1,372 @@
+/* =====================================================
+    🎯 ESTILOS GENERALES
+   ===================================================== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  overflow-x: hidden;
+}
+
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Ajuste de container general */
+.container-fluid {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* =====================================================
+    📊 KPI CARDS
+   ===================================================== */
+.kpi {
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.kpi:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-icon {
+  font-size: 1.8rem;
+  padding: 12px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.kpi-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.kpi-text {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* ===============================
+   Responsividad interna de KPI
+   =============================== */
+@media (max-width: 1200px) {
+  .kpi-number {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .kpi-icon {
+    font-size: 1.6rem;
+    width: 55px;
+    height: 55px;
+  }
+  .kpi-number {
+    font-size: 1.2rem;
+  }
+  .kpi-text {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .kpi {
+    margin-bottom: 0.75rem;
+  }
+  .kpi-icon {
+    font-size: 1.4rem;
+    width: 50px;
+    height: 50px;
+  }
+  .kpi-number {
+    font-size: 1.1rem;
+  }
+  .kpi-text {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .kpi {
+    flex: 1 1 45%;
+    max-width: 48%;
+    margin: 6px auto;
+    padding: 1rem;
+  }
+  .kpi-icon {
+    font-size: 1.2rem;
+    width: 45px;
+    height: 45px;
+  }
+  .kpi-number {
+    font-size: 1rem;
+  }
+  .kpi-text {
+    font-size: 0.75rem;
+  }
+
+  /* Distribución 2 columnas en móviles */
+  .row.g-3 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* =====================================================
+    🤖 IA INTEGRADA (GRADIENTE + PULSACIÓN)
+   ===================================================== */
+.ai-suggestion {
+  position: relative;
+  border-radius: 16px;
+  color: #fff;
+  background: radial-gradient(circle at center, #2563eb, #1e3a8a, #1e40af);
+  background-size: 150% 150%;
+  animation: gradientShift 8s ease-in-out infinite, pulseCenter 5s ease-in-out infinite;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
+  overflow: hidden;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 50% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 50% 50%; }
+}
+
+@keyframes pulseCenter {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4), 0 0 15px rgba(37, 99, 235, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 35px rgba(37, 99, 235, 0), 0 0 40px rgba(37, 99, 235, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4), 0 0 15px rgba(37, 99, 235, 0.6);
+  }
+}
+
+/* Efecto radial animado */
+.ai-suggestion::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 220%;
+  height: 220%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  animation: rippleGlow 5s infinite ease-in-out;
+  z-index: 0;
+}
+
+@keyframes rippleGlow {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+  50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.4; }
+  100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+}
+
+.ai-suggestion h5,
+.ai-suggestion ul {
+  position: relative;
+  z-index: 2;
+}
+
+.bi-robot {
+  animation: pulseIcon 3s ease-in-out infinite;
+}
+
+@keyframes pulseIcon {
+  0%, 100% { text-shadow: 0 0 6px #93c5fd, 0 0 12px #2563eb; }
+  50% { text-shadow: 0 0 15px #60a5fa, 0 0 30px #1e3a8a; }
+}
+
+/* =====================================================
+   📋 TABLAS GENERALES
+   ===================================================== */
+.table-hover tbody tr:hover {
+  background-color: rgba(37, 99, 235, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+td[contenteditable="true"] {
+  background-color: #fffceb;
+  outline: none;
+}
+
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table thead th {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* =====================================================
+   👥 TABLA DE USUARIOS Y PROGRESO
+   ===================================================== */
+#usersTable img {
+  border: 2px solid #e5e7eb;
+  object-fit: cover;
+}
+
+#usersTable td {
+  vertical-align: middle;
+}
+
+#usersTable .progress {
+  height: 8px;
+}
+
+#usersTable .badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+}
+
+#usersTable small {
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+/* =====================================================
+   🔍 BÚSQUEDA Y FORMULARIOS
+   ===================================================== */
+.form-control-sm {
+  min-width: 220px;
+  border-radius: 8px;
+}
+
+.form-control-sm:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.25);
+}
+
+/* =====================================================
+   🧩 PAGINACIÓN
+   ===================================================== */
+.pagination .page-item.active .page-link {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+.pagination .page-link {
+  color: #2563eb;
+}
+.pagination .page-link:hover {
+  background-color: #e5e7eb;
+}
+
+/* =====================================================
+   🎨 RESPONSIVE DESIGN GLOBAL
+   ===================================================== */
+
+/* Tablets medianas (≤992px) */
+@media (max-width: 992px) {
+  .ai-suggestion {
+    margin-top: 16px;
+    min-height: auto;
+    padding: 1rem;
+  }
+  .card {
+    margin-bottom: 1rem;
+  }
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Dispositivos pequeños (≤768px) */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .form-control-sm {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  table th,
+  table td {
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  #usersTable img {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* IA */
+  .ai-suggestion {
+    text-align: left;
+    margin-top: 1rem;
+  }
+}
+
+/* Dispositivos muy pequeños (≤576px) */
+@media (max-width: 576px) {
+  .container-fluid {
+    padding: 1rem;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 1.25rem;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .ai-suggestion h5 {
+    font-size: 1rem;
+  }
+  .ai-suggestion ul li {
+    font-size: 0.85rem;
+  }
+
+  .pagination {
+    justify-content: center !important;
+  }
+
+  /* Tablas centradas con scroll horizontal */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+
+
+
+

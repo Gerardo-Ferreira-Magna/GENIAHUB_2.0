@@ -13,3 +13,12 @@ def nosotros(request):
 def usuario(request):
     return render(request, "webs/usuario.html")
 
+
+# Vista panel
+def panel(request):
+    return render(request, "webs/panel.html")
+
+
+# Vista proyectos
+def proyectos(request):
+    return render(request, "webs/proyectos.html")
