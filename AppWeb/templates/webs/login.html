@@ -16,6 +16,34 @@
   <link rel="stylesheet" href="{% static 'css/estilo_login.css' %}">
 </head>
 <body>
+
+  <!-- ✅ Contenedor de toasts (mensajes flotantes) -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast align-items-center text-white border-0 mb-2 
+          {% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' or message.tags == 'danger' %}bg-danger{% elif message.tags == 'warning' %}bg-warning text-dark{% else %}bg-primary{% endif %}"
+          role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {% if message.tags == 'success' %}
+                <i class="bi bi-check-circle-fill me-2"></i>
+              {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              {% elif message.tags == 'warning' %}
+                <i class="bi bi-exclamation-circle me-2"></i>
+              {% else %}
+                <i class="bi bi-info-circle me-2"></i>
+              {% endif %}
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
   <div class="login-container">
     <!-- Columna izquierda: formulario -->
     <div class="login-form">
@@ -62,7 +90,7 @@
 
         <!-- Enlaces auxiliares -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <a href="{}" class="text-decoration-none">
+          <a href="#" class="text-decoration-none">
             <i class="bi bi-unlock"></i> ¿Olvidaste tu contraseña?
           </a>
           <a href="{% url 'index' %}" class="text-decoration-none">
@@ -100,6 +128,29 @@
       icon.classList.toggle("bi-eye-slash");
     });
   </script>
+
+  <!-- Inicializar toasts automáticamente -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+      toastElList.map(function(toastEl) {
+        const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+        toast.show();
+      });
+    });
+  </script>
+
+  <!-- Redirección automática tras éxito (opcional) -->
+  <script>
+    const successToasts = document.querySelectorAll('.toast.bg-success');
+    if (successToasts.length > 0) {
+      setTimeout(() => {
+        window.location.href = "{% url 'index' %}";
+      }, 4000);
+    }
+  </script>
+
 </body>
 </html>
+
 

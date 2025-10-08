@@ -16,6 +16,34 @@
   <link rel="stylesheet" href="{% static 'css/estilo_registro.css' %}">
 </head>
 <body>
+
+  <!-- ✅ Contenedor de toasts (mensajes flotantes) -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast align-items-center text-white border-0 mb-2 
+          {% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' or message.tags == 'danger' %}bg-danger{% elif message.tags == 'warning' %}bg-warning text-dark{% else %}bg-primary{% endif %}"
+          role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {% if message.tags == 'success' %}
+                <i class="bi bi-check-circle-fill me-2"></i>
+              {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              {% elif message.tags == 'warning' %}
+                <i class="bi bi-exclamation-circle me-2"></i>
+              {% else %}
+                <i class="bi bi-info-circle me-2"></i>
+              {% endif %}
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
   <div class="registro-container">
     <!-- Columna izquierda: imagen -->
     <div class="registro-image">
@@ -25,89 +53,49 @@
     <!-- Columna derecha: formulario -->
     <div class="registro-form">
       <h2 class="mb-4 text-center">Crear Cuenta</h2>
-      <form id="formRegistro" method="post" action="{% url 'registro' %}">
+
+      <!-- ✅ Formulario Django -->
+      <form method="post" action="{% url 'registro' %}">
         {% csrf_token %}
 
-        <!-- Nombre -->
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-person"></i></span>
-            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
-          </div>
-        </div>
+        {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
 
-        <!-- Apellido Paterno -->
-        <div class="mb-3">
-          <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
-            <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" placeholder="Ingrese su apellido paterno" required>
-          </div>
-        </div>
+            <div class="input-group">
+              {% if field.name == "nombre" %}
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+              {% elif field.name == "apellido_paterno" %}
+                <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+              {% elif field.name == "apellido_materno" %}
+                <span class="input-group-text"><i class="bi bi-person-vcard-fill"></i></span>
+              {% elif field.name == "rut" %}
+                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+              {% elif field.name == "email" %}
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              {% elif field.name == "password1" %}
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              {% elif field.name == "password2" %}
+                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+              {% endif %}
+              
+              {{ field }}
+            </div>
 
-        <!-- Apellido Materno -->
-        <div class="mb-3">
-          <label for="apellido_materno" class="form-label">Apellido Materno</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-person-vcard-fill"></i></span>
-            <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" placeholder="Ingrese su apellido materno" required>
+            <!-- Errores específicos por campo -->
+            {% if field.errors %}
+              {% for error in field.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            {% endif %}
           </div>
-        </div>
-
-        <!-- RUT -->
-        <div class="mb-3">
-          <label for="rut" class="form-label">RUT</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-card-text"></i></span>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="rut" 
-              name="rut" 
-              placeholder="Ej: 12345678-9"
-              maxlength="10"
-              required>
-          </div>
-          <div id="rutFeedback" class="form-text text-danger d-none"></div>
-          <div class="form-text text-muted">Ingrese el RUT sin puntos y con guion (ejemplo: 12345678-9)</div>
-        </div>
-
-        <!-- Correo -->
-        <div class="mb-3">
-          <label for="email" class="form-label">Correo electrónico</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su correo" required>
-          </div>
-        </div>
-
-        <!-- Contraseña -->
-        <div class="mb-3">
-          <label for="password" class="form-label">Contraseña</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-lock"></i></span>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Cree una contraseña" required>
-            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-              <i class="bi bi-eye"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Confirmar Contraseña -->
-        <div class="mb-3">
-          <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-            <input type="password" class="form-control" id="confirm_password" placeholder="Repita la contraseña" required>
-          </div>
-          <div id="passwordFeedback" class="form-text text-danger d-none"></div>
-        </div>
+        {% endfor %}
 
         <!-- Botón -->
         <button type="submit" class="btn btn-success w-100 mb-3">Registrarse</button>
 
-        <p class="text-center">¿Ya tienes cuenta? 
+        <p class="text-center">
+          ¿Ya tienes cuenta?
           <a href="{% url 'login' %}">Iniciar Sesión</a>
         </p>
       </form>
@@ -117,71 +105,28 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Validaciones JS -->
+  <!-- Inicializar toasts automáticamente -->
   <script>
-    // Mostrar / ocultar contraseña
-    const togglePassword = document.getElementById("togglePassword");
-    const passwordInput = document.getElementById("password");
-    togglePassword.addEventListener("click", () => {
-      const type = passwordInput.type === "password" ? "text" : "password";
-      passwordInput.type = type;
-      togglePassword.querySelector("i").classList.toggle("bi-eye");
-      togglePassword.querySelector("i").classList.toggle("bi-eye-slash");
-    });
-
-    // Validar RUT con DV
-    function validarRut(rutCompleto) {
-      rutCompleto = rutCompleto.replace(/^0+/, "").replace(/[^\dkK-]/g, "").toUpperCase();
-      if (!/^[0-9]+-[0-9K]$/.test(rutCompleto)) return false;
-
-      const [num, dv] = rutCompleto.split("-");
-      let suma = 0;
-      let multiplo = 2;
-
-      for (let i = num.length - 1; i >= 0; i--) {
-        suma += multiplo * num.charAt(i);
-        multiplo = multiplo === 7 ? 2 : multiplo + 1;
-      }
-
-      const dvEsperado = 11 - (suma % 11);
-      const dvFinal = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
-      return dvFinal === dv;
-    }
-
-    const rutInput = document.getElementById("rut");
-    const rutFeedback = document.getElementById("rutFeedback");
-
-    rutInput.addEventListener("input", function () {
-      this.value = this.value.replace(/[^\dkK-]/g, "").replace(/--+/g, "-");
-      if (this.value.length > 1 && this.value.includes("-")) {
-        if (!validarRut(this.value)) {
-          rutFeedback.textContent = "❌ RUT inválido. Verifique el dígito verificador.";
-          rutFeedback.classList.remove("d-none");
-        } else {
-          rutFeedback.textContent = "";
-          rutFeedback.classList.add("d-none");
-        }
-      } else {
-        rutFeedback.textContent = "";
-        rutFeedback.classList.add("d-none");
-      }
-    });
-
-    // Validar contraseñas iguales
-    const form = document.getElementById("formRegistro");
-    const confirmPassword = document.getElementById("confirm_password");
-    const passwordFeedback = document.getElementById("passwordFeedback");
-
-    form.addEventListener("submit", (e) => {
-      if (passwordInput.value !== confirmPassword.value) {
-        e.preventDefault();
-        passwordFeedback.textContent = "❌ Las contraseñas no coinciden.";
-        passwordFeedback.classList.remove("d-none");
-      } else {
-        passwordFeedback.textContent = "";
-        passwordFeedback.classList.add("d-none");
-      }
+    document.addEventListener('DOMContentLoaded', function() {
+      const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+      toastElList.map(function(toastEl) {
+        const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+        toast.show();
+      });
     });
   </script>
+
+  <!-- Redirección automática si se creó correctamente -->
+  <script>
+    const successToasts = document.querySelectorAll('.toast.bg-success');
+    if (successToasts.length > 0) {
+      setTimeout(() => {
+        window.location.href = "{% url 'login' %}";
+      }, 4000);
+    }
+  </script>
+
 </body>
 </html>
+
+
