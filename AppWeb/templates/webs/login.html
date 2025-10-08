@@ -24,6 +24,7 @@
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
 
+        <!-- Correo -->
         <div class="mb-3">
           <label for="email" class="form-label">Correo electrónico</label>
           <div class="input-group">
@@ -38,6 +39,7 @@
           </div>
         </div>
 
+        <!-- Contraseña -->
         <div class="mb-3">
           <label for="password" class="form-label">Contraseña</label>
           <div class="input-group">
@@ -55,10 +57,22 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100 mb-3">Ingresar</button>
+        <!-- Botón principal -->
+        <button type="submit" class="btn btn-primary w-100 mb-3">Ingresar</button><br><br><br>
 
-        <p class="text-center">¿No tienes cuenta? 
-          <a href="{% url 'registro' %}">Regístrate aquí</a>
+        <!-- Enlaces auxiliares -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <a href="{}" class="text-decoration-none">
+            <i class="bi bi-unlock"></i> ¿Olvidaste tu contraseña?
+          </a>
+          <a href="{% url 'index' %}" class="text-decoration-none">
+            <i class="bi bi-house-door"></i> Volver al inicio
+          </a>
+        </div>
+
+        <!-- Registro -->
+        <p class="text-center mb-0">¿No tienes cuenta? 
+          <a href="{% url 'registro' %}" class="fw-semibold text-primary">Regístrate aquí</a>
         </p>
       </form>
     </div>
@@ -88,3 +102,4 @@
   </script>
 </body>
 </html>
+
