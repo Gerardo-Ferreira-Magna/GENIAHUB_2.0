@@ -22,3 +22,13 @@ def panel(request):
 # Vista proyectos
 def proyectos(request):
     return render(request, "webs/proyectos.html")
+
+
+# Vista registro
+def registro(request):
+    return render(request, "webs/registro.html")
+
+
+# Vista login
+def login(request):
+    return render(request, "webs/login.html")

@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;700&display=swap');
+
+:root{
+    --background: linear-gradient(135deg, #667eea7e 0%, #764ba298 100%);
+    --color-primary:#667eea;
+    --color-secondary:#764ba2;
+    --boton-padding: 20px 40px;
+    --color-rojo:#E30513;
+    --gris-oscuro:#5A5B5E;
+    --color-blanco:#FFFFFF;
+    --color-negro:#000000;
+    --gris-claro: #F5F5F5;
+
+}
+
+/* Fondo */
+body {
+  margin: 0;
+  background: var(--gris-claro);
+  font-family: 'Raleway', sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor general con CSS Grid */
+.registro-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Imagen - Formulario */
+  width: 900px;
+  max-width: 95%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Columna izquierda (imagen) */
+.registro-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #e9ecef;
+}
+
+.registro-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Columna derecha (formulario) */
+.registro-form {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.registro-form h2 {
+  font-weight: 700;
+  color: #333;
+}
+
+/* Inputs */
+.input-group-text {
+  background-color: #f8f9fa;
+}
+
+.btn-outline-secondary {
+  border-radius: 0 6px 6px 0;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .registro-container {
+    grid-template-columns: 1fr;
+  }
+
+  .registro-image {
+    display: none;
+  }
+}

@@ -1,5 +1,5 @@
 /* =====================================================
-🎯 ESTILOS GENERALES
+ ESTILOS GENERALES
 ===================================================== */
 body {
   font-family: 'Poppins', sans-serif;
@@ -20,7 +20,7 @@ body {
 }
 
 /* =====================================================
-📦 TARJETAS DE PROYECTOS
+ TARJETAS DE PROYECTOS
 ===================================================== */
 .project-card {
   border: none !important;
@@ -88,7 +88,7 @@ body {
 }
 
 /* =====================================================
-🔒 ÍCONOS DE ESTADO
+ ÍCONOS DE ESTADO
 ===================================================== */
 .bi-lock-fill {
   color: #dc2626; /* rojo cerrado */
@@ -104,7 +104,7 @@ body {
 }
 
 /* =====================================================
-🧠 MODALES
+ MODALES
 ===================================================== */
 .modal-content {
   border-radius: 16px;
@@ -128,7 +128,7 @@ body {
 }
 
 /* =====================================================
-🎯 PANEL DERECHO DE INFORMACIÓN (IA + NOTIFICACIONES)
+ PANEL DERECHO DE INFORMACIÓN (IA + NOTIFICACIONES)
 ===================================================== */
 .list-unstyled li {
   padding: 6px 0;
