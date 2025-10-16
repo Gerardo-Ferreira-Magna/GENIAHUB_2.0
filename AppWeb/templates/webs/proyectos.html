@@ -9,173 +9,321 @@
 
 <div class="container-fluid px-4 py-4">
 
-  <!-- Encabezado -->
-  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+  <!-- ENCABEZADO -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <h2 class="fw-bold section-title mb-2">Proyectos</h2>
-    <button class="btn btn-primary rounded-pill px-4">
-      <i class="bi bi-plus-circle me-2"></i>Agregar Proyecto
-    </button>
   </div>
 
-  <!-- Leyenda -->
-  <div class="card p-3 mb-4 shadow-sm border-0">
-    <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Leyenda de Estados</h6>
-    <div class="d-flex flex-wrap gap-4">
-      <div><i class="bi bi-lock-fill text-danger me-1"></i><small>Proyecto Finalizado</small></div>
-      <div><i class="bi bi-unlock-fill text-success me-1"></i><small>Proyecto en Desarrollo</small></div>
-      <div><i class="bi bi-hourglass-split text-warning me-1"></i><small>Proyecto en Proceso</small></div>
+  <!-- 🔍 BUSCADOR CON LISTAS -->
+  <div class="row mb-4 gy-2">
+    <div class="col-md-4">
+      <label class="form-label fw-semibold small text-secondary"><i class="bi bi-kanban me-2"></i>Proyecto</label>
+      <select id="busquedaProyecto" class="form-select shadow-sm">
+        <option value="all">Todos</option>
+        {% for proyecto in proyectos %}
+        <option value="{{ proyecto.nombre|lower }}">{{ proyecto.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold small text-secondary"><i class="bi bi-person-badge me-2"></i>Docente</label>
+      <select id="busquedaDocente" class="form-select shadow-sm">
+        <option value="all">Todos</option>
+        {% for proyecto in proyectos|dictsort:"docente" %}
+        <option value="{{ proyecto.docente|lower }}">{{ proyecto.docente }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold small text-secondary"><i class="bi bi-flag me-2"></i>Estado</label>
+      <select id="busquedaEstado" class="form-select shadow-sm">
+        <option value="all">Todos</option>
+        <option value="en desarrollo">En Desarrollo</option>
+        <option value="en proceso">En Proceso</option>
+        <option value="finalizado">Finalizado</option>
+      </select>
     </div>
   </div>
 
-  <div class="row g-3">
-    <!-- =====================================================
-         INFORMÁTICA
-         ===================================================== -->
+  <!-- 🔁 BOTÓN RESTABLECER -->
+  <div class="text-end mb-3">
+    <button id="resetFiltros" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-counterclockwise me-1"></i> Restablecer filtros
+    </button>
+  </div>
+
+  <!-- FILTROS DE CATEGORÍA -->
+  <div class="mb-4">
+    <h6 class="fw-semibold text-secondary mb-2"><i class="bi bi-tags me-2"></i>Categorías</h6>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <button class="btn btn-sm btn-outline-primary filter-btn active" data-filter="all">Todos</button>
+      <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Informática">Informática</button>
+      <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Mecánica">Mecánica</button>
+      <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Tecnología Aplicada">Tecnología Aplicada</button>
+      <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Logística">Logística</button>
+      <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Energía">Energía</button>
+      <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Administración">Administración</button>
+      <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="Educación">Educación</button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- GRID IZQUIERDO -->
     <div class="col-lg-8">
-      <h5 class="fw-bold text-primary mb-3">Proyectos de Informática</h5>
-
-      <div class="card project-card p-3 mb-3 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-unlock-fill fs-4 text-success"></i>
-          <div>
-            <h6>Plataforma Web de Gestión Educativa</h6>
-            <small class="text-muted">Docente: <strong>María López</strong> | 6 Usuarios | Estado: En Desarrollo</small>
+      <div id="gridProyectos" class="row row-cols-1 row-cols-md-2 g-4">
+        {% for proyecto in proyectos %}
+        <div class="col proyecto-item"
+             data-categoria="{{ proyecto.categoria }}"
+             data-estado="{{ proyecto.estado|lower }}"
+             data-nombre="{{ proyecto.nombre|lower }}"
+             data-docente="{{ proyecto.docente|lower }}">
+          <div class="card project-card h-100 shadow-sm border-0 position-relative">
+            <div class="favorite-icon position-absolute top-0 end-0 m-2">
+              <i class="bi bi-heart fs-5 text-secondary fav-btn" data-id="{{ proyecto.id }}"></i>
+            </div>
+            <div class="project-img" style="background-image: url('{{ proyecto.imagen_url }}');">
+              <div class="overlay">
+                <button class="btn btn-sm btn-light me-2"><i class="bi bi-chat-text"></i> Postular</button>
+                <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal"
+                        data-bs-target="#modalProyecto{{ proyecto.id }}"><i class="bi bi-eye"></i> Ver</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <h6 class="fw-bold mb-1">{{ proyecto.nombre }}</h6>
+              <p class="text-muted small mb-2">Docente: <strong>{{ proyecto.docente }}</strong></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-{{ proyecto.estado_color }}">
+                  <i class="bi {{ proyecto.estado_icono }} me-1"></i>{{ proyecto.estado }}
+                </span>
+                <small class="text-muted">Modificado {{ proyecto.fecha_modificacion }}</small>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-text me-1"></i>Postular</button>
-          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal1"><i class="bi bi-eye"></i> Ver Descripción</button>
-        </div>
-      </div>
 
-      <div class="card project-card p-3 mb-3 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-lock-fill fs-4 text-danger"></i>
-          <div>
-            <h6>Automatización de Pruebas de Software</h6>
-            <small class="text-muted">Docente: <strong>Gerardo Ferreira</strong> | 4 Usuarios | Estado: Finalizado</small>
+        <!-- MODAL DETALLE -->
+        <div class="modal fade" id="modalProyecto{{ proyecto.id }}" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">{{ proyecto.nombre }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <img src="{{ proyecto.imagen_url }}" class="img-fluid rounded mb-3">
+                <p>{{ proyecto.descripcion }}</p>
+                <p><strong>Docente:</strong> {{ proyecto.docente }}</p>
+                <p><strong>Categoría:</strong> {{ proyecto.categoria }}</p>
+                <p><strong>Estado:</strong> {{ proyecto.estado }}</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-outline-primary">Postular</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-text me-1"></i>Postular</button>
-          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal2"><i class="bi bi-eye"></i> Ver Descripción</button>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           MANTENIMIENTO Y LOGÍSTICA
-           ===================================================== -->
-      <h5 class="fw-bold text-primary mt-4 mb-3">Mantenimiento y Logística</h5>
-
-      <div class="card project-card p-3 mb-3 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-hourglass-split fs-4 text-warning"></i>
-          <div>
-            <h6>Optimización de Rutas de Transporte</h6>
-            <small class="text-muted">Docente: <strong>Andrea Soto</strong> | 5 Usuarios | Estado: En Proceso</small>
-          </div>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-text me-1"></i>Postular</button>
-          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal3"><i class="bi bi-eye"></i> Ver Descripción</button>
-        </div>
-      </div>
-
-      <div class="card project-card p-3 mb-3 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-unlock-fill fs-4 text-success"></i>
-          <div>
-            <h6>Inventario Automatizado con RFID</h6>
-            <small class="text-muted">Docente: <strong>Paula Méndez</strong> | 3 Usuarios | Estado: En Desarrollo</small>
-          </div>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-text me-1"></i>Postular</button>
-          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal4"><i class="bi bi-eye"></i> Ver Descripción</button>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           ENERGÍA Y SOSTENIBILIDAD
-           ===================================================== -->
-      <h5 class="fw-bold text-primary mt-4 mb-3">Energía y Sostenibilidad</h5>
-
-      <div class="card project-card p-3 mb-3 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-unlock-fill fs-4 text-success"></i>
-          <div>
-            <h6>Paneles Solares Inteligentes para Aulas</h6>
-            <small class="text-muted">Docente: <strong>Javier Morales</strong> | 8 Usuarios | Estado: En Desarrollo</small>
-          </div>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-text me-1"></i>Postular</button>
-          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal5"><i class="bi bi-eye"></i> Ver Descripción</button>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           TECNOLOGÍA APLICADA
-           ===================================================== -->
-      <h5 class="fw-bold text-primary mt-4 mb-3">Tecnología Aplicada</h5>
-
-      <div class="card project-card p-3 mb-3 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-hourglass-split fs-4 text-warning"></i>
-          <div>
-            <h6>Asistente Virtual para Laboratorios</h6>
-            <small class="text-muted">Docente: <strong>Camila Rojas</strong> | 4 Usuarios | Estado: En Proceso</small>
-          </div>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-text me-1"></i>Postular</button>
-          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal6"><i class="bi bi-eye"></i> Ver Descripción</button>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           ADMINISTRACIÓN Y SERVICIOS
-           ===================================================== -->
-      <h5 class="fw-bold text-primary mt-4 mb-3">Administración y Servicios</h5>
-
-      <div class="card project-card p-3 mb-3 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-lock-fill fs-4 text-danger"></i>
-          <div>
-            <h6>Gestión Documental Automatizada</h6>
-            <small class="text-muted">Docente: <strong>Lucía Herrera</strong> | 5 Usuarios | Estado: Finalizado</small>
-          </div>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-text me-1"></i>Postular</button>
-          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal7"><i class="bi bi-eye"></i> Ver Descripción</button>
-        </div>
+        {% endfor %}
       </div>
     </div>
 
     <!-- PANEL DERECHO -->
     <div class="col-lg-4">
-      <div class="ai-suggestion p-3 mb-4 shadow-sm border-0">
-        <h6 class="fw-bold mb-2"><i class="bi bi-robot me-2"></i>Recomendaciones Inteligentes</h6>
-        <p class="mb-2">Basado en tus habilidades previas, podrías participar en:</p>
-        <ul class="mb-0">
-          <li>Proyecto <strong>Inventario RFID</strong> (IoT + Logística)</li>
-          <li>Proyecto <strong>Gestión Educativa</strong> (Django + Web)</li>
-        </ul>
-      </div>
-
-      <div class="card p-3 shadow-sm border-0">
-        <h6 class="fw-bold mb-3"><i class="bi bi-bell me-2 text-primary"></i>Notificaciones</h6>
-        <ul class="list-unstyled mb-0">
-          <li><i class="bi bi-person-check text-success me-2"></i>Tu postulación fue aceptada.</li>
-          <li><i class="bi bi-lightbulb text-warning me-2"></i>Nueva habilidad requerida: <strong>Machine Learning</strong>.</li>
-          <li><i class="bi bi-calendar-event text-primary me-2"></i>Reunión informativa mañana 10:00 AM.</li>
-        </ul>
+      <div class="card p-3 mb-4 shadow-sm border-0">
+        <h6 class="fw-bold mb-3"><i class="bi bi-robot me-2 text-primary"></i>Recomendaciones Inteligentes</h6>
+        {% for rec in recomendaciones_ia %}
+        <div class="d-flex align-items-start mb-3">
+          <div class="icon-circle bg-light text-primary me-3">
+            <i class="bi {{ rec.icono }}"></i>
+          </div>
+          <div>
+            <strong>{{ rec.titulo }}</strong>
+            <p class="small text-muted mb-1">{{ rec.descripcion }}</p>
+            <button class="btn btn-sm btn-outline-primary rounded-pill btn-recomendar">
+              <i class="bi bi-lightbulb me-1"></i>Obtener recomendación
+            </button>
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
 </div>
+
+<!-- === CHATBOT FLOTANTE === -->
+<div id="chatbot-ia" class="chatbot-container shadow-lg">
+  <div id="chatbot-header" class="chatbot-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-robot text-primary fs-5"></i>
+      <strong>Asistente GENIA HUB</strong>
+    </div>
+    <button id="closeChat" class="btn btn-sm btn-light"><i class="bi bi-x"></i></button>
+  </div>
+  <div id="chatBox" class="chat-box mb-2"></div>
+  <div class="input-group p-2">
+    <input type="text" id="chatInput" class="form-control" placeholder="Escribe tu mensaje...">
+    <button class="btn btn-primary" id="chatSend"><i class="bi bi-send"></i></button>
+  </div>
+</div>
+
+<!-- Botón flotante -->
+<button id="openChat" class="btn btn-primary rounded-circle shadow-lg">
+  <i class="bi bi-chat-dots fs-5"></i>
+</button>
+
+<!-- Mensaje flotante del asistente -->
+<div id="chatTooltip" class="chat-tooltip">👋 ¡Estoy aquí para ayudarte!</div>
+
+<!-- === SCRIPT === -->
+<script>
+/* === FAVORITOS === */
+const favBtns = document.querySelectorAll('.fav-btn');
+let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+favBtns.forEach(btn => {
+  const id = btn.dataset.id;
+  if (favoritos.includes(id)) btn.classList.replace('bi-heart', 'bi-heart-fill');
+  btn.addEventListener('click', () => {
+    if (favoritos.includes(id)) {
+      favoritos = favoritos.filter(f => f !== id);
+      btn.classList.replace('bi-heart-fill', 'bi-heart');
+    } else {
+      favoritos.push(id);
+      btn.classList.replace('bi-heart', 'bi-heart-fill');
+    }
+    localStorage.setItem('favoritos', JSON.stringify(favoritos));
+  });
+});
+
+/* === FILTROS === */
+const proyectos = document.querySelectorAll('.proyecto-item');
+const selProyecto = document.getElementById('busquedaProyecto');
+const selDocente = document.getElementById('busquedaDocente');
+const selEstado = document.getElementById('busquedaEstado');
+const filtroBtns = document.querySelectorAll('.filter-btn');
+
+function aplicarBusqueda() {
+  const p = selProyecto.value;
+  const d = selDocente.value;
+  const e = selEstado.value;
+
+  proyectos.forEach(proj => {
+    const matchP = (p === 'all' || proj.dataset.nombre === p);
+    const matchD = (d === 'all' || proj.dataset.docente === d);
+    const matchE = (e === 'all' || proj.dataset.estado === e);
+    proj.style.display = (matchP && matchD && matchE) ? 'block' : 'none';
+  });
+}
+[selProyecto, selDocente, selEstado].forEach(s => s.addEventListener('change', aplicarBusqueda));
+
+/* === REESTABLECER FILTROS === */
+const resetBtn = document.getElementById('resetFiltros');
+resetBtn.addEventListener('click', () => {
+  selProyecto.value = 'all';
+  selDocente.value = 'all';
+  selEstado.value = 'all';
+  filtroBtns.forEach(b => b.classList.remove('active'));
+  document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+  proyectos.forEach(p => p.style.display = 'block');
+  resetBtn.classList.add('btn-success');
+  resetBtn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Filtros restablecidos';
+  setTimeout(() => {
+    resetBtn.classList.replace('btn-success', 'btn-outline-secondary');
+    resetBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i> Restablecer filtros';
+  }, 2000);
+});
+
+/* === CHATBOT Y TOOLTIP === */
+const chatbot = document.getElementById('chatbot-ia');
+const openChatBtn = document.getElementById('openChat');
+const closeChatBtn = document.getElementById('closeChat');
+const chatBox = document.getElementById('chatBox');
+const chatInput = document.getElementById('chatInput');
+const chatSend = document.getElementById('chatSend');
+const tooltip = document.getElementById('chatTooltip');
+
+/* === Tooltip mensajes rotativos === */
+const mensajes = [
+  "👋 ¡Estoy aquí para ayudarte!",
+  "💡 Puedo recomendarte proyectos o docentes.",
+  "🤖 Pregúntame sobre tus intereses.",
+];
+let indice = 0;
+let tooltipActivo = false;
+
+/* === Función para mostrar mensajes secuenciales === */
+function mostrarMensaje() {
+  if (!tooltipActivo) return;
+  tooltip.style.opacity = 1;
+  tooltip.style.transform = "translateY(0)";
+  tooltip.textContent = mensajes[indice];
+
+  setTimeout(() => {
+    tooltip.style.opacity = 0;
+    tooltip.style.transform = "translateY(10px)";
+    setTimeout(() => {
+      indice = (indice + 1) % mensajes.length;
+      if (tooltipActivo) mostrarMensaje();
+    }, 1000);
+  }, 4000);
+}
+
+/* === Activar / Detener el tooltip === */
+function iniciarMensajes() {
+  if (tooltipActivo) return;
+  tooltipActivo = true;
+  mostrarMensaje();
+}
+function detenerMensajes() {
+  tooltipActivo = false;
+  tooltip.style.opacity = 0;
+  tooltip.style.transform = "translateY(10px)";
+}
+
+/* === Abrir / Cerrar el Chat === */
+openChatBtn.addEventListener('click', () => {
+  chatbot.style.display = 'flex';
+  openChatBtn.style.display = 'none';
+  detenerMensajes();
+});
+
+closeChatBtn.addEventListener('click', () => {
+  chatbot.style.display = 'none';
+  openChatBtn.style.display = 'flex';
+  setTimeout(iniciarMensajes, 1500);
+});
+
+/* === Enviar mensajes dentro del Chat === */
+function addMessage(role, text) {
+  const div = document.createElement('div');
+  div.classList.add('chat-msg', role);
+  div.textContent = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+chatSend.addEventListener('click', () => {
+  const msg = chatInput.value.trim();
+  if (!msg) return;
+  addMessage('user', '🧑‍💻 ' + msg);
+  chatInput.value = '';
+  setTimeout(() => {
+    addMessage('bot', '🤖 Estoy aquí para asistirte con tus proyectos. Pronto me conectaré al motor IA real.');
+  }, 700);
+});
+
+/* === Iniciar los mensajes después de cargar la página === */
+window.addEventListener('load', () => {
+  setTimeout(iniciarMensajes, 2000);
+});
+</script>
 {% endblock %}
+
+
+
+
+
+
 
 
 

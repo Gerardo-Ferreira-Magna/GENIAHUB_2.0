@@ -64,7 +64,7 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'nosotros' %}">
-                  <i class="bi bi-people-fill me-1"></i> Nosotros
+                  <i class="bi bi-people-fill me-1"></i> Fundadores
                 </a>
               </li>
               <li class="nav-item">
@@ -208,6 +208,313 @@
       });
 
     </script>
+
+    <!-- === CHATBOT GENIA HUB — FINAL CORREGIDO === -->
+<div id="geniahub-chat-wrapper">
+  <div id="gh-chatbot" class="gh-chatbot-container">
+    <div class="gh-chatbot-header">
+      <span><i class="bi bi-robot"></i> Asistente GENIA HUB</span>
+      <button id="gh-closeChat" class="gh-btn-close">×</button>
+    </div>
+    <div id="gh-chatBox" class="gh-chat-box"></div>
+    <div class="gh-input-group">
+      <input type="text" id="gh-chatInput" placeholder="Escribe tu mensaje..." />
+      <button id="gh-chatSend"><i class="bi bi-send"></i></button>
+    </div>
+  </div>
+
+  <button id="gh-openChat" class="gh-btn-circle">
+    <i class="bi bi-chat-dots"></i>
+  </button>
+  <div id="gh-tooltip" class="gh-tooltip">👋 ¡Hola! ¿Necesitas ayuda?</div>
+</div>
+
+<style>
+/* === CHATBOT AISLADO === */
+#geniahub-chat-wrapper {
+  all: initial;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3000;
+  isolation: isolate;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Contenedor principal */
+#gh-chatbot {
+  position: fixed !important;
+  bottom: 100px !important;
+  right: 40px !important;
+  width: 340px;
+  max-height: 500px;
+  background: #fff;
+  border-radius: 16px;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  pointer-events: auto;
+  z-index: 3001;
+  animation: ghSlideUp 0.4s ease;
+  transform-origin: bottom right;
+}
+
+@keyframes ghSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes ghMinimize {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.9); opacity: 0; }
+}
+
+.gh-chatbot-header {
+  background: linear-gradient(135deg, #007bff, #00a8ff, #0096c7);
+  color: white;
+  padding: 10px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.gh-btn-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.gh-chat-box {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+.gh-chat-box::-webkit-scrollbar {
+  width: 6px;
+}
+.gh-chat-box::-webkit-scrollbar-thumb {
+  background: #007bff60;
+  border-radius: 10px;
+}
+
+.gh-input-group {
+  display: flex;
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+.gh-input-group input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  outline: none;
+  font-size: 0.9rem;
+}
+.gh-input-group button {
+  background: #0d6efd;
+  border: none;
+  color: #fff;
+  padding: 0 14px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* Mensajes */
+.gh-chat-msg {
+  padding: 8px 12px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  max-width: 85%;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+.gh-chat-msg.user {
+  background: #e8f0fe;
+  align-self: flex-end;
+  margin-left: auto;
+}
+.gh-chat-msg.bot {
+  background: #e2f6ff;
+  align-self: flex-start;
+}
+
+/* Botón flotante */
+.gh-btn-circle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007bff, #00a8ff, #0096c7, #48cae4);
+  background-size: 200% 200%;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 3002;
+  box-shadow: 0 0 18px rgba(13, 110, 253, 0.5);
+  animation: ghPulse 3s ease-in-out infinite, ghGradientShift 6s ease infinite;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.gh-btn-circle:hover {
+  transform: scale(1.08);
+}
+@keyframes ghPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 18px rgba(13,110,253,0.4); }
+  50% { transform: scale(1.12); box-shadow: 0 0 25px rgba(13,110,253,0.7); }
+}
+@keyframes ghGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Tooltip */
+.gh-tooltip {
+  position: fixed;
+  bottom: 95px;
+  right: 95px;
+  background: linear-gradient(135deg, #007bff, #00a8ff, #0096c7, #48cae4);
+  background-size: 300% 300%;
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  animation: ghGradientShift 6s ease infinite;
+  z-index: 3001;
+}
+.gh-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  right: 15px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(13, 110, 253, 0.9);
+}
+</style>
+
+<script>
+/* === CHATBOT LÓGICA === */
+const ghChat = document.getElementById("gh-chatbot");
+const ghOpen = document.getElementById("gh-openChat");
+const ghClose = document.getElementById("gh-closeChat");
+const ghBox = document.getElementById("gh-chatBox");
+const ghInput = document.getElementById("gh-chatInput");
+const ghSend = document.getElementById("gh-chatSend");
+const ghTooltip = document.getElementById("gh-tooltip");
+
+let ghMensajes = [
+  "👋 ¡Hola! ¿Necesitas ayuda?",
+  "💡 Puedo contarte sobre GENIA HUB.",
+  "🤖 Haz clic y conversemos.",
+];
+let ghIndice = 0;
+let ghActivo = false;
+
+/* Tooltip secuencial */
+function ghMostrarMensaje() {
+  if (!ghActivo) return;
+  ghTooltip.style.opacity = 1;
+  ghTooltip.style.transform = "translateY(0)";
+  ghTooltip.textContent = ghMensajes[ghIndice];
+  setTimeout(() => {
+    ghTooltip.style.opacity = 0;
+    ghTooltip.style.transform = "translateY(10px)";
+    setTimeout(() => {
+      ghIndice = (ghIndice + 1) % ghMensajes.length;
+      if (ghActivo) ghMostrarMensaje();
+    }, 1000);
+  }, 4000);
+}
+function ghIniciarMensajes() {
+  if (ghActivo) return;
+  ghActivo = true;
+  ghMostrarMensaje();
+}
+function ghDetenerMensajes() {
+  ghActivo = false;
+  ghTooltip.style.opacity = 0;
+  ghTooltip.style.transform = "translateY(10px)";
+}
+
+/* Abrir/Cerrar */
+ghOpen.addEventListener("click", () => {
+  ghChat.style.display = "flex";
+  ghChat.style.animation = "ghSlideUp 0.4s ease";
+  ghOpen.classList.add("gh-hidden");
+  ghDetenerMensajes();
+  ghAddMsg("bot", "👋 ¡Hola! Soy tu asistente GENIA HUB. ¿En qué puedo ayudarte hoy?");
+});
+
+ghClose.addEventListener("click", () => {
+  ghChat.style.animation = "ghMinimize 0.3s ease forwards";
+  setTimeout(() => {
+    ghChat.style.display = "none";
+    ghOpen.classList.remove("gh-hidden");
+    // 🔁 Reinicia animaciones visuales
+    ghOpen.style.animation = "none";
+    ghOpen.offsetHeight; // Forzar reflujo
+    ghOpen.style.animation = "ghPulse 3s ease-in-out infinite, ghGradientShift 6s ease infinite";
+    setTimeout(ghIniciarMensajes, 1500);
+  }, 250);
+});
+
+/* Función para agregar mensajes */
+function ghAddMsg(role, text) {
+  const msg = document.createElement("div");
+  msg.classList.add("gh-chat-msg", role);
+  msg.innerHTML = text;
+  ghBox.appendChild(msg);
+  ghBox.scrollTop = ghBox.scrollHeight;
+}
+
+/* Interacción básica */
+ghSend.addEventListener("click", () => {
+  const userMsg = ghInput.value.trim();
+  if (!userMsg) return;
+  ghAddMsg("user", "🧑‍💻 " + userMsg);
+  ghInput.value = "";
+
+  setTimeout(() => {
+    let respuesta = "🤖 No entiendo muy bien. ¿Podrías reformularlo?";
+    const lower = userMsg.toLowerCase();
+
+    if (lower.includes("hola") || lower.includes("buenas")) {
+      respuesta = "👋 ¡Hola! Soy el asistente de GENIA HUB. Puedo contarte sobre la plataforma o proyectos disponibles.";
+    } else if (lower.includes("genia hub") || lower.includes("aplicación") || lower.includes("plataforma")) {
+      respuesta = "💡 GENIA HUB es una plataforma de innovación donde docentes y estudiantes comparten proyectos tecnológicos. ¿Quieres saber más?";
+    } else if (lower.includes("sí") || lower.includes("mas información") || lower.includes("más info")) {
+      respuesta = "🔐 Para darte más información detallada, por favor inicia sesión en tu cuenta.<br><a href='/login/' style='color:#0d6efd;text-decoration:none;'>🔗 Iniciar sesión</a>";
+    } else if (lower.includes("gracias")) {
+      respuesta = "😊 ¡De nada! Estoy aquí para ayudarte.";
+    }
+
+    ghAddMsg("bot", respuesta);
+  }, 600);
+});
+
+/* Iniciar tooltip al cargar */
+window.addEventListener("load", () => {
+  setTimeout(ghIniciarMensajes, 2500);
+});
+</script>
+
   </body>
 </html>
 
