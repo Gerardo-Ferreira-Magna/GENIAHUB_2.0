@@ -9,43 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/estilo_panel.css' %}">
 
-<!-- ✅ BLOQUE DE MENSAJES -->
-<div class="toast-container">
-  {% if messages %}
-    {% for message in messages %}
-      <div class="toast align-items-center text-white border-0 mb-2 
-        {% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' or message.tags == 'danger' %}bg-danger{% elif message.tags == 'warning' %}bg-warning text-dark{% else %}bg-primary{% endif %}"
-        role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-          <div class="toast-body">
-            {% if message.tags == 'success' %}
-              <i class="bi bi-check-circle-fill me-2"></i>
-            {% elif message.tags == 'error' or message.tags == 'danger' %}
-              <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {% elif message.tags == 'warning' %}
-              <i class="bi bi-exclamation-circle me-2"></i>
-            {% else %}
-              <i class="bi bi-info-circle me-2"></i>
-            {% endif %}
-            {{ message }}
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
-        </div>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
 
-<!-- ✅ Script para mostrar toasts -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-    toastElList.map(function(toastEl) {
-      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-      toast.show();
-    });
-  });
-</script>
+
+
 
 <div class="container-fluid px-4 py-4">
 
