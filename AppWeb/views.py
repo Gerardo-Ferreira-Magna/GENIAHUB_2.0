@@ -108,7 +108,7 @@ def login(request):
             if user is not None:
                 auth_login(request, user)
                 messages.success(request, f"👋 Bienvenido {user.nombre} {user.apellido_paterno}")
-                return redirect('panel')
+                return redirect('proyectos')
             else:
                 messages.error(request, "❌ Correo o contraseña incorrectos.")
     else:

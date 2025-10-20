@@ -109,7 +109,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'AppWeb.Usuario'
 
-LOGIN_REDIRECT_URL = 'panel'
+LOGIN_REDIRECT_URL = 'proyectos'
 LOGOUT_REDIRECT_URL = 'login'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
