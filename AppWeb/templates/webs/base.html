@@ -65,7 +65,7 @@
         
         <div class="sidebar" id="side_nav">
             <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">
-                <h3 class="fs-4"><span class="text-white">GENIAHUB</span></h3>
+                <h3 class="fs-4"><span class="text-warning">GENIAHUB</span></h3>
                 <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i
                         class="bi bi-list"></i></button>
             </div>
@@ -84,6 +84,12 @@
                     </a>
                 </li>
                 {% endif %}
+
+                <li class="">
+                    <a href="#" class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-bar-chart"></i> Dashboard
+                    </a>
+                </li>
 
                 <li class="">
                     <a href="{% url 'panel' %}" class="text-decoration-none px-3 py-2 d-block">

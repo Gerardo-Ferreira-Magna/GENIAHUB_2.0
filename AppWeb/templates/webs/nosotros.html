@@ -10,10 +10,85 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="{% static 'css/estilo_nosotros.css' %}">
 
+  <style>
+    /* === NAVBAR BLUR (estilo vidrio Apple) === */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(15, 15, 15, 0.4); /* fondo semitransparente */
+      backdrop-filter: blur(10px); /* efecto blur */
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: background 0.3s ease-in-out;
+    }
 
+    /* Cambia fondo al hacer scroll (opcional) */
+    .navbar.scrolled {
+      background: rgba(15, 15, 15, 0.7);
+      backdrop-filter: blur(15px);
+    }
+
+    .navbar-toggler {
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30'
+      xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,1%29'
+      stroke-width='2' stroke-linecap='round' stroke-miterlimit='10'
+      d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    }
+
+    body {
+      padding-top: 70px; /* espacio para navbar fija */
+    }
+
+    /* Efecto de transición suave */
+    @media (max-width: 991px) {
+      body {
+        padding-top: 65px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-kanban me-2"></i> GENIAHUB
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'index' %}">
+              <i class="bi bi-house-door-fill me-1"></i> Inicio
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'nosotros' %}">
+              <i class="bi bi-people-fill me-1"></i> Fundadores
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Login
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
   <!-- HERO HEADER -->
   <header class="hero-header text-center text-white">
@@ -32,29 +107,29 @@
       <h3 class="text-center display-6 fw-bold mb-5">Nuestros Principios Fundamentales</h3>
       <div class="row row-cols-1 row-cols-lg-3 g-4">
         <div class="col">
-          <div class="p-4 border-start border-primary border-5 h-100">
-            <i class="bi bi-lightbulb-fill fs-2 text-primary mb-3"></i>
+          <div class="p-4 border-5 h-100">
+            <i class="bi bi-lightbulb-fill fs-2 text-warning mb-3"></i>
             <h4 class="fw-bold">Innovación Constante</h4>
             <p>
-              Estamos siempre en búsqueda de la próxima gran idea, utilizando la tecnología de vanguardia para ofrecer soluciones de futuro a nuestros clientes.
+              Estamos siempre en búsqueda de la próxima gran idea, utilizando tecnología de vanguardia para ofrecer soluciones de futuro.
             </p>
           </div>
         </div>
         <div class="col">
-          <div class="p-4 border-start border-primary border-5 h-100">
-            <i class="bi bi-shield-fill-check fs-2 text-primary mb-3"></i>
+          <div class="p-4 border-5 h-100">
+            <i class="bi bi-shield-fill-check fs-2 text-warning mb-3"></i>
             <h4 class="fw-bold">Integridad Absoluta</h4>
             <p>
-              La honestidad y la transparencia son los pilares de cada decisión que tomamos. Construimos relaciones basadas en la confianza mutua.
+              La honestidad y la transparencia son los pilares de cada decisión. Construimos relaciones basadas en la confianza mutua.
             </p>
           </div>
         </div>
         <div class="col">
-          <div class="p-4 border-start border-primary border-5 h-100">
-            <i class="bi bi-heart-fill fs-2 text-primary mb-3"></i>
+          <div class="p-4 border-5 h-100">
+            <i class="bi bi-check2-all fs-2 text-warning mb-3"></i>
             <h4 class="fw-bold">Pasión por el Cliente</h4>
             <p>
-              El éxito de nuestros clientes es nuestra prioridad. Nos dedicamos a superar sus expectativas con un servicio personalizado y de alta calidad.
+              El éxito de nuestros clientes es nuestra prioridad. Buscamos superar sus expectativas con un servicio de alta calidad.
             </p>
           </div>
         </div>
@@ -63,86 +138,79 @@
   </section>
 
   <!-- EQUIPO -->
-<div class="container my-5">
-  <section id="equipo" class="text-center mb-5">
-    <h2 class="display-5 fw-bold mb-5 text-dark">Nuestro Equipo</h2>
-
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      
-      <!-- Card 1 -->
-      <div class="col d-flex">
-        <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
-          <div class="d-flex justify-content-center">
-            <img src="{% static 'img/Mauricio.jpg' %}" class="profile-circle" alt="Mauricio Retamal Rubio">
+  <div class="container my-5">
+    <section id="equipo" class="text-center mb-5">
+      <h2 class="display-5 fw-bold mb-5 text-dark">Nosotros</h2><br><br><br>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col d-flex">
+          <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
+            <div class="d-flex justify-content-center">
+              <img src="{% static 'img/Mauricio.jpg' %}" class="profile-circle" alt="Mauricio Retamal Rubio">
+            </div>
+            <div class="card-body pt-0 d-flex flex-column">
+              <h5 class="card-title fw-bold mt-3">Mauricio Retamal Rubio</h5>
+              <h6 class="card-subtitle mb-3 text-light">CEO y Fundador</h6>
+              <p class="card-text flex-grow-1">
+                Visionario en el sector. Lidera la estrategia con una mentalidad enfocada en la innovación y el crecimiento sostenible.
+              </p>
+              <div class="mt-auto">
+                <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
+                <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
+              </div>
+            </div>
           </div>
-          <div class="card-body pt-0 d-flex flex-column">
-            <h5 class="card-title fw-bold mt-3">Mauricio Retamal Rubio</h5>
-            <h6 class="card-subtitle mb-3 text-light">CEO y Fundador</h6>
-            <p class="card-text flex-grow-1">
-              Visionario en el sector. Lidera la estrategia con una mentalidad enfocada en la innovación y el crecimiento sostenible.
-            </p>
-            <div class="mt-auto">
-              <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
-              <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
+        </div>
+
+        <div class="col d-flex">
+          <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
+            <div class="d-flex justify-content-center">
+              <img src="{% static 'img/Yesenia.jpg' %}" class="profile-circle" alt="Yesenia Catalan Rubio">
+            </div>
+            <div class="card-body pt-0 d-flex flex-column">
+              <h5 class="card-title fw-bold mt-3">Yesenia Catalan Rubio</h5>
+              <h6 class="card-subtitle mb-3 text-light">Directora de Marketing</h6>
+              <p class="card-text flex-grow-1">
+                Experta en estrategias digitales. Su creatividad impulsa la visibilidad y el posicionamiento de la marca.
+              </p>
+              <div class="mt-auto">
+                <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
+                <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col d-flex">
+          <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
+            <div class="d-flex justify-content-center">
+              <img src="{% static 'img/Gerardo.jpg' %}" class="profile-circle" alt="Gerardo Ferreira Magna">
+            </div>
+            <div class="card-body pt-0 d-flex flex-column">
+              <h5 class="card-title fw-bold mt-3">Gerardo Ferreira Magna</h5>
+              <h6 class="card-subtitle mb-3 text-light">Jefe de Desarrollo</h6>
+              <p class="card-text flex-grow-1">
+                Maestro en arquitectura de sistemas. Asegura que nuestra plataforma sea robusta, escalable y moderna.
+              </p>
+              <div class="mt-auto">
+                <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
+                <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Card 2 -->
-      <div class="col d-flex">
-        <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
-          <div class="d-flex justify-content-center">
-            <img src="{% static 'img/Yesenia.jpg' %}" class="profile-circle" alt="María López">
-          </div>
-          <div class="card-body pt-0 d-flex flex-column">
-            <h5 class="card-title fw-bold mt-3">Yesenia Catalan Rubio</h5>
-            <h6 class="card-subtitle mb-3 text-light">Directora de Marketing</h6>
-            <p class="card-text flex-grow-1">
-              Experta en estrategias digitales. Su creatividad y un profundo conocimiento del mercado impulsan nuestra visibilidad.
-            </p>
-            <div class="mt-auto">
-              <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
-              <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="col d-flex">
-        <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
-          <div class="d-flex justify-content-center">
-            <img src="{% static 'img/Gerardo.jpg' %}" class="profile-circle" alt="Gerardo Ferreira Magna">
-          </div>
-          <div class="card-body pt-0 d-flex flex-column">
-            <h5 class="card-title fw-bold mt-3">Gerardo Ferreira Magna</h5>
-            <h6 class="card-subtitle mb-3 text-light">Jefe de Desarrollo</h6>
-            <p class="card-text flex-grow-1">
-              Maestro en la arquitectura de sistemas. Asegura que nuestra plataforma sea robusta, escalable y esté siempre a la vanguardia.
-            </p>
-            <div class="mt-auto">
-              <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
-              <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-  <hr class="my-5">
-</div>
-
+    </section>
+    <hr class="my-5">
+  </div>
 
   <!-- FOOTER -->
   <footer class="bg-dark text-white pt-5 pb-4 mt-5">
     <div class="container">
       <div class="row">
         <div class="col-lg-4 col-md-6 mb-4">
-          <h5 class="text-uppercase fw-bold mb-4 text-primary">GENIAHUB</h5>
+          <h5 class="text-uppercase fw-bold mb-4 text-warning">GENIAHUB</h5>
           <p class="text-light">
-            GENIAHUB es líder en soluciones tecnológicas. Nos dedicamos a transformar ideas en resultados tangibles, impulsados por la innovación.
+            GENIAHUB transforma ideas en resultados tangibles, impulsados por la innovación.
           </p>
           <p class="mb-0 fs-6">&copy; 2025. Todos los derechos reservados.</p>
         </div>
@@ -157,13 +225,13 @@
         </div>
         <div class="col-lg-3 col-md-6 mb-4">
           <h5 class="text-uppercase fw-bold mb-4">Contacto</h5>
-          <p class="mb-2"><i class="bi bi-geo-alt-fill text-primary me-2"></i> Monterrey 2801</p>
-          <p class="mb-2"><i class="bi bi-envelope-fill text-primary me-2"></i> info@geniahub.com</p>
-          <p class="mb-2"><i class="bi bi-telephone-fill text-primary me-2"></i> +56 9 76012277</p>
+          <p><i class="bi bi-geo-alt-fill text-primary me-2"></i> Monterrey 2801</p>
+          <p><i class="bi bi-envelope-fill text-primary me-2"></i> info@geniahub.com</p>
+          <p><i class="bi bi-telephone-fill text-primary me-2"></i> +56 9 76012277</p>
         </div>
         <div class="col-lg-3 col-md-6 mb-4">
           <h5 class="text-uppercase fw-bold mb-4">Síguenos</h5>
-          <div class="d-flex justify-content-start">
+          <div class="d-flex">
             <a href="#" class="text-white me-3 fs-3"><i class="bi bi-linkedin"></i></a>
             <a href="#" class="text-white me-3 fs-3"><i class="bi bi-twitter-x"></i></a>
             <a href="#" class="text-white me-3 fs-3"><i class="bi bi-instagram"></i></a>
@@ -172,16 +240,27 @@
         </div>
       </div>
       <hr class="text-light mt-4 mb-3">
-      <div class="row text-center">
-        <div class="col-md-12">
-          <a href="#" class="text-white text-decoration-none me-3 fs-7">Política de Privacidad</a>
-          <span class="text-muted">|</span>
-          <a href="#" class="text-white text-decoration-none ms-3 fs-7">Términos y Condiciones</a>
-        </div>
+      <div class="text-center">
+        <a href="#" class="text-white text-decoration-none me-3 fs-7">Política de Privacidad</a>
+        <span class="text-muted">|</span>
+        <a href="#" class="text-white text-decoration-none ms-3 fs-7">Términos y Condiciones</a>
       </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script scroll blur opcional -->
+  <script>
+    window.addEventListener('scroll', () => {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 20) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
 </body>
 </html>
+
