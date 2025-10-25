@@ -159,7 +159,7 @@
                         <ul class="navbar-nav mb-2 mb-lg-0">
                             {% if user.is_authenticated %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{}">(Hola, {{ usuario.nombre }})</a>
+                                <a class="nav-link" href="{}">(Hola, {{ request.usuario.nombre }})</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{% url 'logout' %}">Cerrar Sesión</a>

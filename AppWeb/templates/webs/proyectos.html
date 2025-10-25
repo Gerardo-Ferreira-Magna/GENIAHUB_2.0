@@ -212,7 +212,7 @@
 <!-- Mensaje flotante del asistente -->
 <div id="chatTooltip" class="chat-tooltip">👋 ¡Estoy aquí para ayudarte!</div>
 
-<!-- === SCRIPT === -->
+<!-- === SCRIPT FINAL === -->
 <script>
 /* === FAVORITOS === */
 const favBtns = document.querySelectorAll('.fav-btn');
@@ -280,7 +280,6 @@ const chatInput = document.getElementById('chatInput');
 const chatSend = document.getElementById('chatSend');
 const tooltip = document.getElementById('chatTooltip');
 
-/* === Tooltip mensajes rotativos === */
 const mensajes = [
   "👋 ¡Estoy aquí para ayudarte!",
   "💡 Puedo recomendarte proyectos o docentes.",
@@ -289,13 +288,11 @@ const mensajes = [
 let indice = 0;
 let tooltipActivo = false;
 
-/* === Función para mostrar mensajes secuenciales === */
 function mostrarMensaje() {
   if (!tooltipActivo) return;
   tooltip.style.opacity = 1;
   tooltip.style.transform = "translateY(0)";
   tooltip.textContent = mensajes[indice];
-
   setTimeout(() => {
     tooltip.style.opacity = 0;
     tooltip.style.transform = "translateY(10px)";
@@ -306,7 +303,6 @@ function mostrarMensaje() {
   }, 4000);
 }
 
-/* === Activar / Detener el tooltip === */
 function iniciarMensajes() {
   if (tooltipActivo) return;
   tooltipActivo = true;
@@ -318,7 +314,6 @@ function detenerMensajes() {
   tooltip.style.transform = "translateY(10px)";
 }
 
-/* === Abrir / Cerrar el Chat === */
 openChatBtn.addEventListener('click', () => {
   chatbot.style.display = 'flex';
   openChatBtn.style.display = 'none';
@@ -331,7 +326,6 @@ closeChatBtn.addEventListener('click', () => {
   setTimeout(iniciarMensajes, 1500);
 });
 
-/* === Enviar mensajes dentro del Chat === */
 function addMessage(role, text) {
   const div = document.createElement('div');
   div.classList.add('chat-msg', role);
@@ -350,12 +344,22 @@ chatSend.addEventListener('click', () => {
   }, 700);
 });
 
-/* === Iniciar los mensajes después de cargar la página === */
+/* === ANIMACIÓN DE ENTRADA Y TOOLTIP === */
 window.addEventListener('load', () => {
+  // Mensaje tooltip
   setTimeout(iniciarMensajes, 2000);
+
+  // Animación de entrada de las cards (fade + slide)
+  const cards = document.querySelectorAll('.project-card');
+  cards.forEach((card, index) => {
+    setTimeout(() => {
+      card.classList.add('card-loaded');
+    }, index * 250);
+  });
 });
 </script>
 {% endblock %}
+
 
 
 
