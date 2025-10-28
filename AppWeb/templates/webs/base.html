@@ -56,6 +56,19 @@
 
         /* Estilo para el contenido de la dashboard */
         .dashboard-content { padding-bottom: 50px; }
+
+        .nav-link[aria-expanded="true"] .arrow,
+        a[aria-expanded="true"] .arrow {
+        transform: rotate(90deg);
+        color: var(--bs-warning) !important;
+        }
+
+        .nav-link[aria-expanded="false"] .arrow,
+        a[aria-expanded="false"] .arrow {
+        transform: rotate(0deg);
+        color: var(--bs-warning) !important;
+        }
+
     </style>
     {% endblock extra_css %}
 </head>
@@ -72,7 +85,7 @@
 
             <ul class="list-unstyled px-2">
                 <li class="active">
-                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
+                    <a class="text-decoration-none px-3 py-2 d-block">
                         <i class="bi bi-house-door"></i> Inicio
                     </a>
                 </li>
@@ -80,7 +93,7 @@
                 {% if request.user.is_authenticated and request.user.is_staff %}
                 <li class="">
                     <a href="{% url 'admin:index' %}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-person-lock"></i> Administrador
+                        <i class="bi bi-person-lock"></i> Admin Django
                     </a>
                 </li>
                 {% endif %}
@@ -92,15 +105,35 @@
                 </li>
 
                 <li class="">
-                    <a href="{% url 'panel' %}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-list-task"></i> Panel
+                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center" 
+                        data-bs-toggle="collapse" href="#submenuPanelAdmin" 
+                        role="button" aria-expanded="false" aria-controls="submenuPanelAdmin">
+                        <span><i class="bi bi-clipboard2-check"></i> Panel Admin</span>
+                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
                     </a>
-                </li>
+
+                    <ul class="collapse list-unstyled ps-4" id="submenuPanelAdmin">
+                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block">• Auditoría</a></li>
+                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block">• Usuarios</a></li>
+                    </ul>
+                    </li>
+
                 <li class="">
-                    <a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-list-task"></i> Proyectos
+                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center" 
+                        data-bs-toggle="collapse" href="#submenuProyectos" 
+                        role="button" aria-expanded="false" aria-controls="submenuProyectos">
+                        <span><i class="bi bi-clipboard2-check"></i> Proyectos</span>
+                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
                     </a>
-                </li>
+
+                    <ul class="collapse list-unstyled ps-4" id="submenuProyectos">
+                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block">• Panel Proyectos</a></li>
+                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block">• Mis Proyectos</a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block">• Nuevo Proyecto</a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block">• Solicitudes</a></li>
+                        
+                    </ul>
+                    </li>
                 <li class="">
                     <a href="{}" class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
                         <span><i class="bi bi-chat-dots"></i> Mensajes</span>
