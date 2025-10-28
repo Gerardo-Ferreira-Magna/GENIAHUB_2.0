@@ -85,11 +85,12 @@ class ProyectoAdmin(AuditAdminMixin, admin.ModelAdmin):
     list_filter = ("tipo", "estado", "anio", "es_publico", "sede")
     search_fields = ("titulo", "descripcion", "autor__email", "palabras_clave")
     ordering = ("-updated_at",)
+
     readonly_fields = ("created_at", "updated_at", "created_by", "updated_by", "slug")
-    prepopulated_fields = {"slug": ("titulo",)}
+
     fieldsets = (
         ("Información General", {
-            "fields": ("titulo", "slug", "resumen", "descripcion", "tipo", "estado", "anio")
+            "fields": ("titulo", "resumen", "descripcion", "tipo", "estado", "anio")
         }),
         ("Relaciones", {
             "fields": ("autor", "carrera", "sede")
@@ -99,7 +100,7 @@ class ProyectoAdmin(AuditAdminMixin, admin.ModelAdmin):
         }),
         ("Auditoría", {
             "classes": ("collapse",),
-            "fields": ("created_by", "updated_by", "created_at", "updated_at")
+            "fields": ("slug", "created_by", "updated_by", "created_at", "updated_at")
         }),
     )
 
