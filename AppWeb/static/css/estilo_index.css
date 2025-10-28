@@ -189,7 +189,7 @@ header{
     height: 70%;
     left: 50%;
     transform: translateX(-50%);
-    background-image: url(img/model.png);
+    /*background-image: url(img/model.png);*/
     background-size: cover;
     background-position: top;
     pointer-events: none;
