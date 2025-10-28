@@ -94,8 +94,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 # Catálogos institucionales
 # ----------------------------
 class Sede(AuditStampedModel):
-    nombre = models.CharField(max_length=100, unique=True)   # Ej: INACAP Santiago Sur
-    codigo = models.CharField(max_length=10, unique=True)    # Ej: STS
+    nombre = models.CharField(max_length=100, unique=True)
+    codigo = models.CharField(max_length=10, unique=True)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     ciudad = models.CharField(max_length=100, blank=True, null=True)
     region = models.CharField(max_length=100, blank=True, null=True)
@@ -111,8 +111,8 @@ class Sede(AuditStampedModel):
 
 
 class Carrera(AuditStampedModel):
-    nombre = models.CharField(max_length=120)  # puede repetirse en distintas sedes
-    codigo = models.CharField(max_length=10, unique=True)    # código institucional
+    nombre = models.CharField(max_length=120)
+    codigo = models.CharField(max_length=10, unique=True)
     nivel = models.CharField(
         max_length=20,
         choices=[('T', 'Técnico'), ('P', 'Profesional')],
@@ -128,7 +128,7 @@ class Carrera(AuditStampedModel):
         verbose_name = "Carrera"
         verbose_name_plural = "Carreras"
         ordering = ['sede__codigo', 'nombre']
-        unique_together = (('nombre', 'sede'),)  # misma carrera puede existir en otra sede
+        unique_together = (('nombre', 'sede'),)
 
 
 # ----------------------------
@@ -153,7 +153,7 @@ class Proyecto(AuditStampedModel):
     )
 
     titulo = models.CharField(max_length=255, db_index=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
     resumen = models.TextField(max_length=500, help_text="Resumen ejecutivo")
     descripcion = models.TextField()
 
@@ -313,3 +313,77 @@ class AsignacionProyecto(AuditStampedModel):
         indexes = [
             models.Index(fields=['estado']),
         ]
+
+
+# ------------------------------------------------------------
+# HISTORIAL DE PARTICIPANTES EN PROYECTOS
+# ------------------------------------------------------------
+class HistorialProyectoParticipantes(models.Model):
+    # --- Relaciones principales ---
+    proyecto = models.ForeignKey(
+        Proyecto,
+        on_delete=models.CASCADE,
+        related_name='historial_participantes'
+    )
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name='participaciones_proyectos'
+    )
+
+    # --- ROLES AGRUPADOS POR ÁREA ---
+    ROLES = [
+        # --- ÁREA TECNOLÓGICA ---
+        ('LID', 'Líder del Proyecto / Scrum Master'),
+        ('DEV', 'Desarrollador / Programador'),
+        ('AI', 'Especialista en Inteligencia Artificial / Machine Learning'),
+        ('DS', 'Científico/a de Datos'),
+        ('UX', 'Diseñador UX/UI'),
+        ('QA', 'Tester / Control de Calidad'),
+
+        # --- ÁREA DE NEGOCIOS ---
+        ('ANA', 'Analista de Negocios / Data Analyst'),
+        ('PMO', 'Coordinador PMO / Gestión de Proyectos'),
+        ('MKT', 'Especialista en Marketing Digital / Comercial'),
+        ('FIN', 'Analista Financiero'),
+
+        # --- ÁREA ACADÉMICA ---
+        ('DOC', 'Docente Supervisor / Profesor Guía'),
+        ('INV', 'Investigador / Innovación / I+D'),
+
+        # --- ÁREA INDUSTRIAL ---
+        ('LOG', 'Especialista en Logística / Supply Chain'),
+        ('IOT', 'Integrador IoT / Automatización Industrial'),
+    ]
+    rol = models.CharField(max_length=10, choices=ROLES)
+
+    # --- Fechas y estado de participación ---
+    fecha_inicio = models.DateField(null=True, blank=True)
+    fecha_fin = models.DateField(null=True, blank=True)
+    activo = models.BooleanField(default=True)
+
+    # --- Auditoría estándar ---
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='participaciones_creadas'
+    )
+    updated_by = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='participaciones_actualizadas'
+    )
+
+    class Meta:
+        verbose_name = "Historial de Participación en Proyecto"
+        verbose_name_plural = "Historial de Participaciones en Proyectos"
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"{self.usuario} — {self.get_rol_display()} ({self.proyecto.titulo})"

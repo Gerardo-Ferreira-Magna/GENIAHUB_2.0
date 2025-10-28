@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Usuario, Sede, Carrera, Proyecto, SolicitudEmpresa, AsignacionProyecto
+from .models import Usuario, Sede, Carrera, Proyecto, SolicitudEmpresa, AsignacionProyecto, HistorialProyectoParticipantes
 
 
 # ----------------------------
@@ -149,6 +149,24 @@ class AsignacionProyectoAdmin(AuditAdminMixin, admin.ModelAdmin):
         }),
         ("Estado y Comentarios", {
             "fields": ("estado", "comentarios_docente")
+        }),
+        ("Auditoría", {
+            "classes": ("collapse",),
+            "fields": ("created_by", "updated_by", "created_at", "updated_at")
+        }),
+    )
+
+
+@admin.register(HistorialProyectoParticipantes)
+class HistorialProyectoParticipantesAdmin(AuditAdminMixin, admin.ModelAdmin):
+    list_display = ("proyecto", "usuario", "rol", "activo", "fecha_inicio", "fecha_fin", "updated_at")
+    list_filter = ("rol", "activo", "fecha_inicio", "fecha_fin")
+    search_fields = ("proyecto__titulo", "usuario__email", "usuario__nombre")
+    ordering = ("-updated_at",)
+    readonly_fields = ("created_at", "updated_at", "created_by", "updated_by")
+    fieldsets = (
+        ("Participación", {
+            "fields": ("proyecto", "usuario", "rol", "fecha_inicio", "fecha_fin", "activo")
         }),
         ("Auditoría", {
             "classes": ("collapse",),
