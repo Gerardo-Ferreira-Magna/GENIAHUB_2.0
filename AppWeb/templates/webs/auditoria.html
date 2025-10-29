@@ -1,0 +1,548 @@
+{% extends 'webs/base.html' %}
+{% load static %}
+{% block title %}GENIAHUB | Auditoría{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/estilo_panel.css' %}">
+
+<!-- Contenedor de Toasts -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;"></div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold text-primary mb-0">
+      <i class="bi bi-shield-lock me-2"></i>Centro de Auditoría & Seguridad
+    </h2>
+    <div class="d-flex gap-2">
+      <button id="btnExportCsv" class="btn btn-outline-secondary">
+        <i class="bi bi-file-earmark-arrow-down me-1"></i> Exportar CSV
+      </button>
+      <button id="btnRefresh" class="btn btn-primary">
+        <i class="bi bi-arrow-clockwise me-1"></i> Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros Avanzados (en una fila) -->
+  <div class="card border-0 shadow-sm mb-3 p-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-lg-3 col-md-6">
+        <label class="form-label small text-secondary">Rango de fechas</label>
+        <div class="d-flex gap-2">
+          <input id="f_desde" type="date" class="form-control">
+          <input id="f_hasta" type="date" class="form-control">
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6">
+        <label class="form-label small text-secondary">Usuario (email)</label>
+        <input id="f_usuario" type="text" class="form-control" placeholder="usuario@dominio.cl">
+      </div>
+      <div class="col-lg-2 col-md-6">
+        <label class="form-label small text-secondary">Tipo de acción</label>
+        <select id="f_accion" class="form-select">
+          <option value="">Todas</option>
+          <option value="login">Login</option>
+          <option value="logout">Logout</option>
+          <option value="view">View</option>
+          <option value="create">Create</option>
+          <option value="update">Update</option>
+          <option value="delete">Delete</option>
+          <option value="permission">Permission</option>
+          <option value="error">Error</option>
+        </select>
+      </div>
+      <div class="col-lg-2 col-md-6">
+        <label class="form-label small text-secondary">Severidad</label>
+        <select id="f_sev" class="form-select">
+          <option value="">Todas</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+      <div class="col-lg-2 col-md-6">
+        <label class="form-label small text-secondary">IP</label>
+        <input id="f_ip" type="text" class="form-control" placeholder="x.x.x.x">
+      </div>
+      <div class="col-lg-1 col-12 text-end">
+        <button id="btnClear" class="btn btn-outline-secondary w-100">Limpiar</button>
+      </div>
+    </div>
+    <div class="small text-muted mt-1">* Filtrado dinámico sobre datos del servidor (AJAX).</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="row g-3 mb-3">
+    <div class="col-xxl-2 col-md-4">
+      <div class="card shadow-sm border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">Eventos (24h)</div>
+            <h4 id="kpiEventos24h" class="fw-bold mb-0">—</h4>
+          </div>
+          <div class="icon-circle bg-light text-primary">
+            <i class="bi bi-activity"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xxl-2 col-md-4">
+      <div class="card shadow-sm border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">Sesiones activas</div>
+            <h4 id="kpiSesiones" class="fw-bold mb-0">—</h4>
+          </div>
+          <div class="icon-circle bg-light text-success">
+            <i class="bi bi-person-badge"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xxl-2 col-md-4">
+      <div class="card shadow-sm border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">Tiempo activo (prom.)</div>
+            <h4 id="kpiTiempoActivo" class="fw-bold mb-0">—</h4>
+          </div>
+          <div class="icon-circle bg-light text-info">
+            <i class="bi bi-stopwatch"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xxl-2 col-md-4">
+      <div class="card shadow-sm border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">Riesgo (score)</div>
+            <h4 id="kpiRiesgo" class="fw-bold mb-0">—</h4>
+          </div>
+          <div class="icon-circle bg-light text-warning">
+            <i class="bi bi-exclamation-octagon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xxl-2 col-md-4">
+      <div class="card shadow-sm border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">Alertas críticas</div>
+            <h4 id="kpiCriticos" class="fw-bold mb-0">—</h4>
+          </div>
+          <div class="icon-circle bg-light text-danger">
+            <i class="bi bi-bug"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xxl-2 col-md-4">
+      <div class="card shadow-sm border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">IPs únicas</div>
+            <h4 id="kpiIPs" class="fw-bold mb-0">—</h4>
+          </div>
+          <div class="icon-circle bg-light text-secondary">
+            <i class="bi bi-hdd-network"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row g-3 mb-3">
+    <div class="col-xxl-6">
+      <div class="card shadow-sm border-0 p-3 h-100">
+        <h6 class="fw-semibold mb-3"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Eventos en el tiempo</h6>
+        <canvas id="chTimeline" height="120"></canvas>
+      </div>
+    </div>
+    <div class="col-xxl-3">
+      <div class="card shadow-sm border-0 p-3 h-100">
+        <h6 class="fw-semibold mb-3"><i class="bi bi-pie-chart me-2 text-success"></i>Por tipo de acción</h6>
+        <canvas id="chActions" height="220"></canvas>
+      </div>
+    </div>
+    <div class="col-xxl-3">
+      <div class="card shadow-sm border-0 p-3 h-100">
+        <h6 class="fw-semibold mb-3"><i class="bi bi-bar-chart-steps me-2 text-warning"></i>Severidad</h6>
+        <canvas id="chSeverity" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tablas: Top usuarios / Top IPs -->
+  <div class="row g-3 mb-3">
+    <div class="col-xxl-6">
+      <div class="card shadow-sm border-0 p-3">
+        <h6 class="fw-semibold mb-3"><i class="bi bi-trophy me-2 text-dark"></i>Top usuarios por eventos</h6>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead class="table-light">
+              <tr><th>Usuario</th><th class="text-end">Eventos</th></tr>
+            </thead>
+            <tbody id="tbTopUsers"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-xxl-6">
+      <div class="card shadow-sm border-0 p-3">
+        <h6 class="fw-semibold mb-3"><i class="bi bi-router me-2 text-secondary"></i>Top IPs</h6>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead class="table-light">
+              <tr><th>IP</th><th class="text-end">Eventos</th></tr>
+            </thead>
+            <tbody id="tbTopIPs"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de eventos -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-semibold mb-0"><i class="bi bi-list-ul me-2 text-primary"></i>Eventos recientes</h6>
+        <div class="small text-muted" id="lblCount">—</div>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Fecha/Hora</th>
+              <th>Usuario</th>
+              <th>Acción</th>
+              <th>Página</th>
+              <th>IP</th>
+              <th>Severidad</th>
+              <th class="text-end">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="tbEventos"></tbody>
+        </table>
+      </div>
+
+      <!-- paginación simple -->
+      <div class="d-flex justify-content-end gap-2">
+        <button id="pgPrev" class="btn btn-sm btn-outline-secondary">Anterior</button>
+        <span id="pgInfo" class="align-self-center small text-muted">Página 1/1</span>
+        <button id="pgNext" class="btn btn-sm btn-outline-secondary">Siguiente</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalle evento -->
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="bi bi-search me-2"></i>Detalle del evento</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="detalleContenido" class="small"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js (gráficos) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  /* ========= Helpers ========= */
+  function getCookie(name){const v=`; ${document.cookie}`;const p=v.split(`; ${name}=`);if(p.length===2)return decodeURIComponent(p.pop().split(';').shift());return null;}
+  const CSRF = getCookie('csrftoken');
+
+  function showToast(message, type='primary'){
+    const container=document.querySelector('.toast-container');
+    const icon= type==='success'?'bi-check-circle-fill': type==='danger'?'bi-exclamation-triangle-fill': type==='warning'?'bi-exclamation-circle':'bi-info-circle';
+    const bg= type==='success'?'bg-success': type==='danger'?'bg-danger': type==='warning'?'bg-warning text-dark':'bg-primary';
+    const el=document.createElement('div');
+    el.className=`toast align-items-center text-white border-0 mb-2 ${bg}`;
+    el.innerHTML=`<div class="d-flex"><div class="toast-body"><i class="bi ${icon} me-2"></i>${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+    container.appendChild(el);
+    const t=new bootstrap.Toast(el,{delay:3500}); t.show(); el.addEventListener('hidden.bs.toast',()=>el.remove());
+  }
+  function fmt(n){return n?.toLocaleString('es-CL') ?? '—';}
+  function yyyymmdd(d){return d.toISOString().slice(0,10);}
+
+  /* ========= Filtros ========= */
+  const fDesde = document.getElementById('f_desde');
+  const fHasta = document.getElementById('f_hasta');
+  const fUsuario = document.getElementById('f_usuario');
+  const fAccion = document.getElementById('f_accion');
+  const fSev = document.getElementById('f_sev');
+  const fIP = document.getElementById('f_ip');
+
+  // Default: últimos 7 días
+  const today=new Date(); const d7=new Date(); d7.setDate(today.getDate()-7);
+  fDesde.value = yyyymmdd(d7); fHasta.value = yyyymmdd(today);
+
+  document.getElementById('btnClear').onclick = () => {
+    fDesde.value = yyyymmdd(d7); fHasta.value = yyyymmdd(today);
+    fUsuario.value=''; fAccion.value=''; fSev.value=''; fIP.value='';
+    loadAll();
+  };
+
+  document.getElementById('btnRefresh').onclick = loadAll;
+  document.getElementById('btnExportCsv').onclick = exportCsv;
+
+  /* ========= Endpoints esperados (AJUSTA en tu backend) =========
+    GET  /api/audit/summary/?desde=YYYY-MM-DD&hasta=YYYY-MM-DD&usuario=&accion=&sev=&ip=
+      -> { ok: true,
+           kpis: { eventos24h, sesiones_activas, tiempo_activo_prom, riesgo_score, alertas_criticas, ips_unicas },
+           timeline: { labels: [...], values: [...] },
+           actions:  { labels: [...], values: [...] },
+           severity: { labels: [...], values: [...] },
+           top_users: [{usuario, eventos}], top_ips: [{ip, eventos}]
+         }
+
+    GET  /api/audit/list/?page=1&size=20&...filtros...
+      -> { ok: true, total: N, page: 1, pages: P, items: [
+            { id, ts_iso, usuario, accion, path, ip, sev, detail_summary }
+         ] }
+
+    GET  /api/audit/detail/<id>/
+      -> { ok: true, item: { ... campos completos, diffs, payload ... } }
+  =============================================================== */
+
+  /* ========= Estado de paginación ========= */
+  let page=1, size=20, pages=1;
+
+  /* ========= Referencias DOM ========= */
+  const elKpi24 = document.getElementById('kpiEventos24h');
+  const elKpiSes = document.getElementById('kpiSesiones');
+  const elKpiTmp = document.getElementById('kpiTiempoActivo');
+  const elKpiRisk= document.getElementById('kpiRiesgo');
+  const elKpiCrit= document.getElementById('kpiCriticos');
+  const elKpiIPs = document.getElementById('kpiIPs');
+  const tbTopUsers = document.getElementById('tbTopUsers');
+  const tbTopIPs   = document.getElementById('tbTopIPs');
+  const tbEventos  = document.getElementById('tbEventos');
+  const lblCount   = document.getElementById('lblCount');
+  const pgPrev     = document.getElementById('pgPrev');
+  const pgNext     = document.getElementById('pgNext');
+  const pgInfo     = document.getElementById('pgInfo');
+
+  /* ========= Charts ========= */
+  let chTimeline, chActions, chSeverity;
+  function buildCharts(){
+    const ctx1 = document.getElementById('chTimeline');
+    const ctx2 = document.getElementById('chActions');
+    const ctx3 = document.getElementById('chSeverity');
+
+    const baseOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: true } },
+      scales: { y: { beginAtZero: true, ticks: { precision:0 } } }
+    };
+
+    chTimeline = new Chart(ctx1, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Eventos', data: [], fill:false, tension: .3 }]},
+      options: { ...baseOptions, scales: { ...baseOptions.scales, x: { ticks: { autoSkip: true, maxTicksLimit: 10 }}}}
+    });
+    chActions = new Chart(ctx2, {
+      type: 'doughnut',
+      data: { labels: [], datasets: [{ label: 'Acciones', data: [] }]},
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' }}}
+    });
+    chSeverity = new Chart(ctx3, {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Eventos', data: [] }]},
+      options: baseOptions
+    });
+  }
+  buildCharts();
+
+  function setChartData(chart, labels, values){
+    chart.data.labels = labels || [];
+    chart.data.datasets[0].data = values || [];
+    chart.update();
+  }
+
+  /* ========= Carga de datos ========= */
+  function qs(){
+    const p = new URLSearchParams();
+    if (fDesde.value) p.set('desde', fDesde.value);
+    if (fHasta.value) p.set('hasta', fHasta.value);
+    if (fUsuario.value.trim()) p.set('usuario', fUsuario.value.trim());
+    if (fAccion.value) p.set('accion', fAccion.value);
+    if (fSev.value) p.set('sev', fSev.value);
+    if (fIP.value.trim()) p.set('ip', fIP.value.trim());
+    return p.toString();
+  }
+
+  async function loadSummary(){
+    const res = await fetch(`/api/audit/summary/?${qs()}`, { credentials:'same-origin' });
+    const data = await res.json();
+    if(!data.ok){ showToast('No se pudo cargar el resumen','danger'); return; }
+    const k = data.kpis || {};
+    elKpi24.textContent = fmt(k.eventos24h);
+    elKpiSes.textContent = fmt(k.sesiones_activas);
+    elKpiTmp.textContent = k.tiempo_activo_prom ? `${k.tiempo_activo_prom} min` : '—';
+    elKpiRisk.textContent= k.riesgo_score ?? '—';
+    elKpiCrit.textContent= fmt(k.alertas_criticas);
+    elKpiIPs.textContent = fmt(k.ips_unicas);
+
+    // charts
+    setChartData(chTimeline, data.timeline?.labels, data.timeline?.values);
+    setChartData(chActions,  data.actions?.labels,  data.actions?.values);
+    setChartData(chSeverity, data.severity?.labels, data.severity?.values);
+
+    // Top tables
+    tbTopUsers.innerHTML = (data.top_users||[]).map(r=>`
+      <tr><td>${r.usuario||'—'}</td><td class="text-end">${fmt(r.eventos||0)}</td></tr>
+    `).join('') || `<tr><td colspan="2" class="text-muted">Sin datos</td></tr>`;
+
+    tbTopIPs.innerHTML = (data.top_ips||[]).map(r=>`
+      <tr><td>${r.ip||'—'}</td><td class="text-end">${fmt(r.eventos||0)}</td></tr>
+    `).join('') || `<tr><td colspan="2" class="text-muted">Sin datos</td></tr>`;
+  }
+
+  async function loadList(){
+    const res = await fetch(`/api/audit/list/?page=${page}&size=${size}&${qs()}`, { credentials:'same-origin' });
+    const data = await res.json();
+    if(!data.ok){ showToast('No se pudo cargar la lista','danger'); return; }
+
+    const items = data.items || [];
+    tbEventos.innerHTML = items.map(ev => {
+      const sevClass = ev.sev==='critical'?'bg-danger':
+                       ev.sev==='high'   ?'bg-warning text-dark':
+                       ev.sev==='medium' ?'bg-info text-dark':'bg-secondary';
+      return `
+        <tr>
+          <td>${ev.ts_iso ? new Date(ev.ts_iso).toLocaleString('es-CL') : '—'}</td>
+          <td>${ev.usuario || '—'}</td>
+          <td><span class="badge bg-primary">${ev.accion || '—'}</span></td>
+          <td><span class="small">${ev.path || '—'}</span></td>
+          <td>${ev.ip || '—'}</td>
+          <td><span class="badge ${sevClass} text-uppercase">${ev.sev || '—'}</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-dark btn-detalle" data-id="${ev.id}">
+              <i class="bi bi-search"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('') || `<tr><td colspan="7" class="text-center text-muted py-4">Sin resultados</td></tr>`;
+
+    // Paginación
+    pages = data.pages || 1;
+    lblCount.textContent = `Total: ${fmt(data.total||0)} eventos`;
+    pgInfo.textContent = `Página ${fmt(data.page||1)} / ${fmt(pages)}`;
+
+    // Bind detalle
+    document.querySelectorAll('.btn-detalle').forEach(b => {
+      b.onclick = () => openDetalle(b.dataset.id);
+    });
+  }
+
+  async function openDetalle(id){
+    const res = await fetch(`/api/audit/detail/${id}/`, { credentials:'same-origin' });
+    const data = await res.json();
+    if(!data.ok){ showToast('No se pudo cargar el detalle','danger'); return; }
+    const it = data.item || {};
+    const pre = (obj) => `<pre class="bg-light p-2 rounded border small">${obj ? escapeHtml(JSON.stringify(obj,null,2)) : '—'}</pre>`;
+    document.getElementById('detalleContenido').innerHTML = `
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="small text-muted">Fecha/Hora</div>
+          <div class="fw-semibold">${it.ts_iso ? new Date(it.ts_iso).toLocaleString('es-CL') : '—'}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="small text-muted">Usuario</div>
+          <div class="fw-semibold">${it.usuario || '—'}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="small text-muted">Acción</div>
+          <div class="fw-semibold">${it.accion || '—'}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="small text-muted">IP</div>
+          <div class="fw-semibold">${it.ip || '—'}</div>
+        </div>
+        <div class="col-12">
+          <div class="small text-muted">Página / Endpoint</div>
+          <div class="fw-semibold">${it.path || '—'}</div>
+        </div>
+        <div class="col-12">
+          <div class="small text-muted">Resumen</div>
+          <div>${it.detail_summary || '—'}</div>
+        </div>
+        <div class="col-12">
+          <div class="small text-muted">Payload</div>
+          ${pre(it.payload)}
+        </div>
+        <div class="col-12">
+          <div class="small text-muted">Cambios (diff)</div>
+          ${pre(it.diff)}
+        </div>
+        <div class="col-12">
+          <div class="small text-muted">User-Agent</div>
+          <div class="small">${it.user_agent || '—'}</div>
+        </div>
+      </div>
+    `;
+    new bootstrap.Modal('#modalDetalle').show();
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"'`=\/]/g, s => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
+    }[s]));
+  }
+
+  // Paginación
+  pgPrev.onclick = () => { if(page>1){ page--; loadList(); }};
+  pgNext.onclick = () => { if(page<pages){ page++; loadList(); }};
+
+  // Filtro reactivo
+  [fDesde,fHasta,fUsuario,fAccion,fSev,fIP].forEach(el => {
+    el.addEventListener('change', ()=>{ page=1; loadAll(); });
+    el.addEventListener('keyup', debounce(()=>{ page=1; loadAll(); }, 350));
+  });
+
+  async function loadAll(){
+    await Promise.all([loadSummary(), loadList()]);
+  }
+
+  // Export CSV (desde la lista actual)
+  async function exportCsv(){
+    const res = await fetch(`/api/audit/list/?page=1&size=10000&${qs()}`, { credentials:'same-origin' });
+    const data = await res.json();
+    if(!data.ok){ showToast('No se pudo exportar','danger'); return; }
+    const rows = data.items || [];
+    const header = ['id','ts_iso','usuario','accion','path','ip','sev'];
+    const csv = [header.join(',')].concat(rows.map(r => [
+      r.id, r.ts_iso, `"${(r.usuario||'').replace(/"/g,'""')}"`,
+      r.accion, `"${(r.path||'').replace(/"/g,'""')}"`,
+      r.ip, r.sev
+    ].join(','))).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=`auditoria_${fDesde.value||'ini'}_${fHasta.value||'fin'}.csv`;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showToast('CSV exportado','success');
+  }
+
+  // Carga inicial
+  loadAll();
+});
+</script>
+{% endblock %}

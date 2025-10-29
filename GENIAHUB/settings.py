@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import os
+from django.utils import timezone
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'AppWeb',
+    'AppWeb.apps.AppwebConfig',
 ]
 
 MIDDLEWARE = [
@@ -37,6 +38,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    "AppWeb.middleware.AuditMiddleware",
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -125,3 +127,19 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+
+AUDIT_EXCLUDE_PREFIXES = (
+    "/admin/login/",
+    "/admin/logout/",
+    "/admin/password_change/",
+    "/__debug__/",
+    "/api/healthcheck/",
+    # agrega aquí cualquier otra ruta que NO quieras auditar
+)
+
+# Registrar también GET (vistas navegadas)
+AUDIT_CAPTURE_GET = True
+
+# Límite de bytes para leer del body (para no saturar)
+AUDIT_MAX_BODY_BYTES = 100_000

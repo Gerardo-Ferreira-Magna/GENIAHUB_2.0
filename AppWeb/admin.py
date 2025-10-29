@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import Usuario, Sede, Carrera, Proyecto, SolicitudEmpresa, AsignacionProyecto, HistorialProyectoParticipantes
-
+from .models_audit import AuditLog
 
 # ----------------------------
 # USUARIO
@@ -173,3 +173,11 @@ class HistorialProyectoParticipantesAdmin(AuditAdminMixin, admin.ModelAdmin):
             "fields": ("created_by", "updated_by", "created_at", "updated_at")
         }),
     )
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("fecha_evento", "usuario", "accion", "modelo", "objeto_id", "user_agent")
+    list_filter = ("accion", "modelo", "usuario")
+    search_fields = ("usuario__email", "modelo", "objeto_id", "accion", "user_agent")
+    ordering = ("-fecha_evento",)

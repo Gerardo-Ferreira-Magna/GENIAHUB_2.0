@@ -387,3 +387,4 @@ class HistorialProyectoParticipantes(models.Model):
 
     def __str__(self):
         return f"{self.usuario} — {self.get_rol_display()} ({self.proyecto.titulo})"
+

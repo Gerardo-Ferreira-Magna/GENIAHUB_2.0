@@ -104,6 +104,7 @@
                     </a>
                 </li>
 
+                {% if request.user.is_authenticated and request.user.is_staff %}
                 <li class="">
                     <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center" 
                         data-bs-toggle="collapse" href="#submenuPanelAdmin" 
@@ -113,10 +114,11 @@
                     </a>
 
                     <ul class="collapse list-unstyled ps-4" id="submenuPanelAdmin">
-                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block">• Auditoría</a></li>
-                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block">• Usuarios</a></li>
+                        <li><a href="{% url 'auditoria_dashboard' %}" class="text-decoration-none px-3 py-1 d-block">• Auditoría</a></li>
+                        <li><a href="{% url 'usuarios_panel' %}" class="text-decoration-none px-3 py-1 d-block">• Usuarios</a></li>
                     </ul>
                     </li>
+                {% endif %}
 
                 <li class="">
                     <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center" 
@@ -129,6 +131,7 @@
                     <ul class="collapse list-unstyled ps-4" id="submenuProyectos">
                         <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block">• Panel Proyectos</a></li>
                         <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block">• Mis Proyectos</a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block">• Mis Tareas</a></li>
                         <li><a href="#" class="text-decoration-none px-3 py-1 d-block">• Nuevo Proyecto</a></li>
                         <li><a href="#" class="text-decoration-none px-3 py-1 d-block">• Solicitudes</a></li>
                         
@@ -166,8 +169,8 @@
                     </a>
                 </li>
                 <li class="">
-                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-people"></i> Fundadores
+                    <a class="text-decoration-none px-3 py-2 d-block">
+                        <i class="bi bi-layout-wtf"></i> Versión Beta
                     </a>
                 </li>
             </ul>
@@ -241,6 +244,10 @@
             }
         });
     </script>
+    
+
     {% endblock extra_js %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

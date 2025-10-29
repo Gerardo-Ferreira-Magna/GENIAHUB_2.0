@@ -1,0 +1,184 @@
+{% extends 'webs/base.html' %}
+{% load static %}
+
+{% block title %}GENIAHUB | Dashboard de Auditoría{% endblock %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/estilo_panel.css' %}">
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2 class="fw-bold section-title mb-2 text-primary">
+            <i class="bi bi-shield-lock me-2 text-danger"></i>Dashboard de Auditoría
+        </h2>
+        <a href="#" class="btn btn-danger rounded-pill px-4">
+            <i class="bi bi-file-text me-2"></i>Ver Lista de Logs
+        </a>
+    </div>
+    <p class="text-muted">Estadísticas de eventos y accesos de los últimos 7 días (desde: {{ since|date:"Y-m-d H:i" }}).</p>
+    
+    <hr>
+
+    <div class="row g-3 mb-5 align-items-stretch text-center">
+        
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="card kpi p-3 h-100 d-flex flex-column justify-content-center align-items-center bg-primary-subtle border-primary">
+                <div class="kpi-icon bg-primary text-white mb-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <h4 class="fw-bold kpi-number text-primary">{{ total_logs }}</h4>
+                <small class="text-muted kpi-text">Total de Eventos Auditados</small>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="card kpi p-3 h-100 d-flex flex-column justify-content-center align-items-center bg-success-subtle border-success">
+                <div class="kpi-icon bg-success text-white mb-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h4 class="fw-bold kpi-number text-success">{{ active_sessions }}</h4>
+                <small class="text-muted kpi-text">Sesiones Activas (Última Hora)</small>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="card kpi p-3 h-100 d-flex flex-column justify-content-center align-items-center bg-info-subtle border-info">
+                <div class="kpi-icon bg-info text-white mb-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-stopwatch"></i>
+                </div>
+                <h4 class="fw-bold kpi-number text-info">{% if avg_latency is not None %}{{ avg_latency }} ms{% else %}N/A{% endif %}</h4>
+                <small class="text-muted kpi-text">Latencia Promedio (Si está implementada)</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4 mb-5">
+        
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-exclamation-octagon me-2 text-danger"></i>Eventos por Severidad</h5>
+                <ul class="list-group list-group-flush">
+                    {% for item in by_severity %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            {{ item.severidad|default:"(Sin Severidad)" }}
+                            <span class="badge 
+                                {% if item.severidad == 'HIGH' or item.severidad == 'CRIT' %}bg-danger
+                                {% elif item.severidad == 'MEDIUM' or item.severidad == 'WARN' %}bg-warning
+                                {% else %}bg-secondary{% endif %} rounded-pill">{{ item.n }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-muted">No hay datos de severidad en este período.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-gear me-2 text-primary"></i>Eventos por Tipo de Acción</h5>
+                <ul class="list-group list-group-flush">
+                    {% for item in by_action %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            {{ item.accion|default:"(Sin Acción)" }}
+                            <span class="badge bg-primary rounded-pill">{{ item.n }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-muted">No hay datos de acción.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-link-45deg me-2 text-info"></i>Top 10 Rutas Más Accedidas</h5>
+                <ul class="list-group list-group-flush">
+                    {% for item in top_paths %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <code class="text-truncate" style="max-width: 80%;">{{ item.url|default:"N/A" }}</code>
+                            <span class="badge bg-secondary rounded-pill">{{ item.n }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-muted">No hay datos de rutas.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt me-2 text-warning"></i>Top 10 IPs de Origen</h5>
+                <ul class="list-group list-group-flush">
+                    {% for item in top_ips %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <strong>{{ item.ip_origen|default:"N/A" }}</strong>
+                            <span class="badge bg-dark rounded-pill">{{ item.n }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-muted">No hay datos de IP.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-3 mb-5 shadow">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+            <h5 class="fw-bold mb-0"><i class="bi bi-person-lines-fill me-2 text-success"></i>Últimos Eventos de Sesión por Usuario</h5>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Última Acción</th>
+                        <th>Fecha y Hora</th>
+                        <th>IP de Origen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in last_session_logs %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-circle me-2" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <strong>{{ log.usuario.get_full_name|default:log.usuario.username }}</strong><br>
+                                    <small class="text-muted">{{ log.usuario.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if log.accion == 'LOGIN' %}bg-success
+                                {% elif log.accion == 'LOGOUT' %}bg-primary
+                                {% elif log.accion == 'LOGIN_FAILED' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ log.accion }}
+                            </span>
+                        </td>
+                        <td style="white-space: nowrap;">
+                            {{ log.fecha_evento|date:"Y-m-d H:i:s" }}
+                        </td>
+                        <td>
+                            {{ log.ip_origen }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No se encontraron eventos de sesión recientes.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
