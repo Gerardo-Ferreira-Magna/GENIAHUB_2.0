@@ -26,8 +26,8 @@ def nosotros(request):
 
 
 # Vista usuario
-def usuario(request):
-    return render(request, "webs/usuario.html")
+def tareas(request):
+    return render(request, "webs/tareas.html")
 
 
 # Vista panel

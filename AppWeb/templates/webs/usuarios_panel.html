@@ -18,7 +18,7 @@
   </div>
 
   <!-- FILTROS (UNA SOLA FILA, EN VIVO) -->
-  <div class="card border-0 shadow-sm mb-3 p-3">
+  <div class="card border-0 shadow-sm mb-3 p-3 bg-white">
     <div class="row g-2 align-items-center">
       <div class="col-md-3">
         <input id="f_q" type="text" class="form-control" placeholder="Nombre / Apellidos" value="{{ request.GET.q|default:'' }}">
@@ -34,7 +34,7 @@
           <option value="">Rol</option>
           <option value="EST" {% if request.GET.rol == 'EST' %}selected{% endif %}>Estudiante</option>
           <option value="DOC" {% if request.GET.rol == 'DOC' %}selected{% endif %}>Docente</option>
-          <option value="EMP" {% if request.GET.rol == 'EMP' %}selected{% endif %}>Empleado</option>
+          <option value="EMP" {% if request.GET.rol == 'EMP' %}selected{% endif %}>Empresa</option>
           <option value="ADM" {% if request.GET.rol == 'ADM' %}selected{% endif %}>Administrador</option>
         </select>
       </div>
@@ -56,7 +56,6 @@
         <button id="clearFilters" class="btn btn-outline-secondary">Limpiar</button>
       </div>
     </div>
-    <div class="small text-muted mt-1">* El filtrado es en vivo sobre la página actual.</div>
   </div>
 
   <!-- TABLA -->
@@ -64,7 +63,7 @@
     <div class="card-body">
       <div class="table-responsive">
         <table id="tblUsuarios" class="table align-middle">
-          <thead class="table-light">
+          <thead class="table-secondary">
             <tr>
               <th>Nombre</th>
               <th>RUT</th>
@@ -95,10 +94,10 @@
                 </span>
               </td>
               <td class="cell-activo">
-                {% if u.is_active %}<span class="badge bg-success">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}
+                {% if u.is_active %}<span class="badge bg-warning text-dark">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}
               </td>
               <td class="cell-staff">
-                {% if u.is_staff %}<span class="badge bg-info text-dark">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}
+                {% if u.is_staff %}<span class="badge bg-warning text-dark">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}
               </td>
               <td class="text-end">
                 <div class="btn-group">

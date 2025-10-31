@@ -23,61 +23,6 @@
     </button>
   </div>
 
-  <!-- KPIs + IA 
-  <div class="row g-3 mb-4 align-items-stretch text-center">
-    <div class="col-12 col-sm-6 col-md-3">
-      <div class="card kpi p-3 h-100 d-flex flex-column justify-content-center align-items-center">
-        <div class="kpi-icon bg-primary-subtle text-primary mb-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-kanban"></i>
-        </div>
-        <h4 class="fw-bold kpi-number">24</h4>
-        <small class="text-muted kpi-text">Proyectos Activos</small>
-      </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-md-3">
-      <div class="card kpi p-3 h-100 d-flex flex-column justify-content-center align-items-center">
-        <div class="kpi-icon bg-success-subtle text-success mb-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-bar-chart-line"></i>
-        </div>
-        <h4 class="fw-bold kpi-number">85%</h4>
-        <small class="text-muted kpi-text">Tasa de Éxito</small>
-      </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-md-3">
-      <div class="card kpi p-3 h-100 d-flex flex-column justify-content-center align-items-center">
-        <div class="kpi-icon bg-warning-subtle text-warning mb-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-hourglass-split"></i>
-        </div>
-        <h4 class="fw-bold kpi-number">6</h4>
-        <small class="text-muted kpi-text">Pendientes</small>
-      </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-md-3">
-      <div class="card kpi p-3 h-100 d-flex flex-column justify-content-center align-items-center">
-        <div class="kpi-icon bg-danger-subtle text-danger mb-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-exclamation-triangle"></i>
-        </div>
-        <h4 class="fw-bold kpi-number">3</h4>
-        <small class="text-muted kpi-text">En Riesgo</small>
-      </div>
-    </div> -->
-
-    <!-- IA sugerencias 
-    <div class="col-12">
-      <div class="ai-suggestion p-3 text-white position-relative overflow-hidden h-100 mt-2">
-        <h5 class="fw-bold mb-2"><i class="bi bi-robot me-2"></i>Sugerencias Inteligentes</h5>
-        <ul class="mt-2 mb-0">
-          <li><strong>Proyecto Delta</strong> requiere validación técnica antes del 10 Oct.</li>
-          <li><strong>Proyecto Sigma</strong> puede optimizar recursos en un 15%.</li>
-          <li>Reasignar recursos del proyecto <strong>Beta</strong> al <strong>Epsilon</strong> para equilibrio de carga.</li>
-        </ul>
-      </div>
-    </div> -->
-  </div>
-
   <!-- Tabla de Proyectos -->
   <div class="card p-3 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
@@ -89,7 +34,7 @@
 
     <div class="table-responsive">
       <table class="table align-middle table-hover" id="projectsTable">
-        <thead class="table-light">
+        <thead class="table-secondary">
           <tr>
             <th>#</th>
             <th>Proyecto</th>
@@ -165,83 +110,8 @@
     <nav><ul class="pagination pagination-sm justify-content-end mt-3" id="pagination"></ul></nav>
   </div>
 
-  <!-- Tabla de Usuarios y Progreso -->
-  <div class="card p-3 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-      <h5 class="fw-bold mb-0">Usuarios y Progreso de Tareas</h5>
-      <div class="d-flex align-items-center">
-        <input id="userSearchInput" type="text" class="form-control form-control-sm" placeholder="Buscar usuario o tarea...">
-      </div>
-    </div>
-
-    <div class="table-responsive">
-      <table class="table align-middle table-hover" id="usersTable">
-        <thead class="table-light">
-          <tr>
-            <th>#</th><th>Usuario</th><th>Tarea / Proceso</th><th>Proyecto</th><th>Estado</th>
-            <th>Prioridad</th><th>Cronograma</th><th>Progreso</th><th>%</th><th>Comentarios</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>01</td>
-            <td>
-              <div class="d-flex align-items-center">
-                <img src="{% static 'img/Yesenia.jpg' %}" class="rounded-circle me-2" width="35" height="35">
-                <div><strong>Yesenia Catalan</strong><br><small class="text-muted">Líder de Proyecto</small></div>
-              </div>
-            </td>
-            <td>Validar requerimientos del cliente</td>
-            <td>Proyecto Alpha</td>
-            <td><span class="badge bg-success">Completado</span></td>
-            <td><span class="badge bg-primary">Alta</span></td>
-            <td>01 - 05 Oct</td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:100%"></div></div></td>
-            <td>100%</td>
-            <td><small class="text-muted">Revisión completada y aprobada.</small></td>
-          </tr>
-          <tr>
-            <td>02</td>
-            <td>
-              <div class="d-flex align-items-center">
-                <img src="{% static 'img/Gerardo.jpg' %}" class="rounded-circle me-2" width="35" height="35">
-                <div><strong>Gerardo Ferreira</strong><br><small class="text-muted">Analista</small></div>
-              </div>
-            </td>
-            <td>Desarrollar módulo de autenticación</td>
-            <td>Proyecto Beta</td>
-            <td><span class="badge bg-warning text-dark">En Progreso</span></td>
-            <td><span class="badge bg-danger">Crítica</span></td>
-            <td>05 - 20 Oct</td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:70%"></div></div></td>
-            <td>70%</td>
-            <td><small class="text-muted">Requiere revisión de endpoints API.</small></td>
-          </tr>
-          <tr>
-            <td>03</td>
-            <td>
-              <div class="d-flex align-items-center">
-                <img src="{% static 'img/Mauricio.jpg' %}" class="rounded-circle me-2" width="35" height="35">
-                <div><strong>Mauricio Retamal</strong><br><small class="text-muted">UX Designer</small></div>
-              </div>
-            </td>
-            <td>Actualizar prototipos de interfaz</td>
-            <td>Proyecto Gamma</td>
-            <td><span class="badge bg-secondary">Pendiente</span></td>
-            <td><span class="badge bg-warning text-dark">Media</span></td>
-            <td>10 - 18 Oct</td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:35%"></div></div></td>
-            <td>35%</td>
-            <td><small class="text-muted">Esperando validación del cliente.</small></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
 <script>
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
   let currentPage = 1;
   const table = document.getElementById("projectsTable");
   const rows = table.querySelectorAll("tbody tr");

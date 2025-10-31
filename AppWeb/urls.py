@@ -5,7 +5,7 @@ from .views_audit import auditoria_dashboard
 urlpatterns = [
     path("", views.index, name="index"),
     path("nosotros/", views.nosotros, name="nosotros"),
-    path("usuario/", views.usuario, name="usuario"),
+    path("tareas/", views.tareas, name="tareas"),
     path("panel/", views.panel, name="panel"),
     path("proyectos/", views.proyectos, name="proyectos"),
     path("registro/", views.registro, name="registro"),
