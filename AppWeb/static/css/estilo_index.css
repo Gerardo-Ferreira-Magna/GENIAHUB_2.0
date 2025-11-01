@@ -231,8 +231,8 @@ header{
 
 /* Navbar links */
 .navbar .nav-link {
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
+  color: #fff;
+  font-weight: 700;
   position: relative;
   transition: color 0.3s ease-in-out;
 }
@@ -244,7 +244,7 @@ header{
 
 /* Active: un tono cálido */
 .navbar .nav-link.active {
-  color: black; /* ámbar/naranja suave */
+  color: #fff; /* ámbar/naranja suave */
 }
 
 /* Subrayado animado */
@@ -263,4 +263,3 @@ header{
 .navbar .nav-link.active::after {
   width: 100%;
 }
-

@@ -1,0 +1,268 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GENIAHUB | Registro Empresa</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+  </head>
+
+  <body class="bg-light">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-light bg-white shadow-sm px-3">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center">
+          <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-sm me-3">
+            <i class="bi bi-arrow-left"></i> Volver al inicio
+          </a>
+          <a class="navbar-brand d-flex align-items-center" href="#">
+            <i class="bi bi-kanban me-2 text-warning fs-4"></i>
+            <span class="fw-semibold fs-5">GENIAHUB</span>
+          </a>
+        </div>
+        <div>
+          <span class="text-muted me-2">¿Ya tienes una cuenta?</span>
+          <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Iniciar Sesión</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="container my-5">
+      <div class="row g-5 align-items-start">
+        <!-- COLUMNA IZQUIERDA -->
+        <div class="col-lg-6">
+          <h2 class="fw-bold mb-4">
+            Conecta tu empresa con el<br />
+            <span class="text-primary">talento universitario del futuro.</span>
+          </h2>
+          <p class="text-secondary mb-5">
+            Únete a nuestra red de innovación y encuentra los mejores proyectos y colaboradores para impulsar tu crecimiento.
+          </p>
+
+          <div class="d-flex align-items-start mb-4">
+            <i class="bi bi-buildings text-primary fs-2 me-3"></i>
+            <div>
+              <h6 class="fw-semibold mb-1">Tu Empresa</h6>
+              <p class="text-muted small mb-0">Cuéntanos sobre tu organización y lo que haces.</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start mb-4">
+            <i class="bi bi-person-lines-fill text-primary fs-2 me-3"></i>
+            <div>
+              <h6 class="fw-semibold mb-1">Datos de Contacto</h6>
+              <p class="text-muted small mb-0">Información clave para que podamos estar en contacto.</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start mb-4">
+            <i class="bi bi-check-circle text-success fs-2 me-3"></i>
+            <div>
+              <h6 class="fw-semibold mb-1">Próximos Pasos</h6>
+              <p class="text-muted small mb-0">Te guiaremos en el proceso de aprobación y acceso a la plataforma.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA -->
+        <div class="col-lg-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+              <h5 class="fw-semibold mb-3">
+                <i class="bi bi-buildings text-primary me-2"></i> Registro de Empresa
+              </h5>
+
+              <form id="registroForm">
+                <!-- Datos empresa -->
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Nombre de la empresa</label>
+                  <input type="text" class="form-control" placeholder="Introduce el nombre legal de tu empresa" />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Dirección fiscal</label>
+                  <input type="text" class="form-control" placeholder="Dirección completa, ciudad y código postal" />
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label small fw-semibold">NIF/CIF de la Empresa</label>
+                  <input type="text" class="form-control" placeholder="Ej: B12345678" />
+                </div>
+
+                <!-- Datos contacto -->
+                <h5 class="fw-semibold mb-3">
+                  <i class="bi bi-person-lines-fill text-primary me-2"></i> Datos de Contacto
+                </h5>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small fw-semibold">Número de contacto</label>
+                    <input type="text" class="form-control" placeholder="+34 123 456 789" />
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <label class="form-label small fw-semibold">Correo electrónico corporativo</label>
+                    <input type="email" class="form-control" placeholder="contacto@tuempresa.com" />
+                  </div>
+                </div>
+
+                <!-- CHECKS LEGALES -->
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="checkTerminosForm" />
+                  <label class="form-check-label small text-muted" for="checkTerminosForm">
+                    He leído y acepto los
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#modalTerminos" class="text-primary text-decoration-none">Términos y Condiciones</a>.
+                  </label>
+                </div>
+
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" id="checkPrivacidadForm" />
+                  <label class="form-check-label small text-muted" for="checkPrivacidadForm">
+                    He leído y acepto la
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#modalPrivacidad" class="text-primary text-decoration-none">Política de Privacidad</a>.
+                  </label>
+                </div>
+
+                <div class="d-grid">
+                  <button type="button" id="btnEnviar" class="btn btn-primary" disabled>Enviar Solicitud de Registro</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL TÉRMINOS -->
+    <div class="modal fade" id="modalTerminos" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>Términos y Condiciones</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body small text-muted">
+            <p>Estos términos establecen las reglas de uso de la plataforma GENIAHUB. 
+            El registro implica la aceptación de los presentes términos, incluyendo el 
+            tratamiento de la información con fines académicos y de vinculación profesional.</p>
+          </div>
+          <div class="modal-footer">
+            <div class="form-check me-auto">
+              <input class="form-check-input" type="checkbox" id="checkTerminosModal" />
+              <label class="form-check-label small" for="checkTerminosModal">
+                He leído y acepto los términos
+              </label>
+            </div>
+            <button type="button" id="btnCerrarTerminos" class="btn btn-primary" data-bs-dismiss="modal" disabled>Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL PRIVACIDAD -->
+    <div class="modal fade" id="modalPrivacidad" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-lock me-2"></i>Política de Privacidad</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body small text-muted">
+            <p>GENIAHUB garantiza la confidencialidad de tus datos. La información será
+            utilizada únicamente para fines internos y académicos, sin ser compartida 
+            con terceros sin tu autorización expresa.</p>
+          </div>
+          <div class="modal-footer">
+            <div class="form-check me-auto">
+              <input class="form-check-input" type="checkbox" id="checkPrivacidadModal" />
+              <label class="form-check-label small" for="checkPrivacidadModal">
+                He leído y acepto la política de privacidad
+              </label>
+            </div>
+            <button type="button" id="btnCerrarPrivacidad" class="btn btn-primary" data-bs-dismiss="modal" disabled>Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+      <div id="toastFaltante" class="toast align-items-center text-bg-danger border-0" role="alert">
+        <div class="d-flex">
+          <div class="toast-body" id="toastMensaje"></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      const checkTerminosForm = document.getElementById("checkTerminosForm");
+      const checkPrivacidadForm = document.getElementById("checkPrivacidadForm");
+      const checkTerminosModal = document.getElementById("checkTerminosModal");
+      const checkPrivacidadModal = document.getElementById("checkPrivacidadModal");
+      const btnCerrarTerminos = document.getElementById("btnCerrarTerminos");
+      const btnCerrarPrivacidad = document.getElementById("btnCerrarPrivacidad");
+      const btnEnviar = document.getElementById("btnEnviar");
+      const toastFaltante = new bootstrap.Toast(document.getElementById("toastFaltante"));
+      const toastMensaje = document.getElementById("toastMensaje");
+
+      // Solo habilita el botón "Aceptar" del modal cuando se marca el checkbox interno
+      checkTerminosModal.addEventListener("change", () => {
+        btnCerrarTerminos.disabled = !checkTerminosModal.checked;
+      });
+      checkPrivacidadModal.addEventListener("change", () => {
+        btnCerrarPrivacidad.disabled = !checkPrivacidadModal.checked;
+      });
+
+      // Marca los checks del formulario al aceptar dentro del modal
+      btnCerrarTerminos.addEventListener("click", function () {
+        checkTerminosForm.checked = true;
+        validarEnvio();
+      });
+      btnCerrarPrivacidad.addEventListener("click", function () {
+        checkPrivacidadForm.checked = true;
+        validarEnvio();
+      });
+
+      // Habilita el botón de envío solo si ambos están aceptados
+      function validarEnvio() {
+        btnEnviar.disabled = !(checkTerminosForm.checked && checkPrivacidadForm.checked);
+      }
+
+      checkTerminosForm.addEventListener("change", validarEnvio);
+      checkPrivacidadForm.addEventListener("change", validarEnvio);
+
+      // Toast de validación
+      btnEnviar.addEventListener("click", function () {
+        if (!checkTerminosForm.checked || !checkPrivacidadForm.checked) {
+          if (!checkTerminosForm.checked && !checkPrivacidadForm.checked) {
+            toastMensaje.textContent = "⚠️ Debes aceptar los Términos y la Política de Privacidad.";
+          } else if (!checkTerminosForm.checked) {
+            toastMensaje.textContent = "⚠️ Acepta los Términos y Condiciones antes de continuar.";
+          } else {
+            toastMensaje.textContent = "⚠️ Acepta la Política de Privacidad antes de continuar.";
+          }
+          toastFaltante.show();
+        } else {
+          alert("✅ Solicitud enviada correctamente.");
+        }
+      });
+    </script>
+  </body>
+</html>
+
+
+
+
+

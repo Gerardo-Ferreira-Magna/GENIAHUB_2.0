@@ -17,6 +17,7 @@
       .navbar {
         position: relative;
         z-index: 1000; /* queda encima del slider */
+        background: rgba(15, 15, 15, 0.4);
       }
       .navbar-toggler {
         border-color: rgba(255,255,255,0.5);
@@ -40,10 +41,10 @@
     <main>
       <!-- NAVBAR -->
 
-      <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+      <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
           <a class="navbar-brand d-flex align-items-center" href="#">
-            <i class="bi bi-kanban me-2"></i> GENIAHUB
+            <i class="bi bi-kanban me-2 text-warning"></i> GENIAHUB
           </a>
           <button
             class="navbar-toggler"
@@ -59,17 +60,22 @@
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
                 <a class="nav-link active" href="#">
-                  <i class="bi bi-house-door-fill me-1"></i> Inicio
+                  <i class="bi bi-house-door-fill me-2"></i> Inicio
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'nosotros' %}">
-                  <i class="bi bi-people-fill me-1"></i> Fundadores
+                <a class="nav-link" href="{% url 'nosotros' %}"> | 
+                  <i class="bi bi-people-fill me-2"></i> Fundadores
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">
-                  <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                <a class="nav-link" href="{% url 'registro_empresa' %}">| 
+                  <i class="bi bi-buildings me-2"></i> Empresa
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}"> | 
+                  <i class="bi bi-box-arrow-in-right me-2"></i> Login
                 </a>
               </li>
             </ul>

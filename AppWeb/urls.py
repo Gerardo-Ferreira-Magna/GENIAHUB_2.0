@@ -16,4 +16,5 @@ urlpatterns = [
     path('api/usuario/<int:pk>/update/', views.usuario_update_api, name='usuario_update_api'),
     path('api/usuario/<int:pk>/delete/', views.usuario_delete_api, name='usuario_delete_api'),
     path("auditoria_dashboard", auditoria_dashboard, name="auditoria_dashboard"),
+    path("registro_empresa/", views.registro_empresa, name="registro_empresa"),
 ]

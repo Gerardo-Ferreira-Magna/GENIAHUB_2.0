@@ -35,6 +35,11 @@ def panel(request):
     return render(request, "webs/panel.html")
 
 
+# registro empresa
+def registro_empresa(request):
+    return render(request, "webs/registro_empresa.html")
+
+
 # Vista proyectos
 def proyectos(request):
     proyectos = [
