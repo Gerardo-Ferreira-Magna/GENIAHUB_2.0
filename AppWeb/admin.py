@@ -2,6 +2,14 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import Usuario, Sede, Carrera, Proyecto, SolicitudEmpresa, AsignacionProyecto, HistorialProyectoParticipantes
 from .models_audit import AuditLog
+from .models import RegistroEmpresa
+from django.contrib import admin
+from django.utils.html import format_html
+from django.utils import timezone
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.contrib.sites.models import Site
+from django.conf import settings
 
 # ----------------------------
 # USUARIO
@@ -181,3 +189,61 @@ class AuditLogAdmin(admin.ModelAdmin):
     list_filter = ("accion", "modelo", "usuario")
     search_fields = ("usuario__email", "modelo", "objeto_id", "accion", "user_agent")
     ordering = ("-fecha_evento",)
+
+
+# ------------------------------------------------------------
+# REGISTRO DE EMPRESA
+
+@admin.register(RegistroEmpresa)
+class RegistroEmpresaAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'nombre_empresa', 'correo_contacto', 'estado', 'created_at',
+    )
+    list_filter = ('estado', 'created_at')
+    search_fields = ('nombre_empresa', 'correo_contacto', 'nif_cif')
+    readonly_fields = ('uuid_seguimiento', 'created_at', 'updated_at')
+
+    actions = ['aprobar', 'rechazar']
+
+    def aprobar(self, request, queryset):
+        updated = 0
+        for reg in queryset:
+            reg.estado = 'APR'
+            reg.updated_by = request.user
+            reg.save(update_fields=['estado', 'updated_by', 'updated_at'])
+            # Activar el usuario EMP asociado (created_by)
+            if reg.created_by:
+                reg.created_by.is_active = True
+                reg.created_by.save(update_fields=['is_active'])
+            # Notificar por correo
+            dominio = Site.objects.get_current().domain
+            link = f"http://{dominio}{reverse('estado_solicitud', args=[reg.uuid_seguimiento])}"
+            send_mail(
+                subject="Tu solicitud ha sido aprobada - GENIAHUB",
+                message=f"¡Felicitaciones! Tu solicitud fue aprobada.\nPuedes ver el estado aquí: {link}",
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@geniahub.cl"),
+                recipient_list=[reg.email_tracking],
+                fail_silently=True,
+            )
+            updated += 1
+        self.message_user(request, f"✅ {updated} solicitud(es) aprobada(s).")
+    aprobar.short_description = "Aprobar solicitud(es)"
+
+    def rechazar(self, request, queryset):
+        updated = 0
+        for reg in queryset:
+            reg.estado = 'REJ'
+            reg.updated_by = request.user
+            reg.save(update_fields=['estado', 'updated_by', 'updated_at'])
+            dominio = Site.objects.get_current().domain
+            link = f"http://{dominio}{reverse('estado_solicitud', args=[reg.uuid_seguimiento])}"
+            send_mail(
+                subject="Tu solicitud ha sido rechazada - GENIAHUB",
+                message=f"Lamentamos informarte que tu solicitud fue rechazada.\nPuedes ver el estado aquí: {link}",
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@geniahub.cl"),
+                recipient_list=[reg.email_tracking],
+                fail_silently=True,
+            )
+            updated += 1
+        self.message_user(request, f"❌ {updated} solicitud(es) rechazada(s).")
+    rechazar.short_description = "Rechazar solicitud(es)"

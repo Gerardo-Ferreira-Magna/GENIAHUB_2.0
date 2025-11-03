@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from django.utils.text import slugify
+import uuid
 
 
 # ----------------------------
@@ -388,3 +389,50 @@ class HistorialProyectoParticipantes(models.Model):
     def __str__(self):
         return f"{self.usuario} — {self.get_rol_display()} ({self.proyecto.titulo})"
 
+
+# ------------------------------------------------------------
+# REGISTRO DE EMPRESA
+# ------------------------------------------------------------
+
+class RegistroEmpresa(AuditStampedModel):
+    """
+    Registro de empresas sin login. Se crea un usuario EMP inactivo y
+    se genera un enlace de seguimiento por UUID.
+    """
+    ESTADO = (
+        ('PEN', 'Pendiente'),
+        ('APR', 'Aprobada'),
+        ('REJ', 'Rechazada'),
+    )
+
+    # Para seguimiento público
+    uuid_seguimiento = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    # Datos visibles del formulario
+    nombre_empresa = models.CharField(max_length=255)
+    direccion_fiscal = models.CharField(max_length=255)
+    nif_cif = models.CharField(max_length=20, verbose_name="NIF/CIF")
+    telefono_contacto = models.CharField(max_length=30, blank=True, null=True)
+    correo_contacto = models.EmailField(max_length=150)
+    documento_adjunto = models.FileField(
+        upload_to="empresas/documentos/",
+        null=True,
+        blank=True,
+        help_text="Documento de respaldo (PDF o Word)."
+    )
+
+    # Estado workflow
+    estado = models.CharField(max_length=3, choices=ESTADO, default="PEN", db_index=True)
+    motivo_rechazo = models.TextField(blank=True, null=True)
+
+    # Para trazabilidad de reenvíos/notificaciones
+    email_tracking = models.EmailField(help_text="Correo que dejó el usuario para seguimiento.")
+
+    def __str__(self):
+        return f"{self.nombre_empresa} - {self.get_estado_display()}"
+
+    class Meta:
+        verbose_name = "Registro de Empresa"
+        verbose_name_plural = "Registros de Empresas"
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['estado'])]

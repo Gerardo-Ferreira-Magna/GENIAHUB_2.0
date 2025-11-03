@@ -1,0 +1,22 @@
+{% extends 'webs/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="card shadow-lg border-0 rounded-4 p-4 mx-auto" style="max-width: 600px;">
+    <div class="mb-3">
+      <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+    </div>
+    <h3 class="fw-bold mb-3">✅ Solicitud enviada correctamente</h3>
+    <p class="text-muted">
+      Gracias por registrar a <strong>{{ registro.nombre_empresa }}</strong> en <strong>GENIAHUB</strong>.<br>
+      Te hemos enviado un correo con el enlace de seguimiento de tu solicitud.
+    </p>
+    <div class="mt-4">
+      <a href="{% url 'index' %}" class="btn btn-primary rounded-pill px-4">
+        <i class="bi bi-house-door me-2"></i> Volver al inicio
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

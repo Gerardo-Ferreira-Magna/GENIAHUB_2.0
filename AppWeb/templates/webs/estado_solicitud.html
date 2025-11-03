@@ -1,0 +1,45 @@
+{% extends 'webs/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-lg border-0 rounded-4 p-4 mx-auto" style="max-width: 650px;">
+    <h3 class="fw-bold text-center mb-4">📋 Estado de tu solicitud</h3>
+
+    <div class="text-center mb-4">
+      <h5 class="text-primary">{{ solicitud.nombre_empresa }}</h5>
+      <p class="text-muted mb-1">Correo de contacto: <strong>{{ solicitud.email_tracking }}</strong></p>
+      <p class="text-muted">Número de seguimiento: <code>{{ solicitud.uuid_seguimiento }}</code></p>
+    </div>
+
+    <div class="alert 
+        {% if solicitud.estado == 'PEN' %}alert-warning
+        {% elif solicitud.estado == 'APR' %}alert-success
+        {% elif solicitud.estado == 'REJ' %}alert-danger
+        {% endif %} text-center">
+      <h5 class="mb-0">
+        {% if solicitud.estado == 'PEN' %}⏳ Pendiente de revisión
+        {% elif solicitud.estado == 'APR' %}✅ Aprobada
+        {% elif solicitud.estado == 'REJ' %}❌ Rechazada
+        {% else %}📬 {{ solicitud.get_estado_display }}
+        {% endif %}
+      </h5>
+    </div>
+
+    {% if solicitud.estado == 'PEN' %}
+      <p class="text-muted text-center">Tu solicitud será revisada por nuestro equipo. Te avisaremos al correo indicado.</p>
+    {% elif solicitud.estado == 'APR' %}
+      <p class="text-muted text-center">Tu registro ha sido aprobado. En breve recibirás tus credenciales de acceso.</p>
+    {% elif solicitud.estado == 'REJ' %}
+      <p class="text-muted text-center">Lamentamos informarte que tu registro fue rechazado. Puedes contactarnos para más detalles.</p>
+    {% endif %}
+
+    <div class="text-center mt-4">
+      <a href="{% url 'reenviar_estado' solicitud.uuid_seguimiento %}" class="btn btn-outline-primary rounded-pill px-4">
+        <i class="bi bi-envelope-arrow-up me-2"></i> Reenviar enlace al correo
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

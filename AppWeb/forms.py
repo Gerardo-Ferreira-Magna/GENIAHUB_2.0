@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, authenticate
 from .models import Usuario
+from .models import RegistroEmpresa
 
 # --------------------------
 # FORMULARIO DE REGISTRO
@@ -72,3 +73,42 @@ class LoginForm(forms.Form):
                 raise forms.ValidationError("❌ Correo o contraseña incorrectos.")
         return cleaned_data
 
+
+# --------------------------
+class RegistroEmpresaForm(forms.ModelForm):
+    class Meta:
+        model = RegistroEmpresa
+        fields = [
+            'nombre_empresa',
+            'direccion_fiscal',
+            'nif_cif',
+            'telefono_contacto',
+            'correo_contacto',
+            'documento_adjunto',
+        ]
+        widgets = {
+            'nombre_empresa': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Introduce el nombre legal de tu empresa'
+            }),
+            'direccion_fiscal': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Dirección completa, ciudad y código postal'
+            }),
+            'nif_cif': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: B12345678'
+            }),
+            'telefono_contacto': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+56 9 1234 5678'
+            }),
+            'correo_contacto': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'contacto@tuempresa.com'
+            }),
+            'documento_adjunto': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.pdf,.doc,.docx'
+            }),
+        }

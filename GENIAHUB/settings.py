@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'AppWeb.apps.AppwebConfig',
 ]
 
@@ -143,3 +144,13 @@ AUDIT_CAPTURE_GET = True
 
 # Límite de bytes para leer del body (para no saturar)
 AUDIT_MAX_BODY_BYTES = 100_000
+
+
+# EMAIL (dev)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "no-reply@geniahub.cl"
+
+
+# Archivos subidos
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
