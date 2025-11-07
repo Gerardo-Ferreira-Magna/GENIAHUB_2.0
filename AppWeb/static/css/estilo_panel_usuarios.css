@@ -1,0 +1,130 @@
+/* =========================================================
+   🎨 FUENTE Y LAYOUT
+========================================================= */
+body, table, .form-control, .btn, .badge, .toast, h3, label {
+  font-family: 'Inter', sans-serif !important;
+}
+
+.panel-container {
+  flex: 1;
+  width: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================
+   📊 TABLA PRINCIPAL
+========================================================= */
+.table-dark {
+  background-color: #212429 !important;
+  color: #fff !important;
+}
+
+.table-dark th {
+  color: #ffc107 !important;
+}
+
+/* =========================================================
+   💡 TARJETAS CLÁSICAS (panel de empresas)
+========================================================= */
+.resumen-cards .card {
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.resumen-cards .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.resumen-card-total {
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.resumen-card-total h6 {
+  font-weight: 600;
+  color: #212529;
+}
+
+.resumen-card-total h3 {
+  font-size: 2rem;
+  color: #0d6efd;
+}
+
+.resumen-card-total div strong {
+  color: #000;
+}
+
+/* =========================================================
+   🧩 TARJETAS MINI (estilo limpio, como la imagen)
+========================================================= */
+.resumen-mini-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: none;
+  transition: all 0.25s ease;
+}
+
+.resumen-mini-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.resumen-mini-card h6 {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.resumen-mini-card h2 {
+  font-size: 1.8rem;
+  color: #212529;
+}
+
+.toast {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0.95;
+}
+.toast-body {
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   ✨ EFECTOS DE ENTRADA
+========================================================= */
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.resumen-cards .card {
+  opacity: 0;
+  animation-duration: 0.6s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+.resumen-cards .card:nth-child(1) { animation-name: fadeInLeft; animation-delay: 0.2s; }
+.resumen-cards .card:nth-child(2) { animation-name: fadeInUp;   animation-delay: 0.3s; }
+.resumen-cards .card:nth-child(3) { animation-name: fadeInUp;   animation-delay: 0.4s; }
+.resumen-cards .card:nth-child(4) { animation-name: fadeInUp;   animation-delay: 0.5s; }
+.resumen-cards .card:nth-child(5) { animation-name: fadeInUp;   animation-delay: 0.6s; }
+.resumen-cards .card:nth-child(6) { animation-name: fadeInRight; animation-delay: 0.7s; }
+

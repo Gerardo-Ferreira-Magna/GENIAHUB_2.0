@@ -20,12 +20,12 @@ class AuditStampedModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="%(class)s_creados",
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="%(class)s_actualizados",
     )
 

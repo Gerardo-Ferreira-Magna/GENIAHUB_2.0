@@ -27,6 +27,7 @@ urlpatterns = [
     path("auditoria_dashboard", auditoria_dashboard, name="auditoria_dashboard"),
     path("api/registro-empresa/exists/", views.verificar_solicitud, name="verificar_solicitud"),
     path("api/registro-empresa/create/", views.crear_solicitud, name="crear_solicitud"),
+    path('api/usuario/create/', views.usuario_create_api, name='usuario_create_api'),
 ]
 
 

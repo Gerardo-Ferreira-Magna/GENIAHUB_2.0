@@ -282,7 +282,7 @@ def usuarios_panel(request):
     if exclude_super == '1':
         qs = qs.exclude(is_superuser=True)
 
-    # Filtros dinámicos
+    # Filtros dinámicos (sin cambios)
     q = request.GET.get('q')
     if q:
         qs = qs.filter(
@@ -306,12 +306,18 @@ def usuarios_panel(request):
     if staff in ('0', '1'):
         qs = qs.filter(is_staff=(staff == '1'))
 
-    # Paginación
+    # --- NUEVOS CONTEOS PARA TARJETAS ---
+    total_usuarios = Usuario.objects.exclude(is_superuser=True).count()
+    activos = Usuario.objects.filter(is_active=True, is_superuser=False).count()
+    inactivos = Usuario.objects.filter(is_active=False, is_superuser=False).count()
+    docentes = Usuario.objects.filter(rol='DOC', is_superuser=False).count()
+    estudiantes = Usuario.objects.filter(rol='EST', is_superuser=False).count()
+    empresas = Usuario.objects.filter(rol='EMP', is_superuser=False).count()
+
     paginator = Paginator(qs, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # URLs dinámicas admin
     admin_user_change_url = f"admin:{Usuario._meta.app_label}_{Usuario._meta.model_name}_change"
     admin_user_add_url = f"admin:{Usuario._meta.app_label}_{Usuario._meta.model_name}_add"
 
@@ -322,47 +328,88 @@ def usuarios_panel(request):
         'admin_user_change_url': admin_user_change_url,
         'admin_user_add_url': admin_user_add_url,
         'csrf_token': csrf_token,
+        # Conteos para las tarjetas
+        'total_usuarios': total_usuarios,
+        'activos': activos,
+        'inactivos': inactivos,
+        'docentes': docentes,
+        'estudiantes': estudiantes,
+        'empresas': empresas,
     })
+
 
 
 # ============================================================
 # 🧾 API USUARIOS (DETALLE / UPDATE / DELETE)
 # ============================================================
 
+from django.db.models import ProtectedError
+
+@staff_required
+@require_POST
+def usuario_delete_api(request, pk):
+    """API: elimina usuario de forma segura y controlada."""
+    try:
+        u = get_object_or_404(Usuario, pk=pk)
+
+        if u.is_superuser:
+            return JsonResponse({"ok": False, "error": "❌ No se puede eliminar un superusuario."}, status=403)
+
+        try:
+            u.delete()
+            return JsonResponse({"ok": True, "message": f"✅ Usuario '{u.nombre} {u.apellido_paterno}' eliminado correctamente."})
+        except ProtectedError as e:
+            print(f"[ERROR] No se puede eliminar el usuario {u.id}: {e}")
+            return JsonResponse({"ok": False, "error": "Este usuario tiene registros asociados y no puede eliminarse."}, status=400)
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"ok": False, "error": f"Error interno: {str(e)}"}, status=500)
+
+
 @staff_required
 def usuario_detail_api(request, pk):
-    """API: devuelve detalle de un usuario."""
-    u = get_object_or_404(Usuario, pk=pk)
-    data = {
-        "id": u.id,
-        "nombre": u.nombre,
-        "apellido_paterno": u.apellido_paterno,
-        "apellido_materno": u.apellido_materno,
-        "rut": u.rut,
-        "email": u.email,
-        "rol": u.rol,
-        "is_active": u.is_active,
-        "is_staff": u.is_staff,
-        "date_joined": u.date_joined.isoformat(),
-    }
-    return JsonResponse({"ok": True, "usuario": data})
-
+    """API: devuelve detalle de un usuario para edición."""
+    try:
+        u = get_object_or_404(Usuario, pk=pk)
+        data = {
+            "id": u.id,
+            "nombre": u.nombre,
+            "apellido_paterno": u.apellido_paterno,
+            "apellido_materno": u.apellido_materno,
+            "rut": u.rut,
+            "email": u.email,
+            "rol": u.rol,
+            "is_active": u.is_active,
+            "is_staff": u.is_staff,
+            "date_joined": u.date_joined.isoformat(),
+        }
+        return JsonResponse({"ok": True, "usuario": data})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"ok": False, "error": f"Error interno: {str(e)}"}, status=500)
+    
 
 @staff_required
 @require_http_methods(["POST"])
 def usuario_update_api(request, pk):
-    """API: actualiza usuario via JSON."""
+    """API: actualiza datos de un usuario existente."""
     try:
         data = json.loads(request.body.decode('utf-8'))
     except Exception:
         return JsonResponse({"ok": False, "error": "JSON inválido"}, status=400)
 
     u = get_object_or_404(Usuario, pk=pk)
-    campos = ['nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'email', 'rol', 'is_active', 'is_staff']
-    for f in campos:
-        if f in data:
-            setattr(u, f, data[f])
 
+    # Campos editables
+    campos = ['nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'email', 'rol', 'is_active', 'is_staff']
+    for campo in campos:
+        if campo in data:
+            setattr(u, campo, data[campo])
+
+    # Validar contraseña si fue enviada
     pwd = data.get('password')
     pwd_confirm = data.get('password_confirm')
     if pwd or pwd_confirm:
@@ -373,7 +420,31 @@ def usuario_update_api(request, pk):
         u.set_password(pwd)
 
     u.save()
-    return JsonResponse({"ok": True, "message": "Usuario actualizado", "usuario_id": u.id})
+    return JsonResponse({"ok": True, "message": "✅ Usuario actualizado correctamente", "usuario_id": u.id})
+
+
+@staff_required
+@require_POST
+def usuario_delete_api(request, pk):
+    """API: elimina un usuario (seguro, con control de errores)."""
+    try:
+        u = get_object_or_404(Usuario, pk=pk)
+
+        # Seguridad: evitar eliminar superusuarios
+        if u.is_superuser:
+            return JsonResponse({"ok": False, "error": "No se puede eliminar un superusuario."}, status=403)
+
+        nombre = f"{u.nombre} {u.apellido_paterno}".strip()
+        u.delete()
+        return JsonResponse({"ok": True, "message": f"🗑️ Usuario '{nombre}' eliminado correctamente."})
+
+    except Usuario.DoesNotExist:
+        return JsonResponse({"ok": False, "error": "Usuario no encontrado."}, status=404)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"ok": False, "error": f"Error interno: {str(e)}"}, status=500)
+
 
 
 @staff_required
@@ -532,3 +603,92 @@ def cambiar_estado_solicitud(request, pk, nuevo_estado):
         messages.info(request, f"📋 Estado actualizado para {solicitud.nombre_empresa}.")
 
     return redirect('panel_solicitudes')
+
+
+@staff_required
+@require_http_methods(["POST"])
+def usuario_create_api(request):
+    """API: crea un nuevo usuario (staff/admin)."""
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "JSON inválido"}, status=400)
+
+    campos_obligatorios = ['nombre', 'apellido_paterno', 'rut', 'email', 'rol']
+    if not all(data.get(c) for c in campos_obligatorios):
+        return JsonResponse({"ok": False, "error": "Faltan campos obligatorios"}, status=400)
+
+    # Validar contraseñas
+    pwd = data.get('password')
+    pwd_confirm = data.get('password_confirm')
+    if not pwd or not pwd_confirm:
+        return JsonResponse({"ok": False, "error": "Debe ingresar y confirmar la contraseña"}, status=400)
+    if pwd != pwd_confirm:
+        return JsonResponse({"ok": False, "error": "Las contraseñas no coinciden"}, status=400)
+    if len(pwd) < 6:
+        return JsonResponse({"ok": False, "error": "La contraseña debe tener al menos 6 caracteres"}, status=400)
+
+    # Crear usuario
+    User = get_user_model()
+    if User.objects.filter(email=data['email']).exists():
+        return JsonResponse({"ok": False, "error": "El correo ya está registrado"}, status=400)
+
+    u = User(
+        nombre=data['nombre'],
+        apellido_paterno=data['apellido_paterno'],
+        apellido_materno=data.get('apellido_materno', ''),
+        rut=data['rut'],
+        email=data['email'],
+        rol=data['rol'],
+        is_active=data.get('is_active', True),
+        is_staff=data.get('is_staff', False),
+    )
+    u.set_password(pwd)
+    u.save()
+
+    return JsonResponse({"ok": True, "usuario_id": u.id, "message": "Usuario creado correctamente"})
+
+
+@staff_required
+@require_http_methods(["POST"])
+def usuario_create_api(request):
+    """API: crea un nuevo usuario (solo staff)."""
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "JSON inválido"}, status=400)
+
+    campos_obligatorios = ['nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'email', 'rol']
+    for campo in campos_obligatorios:
+        if not data.get(campo):
+            return JsonResponse({"ok": False, "error": f"El campo '{campo}' es obligatorio."}, status=400)
+
+    password = data.get('password')
+    password_confirm = data.get('password_confirm')
+    if not password or not password_confirm:
+        return JsonResponse({"ok": False, "error": "Debe ingresar y confirmar una contraseña."}, status=400)
+    if password != password_confirm:
+        return JsonResponse({"ok": False, "error": "Las contraseñas no coinciden."}, status=400)
+    if len(password) < 6:
+        return JsonResponse({"ok": False, "error": "La contraseña debe tener al menos 6 caracteres."}, status=400)
+
+    # Crear usuario
+    UsuarioModel = get_user_model()
+    if UsuarioModel.objects.filter(email=data['email']).exists():
+        return JsonResponse({"ok": False, "error": "Ya existe un usuario con ese correo."}, status=400)
+
+    u = UsuarioModel.objects.create(
+        nombre=data['nombre'],
+        apellido_paterno=data['apellido_paterno'],
+        apellido_materno=data['apellido_materno'],
+        rut=data['rut'],
+        email=data['email'],
+        rol=data['rol'],
+        is_active=data.get('is_active', True),
+        is_staff=data.get('is_staff', False),
+    )
+    u.set_password(password)
+    u.save()
+
+    return JsonResponse({"ok": True, "message": "Usuario creado correctamente", "usuario_id": u.id})
+
