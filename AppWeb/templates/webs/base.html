@@ -224,7 +224,7 @@
                     <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
                        data-bs-toggle="collapse" href="#submenuProyectos"
                        role="button" aria-expanded="false" aria-controls="submenuProyectos">
-                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Proyectos</span></span>
+                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Docente</span></span>
                         <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
                     </a>
 
@@ -238,14 +238,39 @@
                 </li>
 
                 <li>
-                    <a href="#" class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span><i class="bi bi-chat-dots"></i> <span class="nav-text">Mensajes</span></span>
-                        <span class="bg-danger rounded-pill text-white py-0 px-2 count-badge">02</span>
+                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+                       data-bs-toggle="collapse" href="#submenuEstudiante"
+                       role="button" aria-expanded="false" aria-controls="submenuEstudiante">
+                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Estudiante</span></span>
+                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
                     </a>
+
+                    <ul class="collapse list-unstyled ps-4" id="submenuEstudiante">
+                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Panel Proyectos</span></a></li>
+                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Proyectos</span></a></li>
+                        <li><a href="{% url 'tareas' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Tareas</span></a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Nuevo Proyecto</span></a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Solicitudes</span></a></li>
+                    </ul>
                 </li>
 
-                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-gear"></i> <span class="nav-text">Servicios</span></a></li>
-                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-people"></i> <span class="nav-text">Clientes</span></a></li>
+                <li>
+                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+                       data-bs-toggle="collapse" href="#submenuEmpresa"
+                       role="button" aria-expanded="false" aria-controls="submenuEmpresa">
+                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Empresa</span></span>
+                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
+                    </a>
+
+                    <ul class="collapse list-unstyled ps-4" id="submenuEmpresa">
+                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Panel Empresa</span></a></li>
+                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Proyectos</span></a></li>
+                        <li><a href="{% url 'tareas' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Tareas</span></a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Nuevo Proyecto</span></a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Solicitudes</span></a></li>
+                    </ul>
+                </li>
+
             </ul>
 
             <hr class="h-color mx-2">
@@ -253,7 +278,7 @@
             <ul class="list-unstyled px-2">
                 <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-sliders"></i> <span class="nav-text">Configuración</span></a></li>
                 <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-bell"></i> <span class="nav-text">Notificaciones</span></a></li>
-                <li><a class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-layout-wtf"></i> <span class="nav-text">Versión Beta</span></a></li>
+                <li><a class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-layout-wtf"></i> <span class="nav-text">Versión 1.1</span></a></li>
             </ul>
         </div>
 
