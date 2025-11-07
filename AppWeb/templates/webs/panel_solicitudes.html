@@ -1,58 +1,10 @@
 {% extends 'webs/base.html' %}
-
+{% load static %}
 
 {% block content %}
-
 <!-- Fuente Google -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-
-/* ======== FUENTE GLOBAL ======== */
-body, table, .form-control, .btn, .badge, .toast, h3, label {
-  font-family: 'Inter', sans-serif !important;
-}
-
-/* ======== AJUSTE DE LAYOUT ======== */
-.main-container .content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.dashboard-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0;
-}
-
-/* ======== CONTENEDOR PRINCIPAL ======== */
-.panel-container {
-  flex: 1;
-  width: 100%;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ======== TABLA ======== */
-/* Forzar color personalizado para .table-dark */
-.table-dark {
-  background-color: #212429 !important;
-  color: #fff !important;
-}
-
-/* Para eliminar márgenes laterales fijos */
-@media (min-width: 992px) {
-  .panel-container {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/estilo_panel_solicitudes.css' %}">
 
 <div class="container-fluid panel-container">
 
@@ -166,8 +118,6 @@ body, table, .form-control, .btn, .badge, .toast, h3, label {
               <td>{{ s.nombre_empresa }}</td>
               <td>{{ s.nif_cif }}</td>
               <td>{{ s.email_tracking }}</td>
-
-              <!-- DOCUMENTO -->
               <td class="text-center">
                 {% if s.documento_adjunto and s.documento_adjunto.name %}
                   <a href="{{ s.documento_adjunto.url }}" class="btn btn-outline-secondary btn-sm" download title="Descargar documento">
@@ -175,8 +125,6 @@ body, table, .form-control, .btn, .badge, .toast, h3, label {
                   </a>
                 {% endif %}
               </td>
-
-              <!-- ESTADO -->
               <td data-estado="{{ s.estado }}">
                 <span class="badge 
                   {% if s.estado == 'PEN' %}bg-warning text-dark
@@ -186,8 +134,6 @@ body, table, .form-control, .btn, .badge, .toast, h3, label {
                   {{ s.get_estado_display }}
                 </span>
               </td>
-
-              <!-- MOTIVO -->
               <td>
                 {% if s.estado == 'REJ' %}
                   <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalMotivo{{ s.pk }}">
@@ -197,11 +143,7 @@ body, table, .form-control, .btn, .badge, .toast, h3, label {
                   <span class="text-muted small">—</span>
                 {% endif %}
               </td>
-
-              <!-- FECHA -->
               <td>{{ s.created_at|date:"d-m-Y H:i" }}</td>
-
-              <!-- ACCIÓN -->
               <td>
                 <div class="d-flex gap-2">
                   <button class="btn btn-outline-primary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalEditar{{ s.pk }}">
@@ -288,36 +230,60 @@ body, table, .form-control, .btn, .badge, .toast, h3, label {
 <!-- JS -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+  // === Toasts ===
   document.querySelectorAll('.toast').forEach(t => new bootstrap.Toast(t, { delay: 3500 }).show());
+
+  // === ANIMACIÓN SOLO AL INGRESAR ===
+  const cards = document.querySelectorAll('.resumen-cards .card');
+  const yaAnimado = sessionStorage.getItem("cardsAnimadas");
+
+  if (!yaAnimado) {
+    cards.forEach(card => {
+      card.style.opacity = 0;
+      card.style.animationPlayState = "running";
+    });
+
+    // Marca como animadas después de 1 segundo
+    setTimeout(() => sessionStorage.setItem("cardsAnimadas", "true"), 1000);
+  } else {
+    // Si ya entró antes, se muestran sin animación
+    cards.forEach(card => {
+      card.style.opacity = 1;
+      card.style.animation = "none";
+    });
+  }
+
+  // === FILTRO DE TABLA ===
+  const filtroTexto = document.getElementById("filtroTexto");
+  const filtroEstado = document.getElementById("filtroEstado");
+  const filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
+
+  function filtrarTabla() {
+    const texto = filtroTexto.value.toLowerCase().trim();
+    const estadoSel = filtroEstado.value;
+
+    filas.forEach(fila => {
+      const columnas = fila.querySelectorAll("td");
+      const empresa = columnas[1]?.innerText.toLowerCase() || "";
+      const nif = columnas[2]?.innerText.toLowerCase() || "";
+      const correo = columnas[3]?.innerText.toLowerCase() || "";
+      const estado = fila.querySelector("td[data-estado]")?.getAttribute("data-estado") || "";
+
+      const coincideTexto = empresa.includes(texto) || nif.includes(texto) || correo.includes(texto);
+      const coincideEstado = !estadoSel || estado === estadoSel;
+
+      fila.style.display = (coincideTexto && coincideEstado) ? "" : "none";
+    });
+  }
+
+  filtroTexto.addEventListener("input", filtrarTabla);
+  filtroEstado.addEventListener("change", filtrarTabla);
 });
-
-const filtroTexto = document.getElementById("filtroTexto");
-const filtroEstado = document.getElementById("filtroEstado");
-const filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
-
-function filtrarTabla() {
-  const texto = filtroTexto.value.toLowerCase().trim();
-  const estadoSel = filtroEstado.value;
-
-  filas.forEach(fila => {
-    const columnas = fila.querySelectorAll("td");
-    const empresa = columnas[1]?.innerText.toLowerCase() || "";
-    const nif = columnas[2]?.innerText.toLowerCase() || "";
-    const correo = columnas[3]?.innerText.toLowerCase() || "";
-    const estado = fila.querySelector("td[data-estado]")?.getAttribute("data-estado") || "";
-
-    const coincideTexto = empresa.includes(texto) || nif.includes(texto) || correo.includes(texto);
-    const coincideEstado = !estadoSel || estado === estadoSel;
-
-    fila.style.display = (coincideTexto && coincideEstado) ? "" : "none";
-  });
-}
-
-filtroTexto.addEventListener("input", filtrarTabla);
-filtroEstado.addEventListener("change", filtrarTabla);
 </script>
 
+
 {% endblock %}
+
 
 
 

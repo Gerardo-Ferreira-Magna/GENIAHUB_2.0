@@ -1,0 +1,50 @@
+/* Fuente global */
+body, table, .form-control, .btn, .badge, .toast, h3, label {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Contenedor principal */
+.panel-container {
+  flex: 1;
+  width: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tabla */
+.table-dark {
+  background-color: #212429 !important;
+  color: #fff !important;
+}
+
+/* Animaciones */
+@keyframes fadeInUp { from {opacity:0;transform:translateY(30px);} to {opacity:1;transform:translateY(0);} }
+@keyframes fadeInDown { from {opacity:0;transform:translateY(-30px);} to {opacity:1;transform:translateY(0);} }
+@keyframes fadeInLeft { from {opacity:0;transform:translateX(-30px);} to {opacity:1;transform:translateX(0);} }
+@keyframes fadeInRight { from {opacity:0;transform:translateX(30px);} to {opacity:1;transform:translateX(0);} }
+
+/* Tarjetas con animación y borde fino */
+.resumen-cards .card {
+  opacity: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  animation-duration: 0.6s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+/* Hover elegante */
+.resumen-cards .card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-color: rgba(33, 37, 41, 0.4);
+}
+
+/* Direcciones de entrada */
+.resumen-cards .card:nth-child(1) { animation-name: fadeInLeft; animation-delay: 0.2s; }
+.resumen-cards .card:nth-child(2) { animation-name: fadeInUp; animation-delay: 0.3s; }
+.resumen-cards .card:nth-child(3) { animation-name: fadeInDown; animation-delay: 0.4s; }
+.resumen-cards .card:nth-child(4) { animation-name: fadeInRight; animation-delay: 0.5s; }
+
