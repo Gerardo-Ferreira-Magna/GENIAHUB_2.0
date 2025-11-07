@@ -3,25 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}GENIAHUB | Dashboard{% endblock title %}</title> 
-    
+    <title>{% block title %}GENIAHUB | Dashboard{% endblock title %}</title>
+
+    <!-- Fuentes y librerías -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+
     {% block extra_css %}
     <style>
-        /* Estilos base del contenedor principal */
-        .main-container { min-height: 100vh; }
+        /* ======== CONFIGURACIÓN GLOBAL ======== */
+        html, body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden !important;
+            scroll-behavior: smooth;
+        }
 
-        /* Estilos para el sidebar */
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* ======== SIDEBAR ======== */
         .sidebar {
             width: 250px;
             background-color: #212429;
-            transition: all 0.3s;
-            flex-shrink: 0; 
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: relative;
         }
 
-        /* Estilo para ocultar/mostrar el sidebar en pantallas pequeñas */
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar.collapsed:hover {
+            width: 250px;
+        }
+
+        /* Ocultar texto y elementos cuando está colapsado */
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .h-color,
+        .sidebar.collapsed .count-badge {
+            display: none !important;
+        }
+
+        /* Mostrar texto cuando está expandido o en hover */
+        .sidebar:not(.collapsed) .nav-text,
+        .sidebar:not(.collapsed) .h-color,
+        .sidebar:not(.collapsed) .count-badge,
+        .sidebar.collapsed:hover .nav-text,
+        .sidebar.collapsed:hover .h-color,
+        .sidebar.collapsed:hover .count-badge {
+            display: inline !important;
+        }
+
+        /* ======== CONTENIDO PRINCIPAL ======== */
+        .content {
+            flex: 1;
+            width: 100%;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-content {
+            padding-bottom: 50px;
+        }
+
+        /* ======== LINKS Y BOTONES ======== */
+        .sidebar ul li a {
+            color: #ccc;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            padding-left: 15px !important;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar.collapsed ul li a {
+            padding-left: 17px !important;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #444;
+            color: #fff;
+            border-radius: 5px;
+            transform: translateX(3px);
+        }
+
+        .sidebar ul li.active a {
+            background-color: #0d6efd;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        /* ======== PIN ======== */
+        #pin-sidebar-btn {
+            transition: all 0.3s;
+        }
+
+        #pin-sidebar-btn.fixed i {
+            color: var(--bs-info);
+            transform: rotate(45deg);
+        }
+
+        /* ======== SEPARADOR ======== */
+        .h-color {
+            border-top: 1px solid #666;
+            opacity: 0.5;
+        }
+
+        /* ======== FLECHA DE COLAPSO ======== */
+        .nav-link[aria-expanded="true"] .arrow,
+        a[aria-expanded="true"] .arrow {
+            transform: rotate(90deg);
+            color: var(--bs-warning) !important;
+        }
+
+        .nav-link[aria-expanded="false"] .arrow,
+        a[aria-expanded="false"] .arrow {
+            transform: rotate(0deg);
+            color: var(--bs-warning) !important;
+        }
+
+        /* ======== RESPONSIVO ======== */
         @media (max-width: 768px) {
             .sidebar {
                 margin-left: -250px;
@@ -29,46 +136,28 @@
                 height: 100%;
                 z-index: 1000;
             }
-            .sidebar.active { margin-left: 0; }
+
+            .sidebar.active {
+                margin-left: 0;
+                width: 250px;
+            }
+
+            .sidebar.active .nav-text,
+            .sidebar.active .header-box h3,
+            .sidebar.active .h-color,
+            .sidebar.active .count-badge {
+                display: inline !important;
+            }
+
+            #pin-sidebar-btn {
+                display: none !important;
+            }
+
+            .content {
+                width: 100%;
+                flex: 1;
+            }
         }
-
-        /* Contenedor de contenido */
-        .content { flex-grow: 1; }
-        .header-box h3 { color: #fff; }
-
-        /* Estilos de los enlaces del menú */
-        .sidebar ul li a { color: #ccc; }
-        .sidebar ul li a:hover {
-            background-color: #444;
-            color: #fff;
-            border-radius: 5px;
-        }
-
-        /* Estilo para el elemento de menú activo */
-        .sidebar ul li.active a {
-            background-color: #0d6efd;
-            border-radius: 5px;
-            color: #fff;
-        }
-
-        /* Estilo del separador */
-        .h-color { border-top: 1px solid #666; opacity: 0.5; }
-
-        /* Estilo para el contenido de la dashboard */
-        .dashboard-content { padding-bottom: 50px; }
-
-        .nav-link[aria-expanded="true"] .arrow,
-        a[aria-expanded="true"] .arrow {
-        transform: rotate(90deg);
-        color: var(--bs-warning) !important;
-        }
-
-        .nav-link[aria-expanded="false"] .arrow,
-        a[aria-expanded="false"] .arrow {
-        transform: rotate(0deg);
-        color: var(--bs-warning) !important;
-        }
-
     </style>
     {% endblock extra_css %}
 </head>
@@ -76,109 +165,100 @@
 
     <div class="main-container d-flex">
         
-        <div class="sidebar" id="side_nav">
-            <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">
-                <h3 class="fs-4"><span class="text-warning">GENIAHUB</span></h3>
-                <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i
-                        class="bi bi-list"></i></button>
+        <!-- ======== SIDEBAR ======== -->
+        <div class="sidebar collapsed" id="side_nav">
+            <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between align-items-center">
+                <h3 class="fs-4">
+                    <span class="text-warning">G</span>
+                    <span class="nav-text text-warning">ENIAHUB</span>
+                </h3>
+
+                <button id="pin-sidebar-btn" class="btn p-0 d-none d-md-block text-white" title="Fijar Menú">
+                    <i class="bi bi-pin-angle" style="font-size: 1.2rem;"></i>
+                </button>
+
+                <button class="btn d-md-none d-block close-btn px-1 py-0 text-white">
+                    <i class="bi bi-list"></i>
+                </button>
             </div>
 
             <ul class="list-unstyled px-2">
                 <li class="active">
                     <a class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-house-door"></i> Inicio
+                        <i class="bi bi-house-door"></i> <span class="nav-text">Inicio</span>
                     </a>
                 </li>
 
                 {% if request.user.is_authenticated and request.user.is_staff %}
-                <li class="">
+                <li>
                     <a href="{% url 'admin:index' %}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-person-lock"></i> Admin Django
+                        <i class="bi bi-person-lock"></i> <span class="nav-text">Admin Django</span>
                     </a>
                 </li>
                 {% endif %}
 
-                <li class="">
+                <li>
                     <a href="#" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-bar-chart"></i> Dashboard
+                        <i class="bi bi-bar-chart"></i> <span class="nav-text">Dashboard</span>
                     </a>
                 </li>
 
                 {% if request.user.is_authenticated and request.user.is_staff %}
-                <li class="">
-                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center" 
-                        data-bs-toggle="collapse" href="#submenuPanelAdmin" 
-                        role="button" aria-expanded="false" aria-controls="submenuPanelAdmin">
-                        <span><i class="bi bi-clipboard2-check"></i> Panel Admin</span>
+                <li>
+                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+                       data-bs-toggle="collapse" href="#submenuPanelAdmin"
+                       role="button" aria-expanded="false" aria-controls="submenuPanelAdmin">
+                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Panel Admin</span></span>
                         <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
                     </a>
 
                     <ul class="collapse list-unstyled ps-4" id="submenuPanelAdmin">
-                        <li><a href="{% url 'auditoria_dashboard' %}" class="text-decoration-none px-3 py-1 d-block">• Auditoría</a></li>
-                        <li><a href="{% url 'usuarios_panel' %}" class="text-decoration-none px-3 py-1 d-block">• Usuarios</a></li>
-                        <li><a href="{% url 'panel_solicitudes' %}" class="text-decoration-none px-3 py-1 d-block">• Solicitud Empresa</a></li>
+                        <li><a href="{% url 'auditoria_dashboard' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Auditoría</span></a></li>
+                        <li><a href="{% url 'usuarios_panel' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Usuarios</span></a></li>
+                        <li><a href="{% url 'panel_solicitudes' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Solicitud Empresa</span></a></li>
                     </ul>
-                    </li>
+                </li>
                 {% endif %}
 
-                <li class="">
-                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center" 
-                        data-bs-toggle="collapse" href="#submenuProyectos" 
-                        role="button" aria-expanded="false" aria-controls="submenuProyectos">
-                        <span><i class="bi bi-clipboard2-check"></i> Proyectos</span>
+                <li>
+                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+                       data-bs-toggle="collapse" href="#submenuProyectos"
+                       role="button" aria-expanded="false" aria-controls="submenuProyectos">
+                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Proyectos</span></span>
                         <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
                     </a>
 
                     <ul class="collapse list-unstyled ps-4" id="submenuProyectos">
-                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block">• Panel Proyectos</a></li>
-                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block">• Mis Proyectos</a></li>
-                        <li><a href="{% url 'tareas' %}" class="text-decoration-none px-3 py-1 d-block">• Mis Tareas</a></li>
-                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block">• Nuevo Proyecto</a></li>
-                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block">• Solicitudes</a></li>
-                        
+                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Panel Proyectos</span></a></li>
+                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Proyectos</span></a></li>
+                        <li><a href="{% url 'tareas' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Tareas</span></a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Nuevo Proyecto</span></a></li>
+                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Solicitudes</span></a></li>
                     </ul>
-                    </li>
-                <li class="">
-                    <a href="{}" class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span><i class="bi bi-chat-dots"></i> Mensajes</span>
-                        <span class="bg-danger rounded-pill text-white py-0 px-2">02</span>
+                </li>
+
+                <li>
+                    <a href="#" class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
+                        <span><i class="bi bi-chat-dots"></i> <span class="nav-text">Mensajes</span></span>
+                        <span class="bg-danger rounded-pill text-white py-0 px-2 count-badge">02</span>
                     </a>
                 </li>
-                <li class="">
-                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-gear"></i> Servicios
-                    </a>
-                </li>
-                <li class="">
-                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-people"></i> Clientes
-                    </a>
-                </li>
+
+                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-gear"></i> <span class="nav-text">Servicios</span></a></li>
+                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-people"></i> <span class="nav-text">Clientes</span></a></li>
             </ul>
 
             <hr class="h-color mx-2">
 
             <ul class="list-unstyled px-2">
-                <li class="">
-                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-sliders"></i> Configuración
-                    </a>
-                </li>
-                <li class="">
-                    <a href="{}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-bell"></i> Notificaciones
-                    </a>
-                </li>
-                <li class="">
-                    <a class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-layout-wtf"></i> Versión Beta
-                    </a>
-                </li>
+                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-sliders"></i> <span class="nav-text">Configuración</span></a></li>
+                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-bell"></i> <span class="nav-text">Notificaciones</span></a></li>
+                <li><a class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-layout-wtf"></i> <span class="nav-text">Versión Beta</span></a></li>
             </ul>
         </div>
-        
+
+        <!-- ======== CONTENIDO ======== -->
         <div class="content">
-            
             <nav class="navbar navbar-expand-md navbar-light bg-light">
                 <div class="container-fluid">
                     <div class="d-flex justify-content-between d-md-none d-block">
@@ -187,8 +267,8 @@
                     </div>
 
                     <button class="navbar-toggler p-0 border-0" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
                         <i class="bi bi-list"></i>
                     </button>
 
@@ -196,14 +276,14 @@
                         <ul class="navbar-nav mb-2 mb-lg-0">
                             {% if user.is_authenticated %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{}">(Hola, {{ request.usuario.nombre }})</a>
+                                <a class="nav-link" href="#">(Hola, {{ request.usuario.nombre }})</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{% url 'logout' %}">Cerrar Sesión</a>
+                                <a class="nav-link active" href="{% url 'logout' %}">Cerrar Sesión</a>
                             </li>
                             {% else %}
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{}">Login</a>
+                                <a class="nav-link active" href="#">Login</a>
                             </li>
                             {% endif %}
                         </ul>
@@ -211,44 +291,62 @@
                 </div>
             </nav>
 
-            <!-- Contenido específico de cada página -->
             <div class="dashboard-content p-4">
                 {% block content %}
-                <!-- Contenido específico de cada página -->
                 {% endblock content %}
             </div>
-            
+        </div>
     </div>
 
+    <!-- ======== SCRIPTS ======== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {% block extra_js %}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('side_nav');
-            // Selectores para los botones de abrir y cerrar
             const openBtn = document.querySelector('.open-btn');
             const closeBtn = document.querySelector('.close-btn');
+            const pinBtn = document.getElementById('pin-sidebar-btn');
 
-            // Toggle Sidebar al hacer clic en el botón de abrir (móvil)
-            if (openBtn) {
-                openBtn.addEventListener('click', function () {
-                    sidebar.classList.add('active');
+            // Verificar si es móvil
+            function isMobile() {
+                return window.innerWidth <= 768;
+            }
+
+            // Botón de Pin/Fijación (Escritorio)
+            if (pinBtn) {
+                if (!sidebar.classList.contains('collapsed')) {
+                    pinBtn.classList.add('fixed');
+                }
+
+                pinBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('collapsed');
+                    pinBtn.classList.toggle('fixed');
+                    if (!sidebar.classList.contains('collapsed')) {
+                        sidebar.classList.remove('active');
+                    }
                 });
             }
 
-            // Ocultar Sidebar al hacer clic en el botón de cerrar (móvil)
+            // Menú móvil
+            if (openBtn) {
+                openBtn.addEventListener('click', function () {
+                    sidebar.classList.add('active');
+                    sidebar.classList.remove('collapsed');
+                });
+            }
+
             if (closeBtn) {
                 closeBtn.addEventListener('click', function () {
                     sidebar.classList.remove('active');
+                    if (!isMobile() && pinBtn && !pinBtn.classList.contains('fixed')) {
+                        sidebar.classList.add('collapsed');
+                    }
                 });
             }
         });
     </script>
-    
-
     {% endblock extra_js %}
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

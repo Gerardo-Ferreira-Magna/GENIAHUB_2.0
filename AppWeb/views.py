@@ -36,6 +36,8 @@ from .models import Usuario, RegistroEmpresa
 from .models_audit import AuditLog
 from .forms import RegistroForm, LoginForm, RegistroEmpresaForm
 from .models import RegistroEmpresa
+from django.shortcuts import render
+from .models import RegistroEmpresa
 
 # ============================================================
 # VISTAS PÚBLICAS BÁSICAS
@@ -459,9 +461,22 @@ def crear_solicitud(request):
 
 # === PANEL DE SOLICITUDES ===
 def panel_solicitudes(request):
-    """Listado de solicitudes de empresas"""
-    solicitudes = RegistroEmpresa.objects.all().order_by('-created_at')
-    return render(request, 'webs/panel_solicitudes.html', {'solicitudes': solicitudes})
+    solicitudes = RegistroEmpresa.objects.all()
+
+    # Conteos directos optimizados en SQL
+    total = solicitudes.count()
+    aprobadas = solicitudes.filter(estado='APR').count()
+    pendientes = solicitudes.filter(estado='PEN').count()
+    rechazadas = solicitudes.filter(estado='REJ').count()
+
+    context = {
+        'solicitudes': solicitudes,
+        'total': total,
+        'aprobadas': aprobadas,
+        'pendientes': pendientes,
+        'rechazadas': rechazadas,
+    }
+    return render(request, 'webs/panel_solicitudes.html', context)
 
 
 # === EDITAR SOLICITUD ===

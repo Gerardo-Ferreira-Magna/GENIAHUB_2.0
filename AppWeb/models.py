@@ -7,6 +7,7 @@ from django.utils.text import slugify
 import uuid
 
 
+
 # ----------------------------
 # Auditoría obligatoria (abstract)
 # ----------------------------
@@ -436,3 +437,5 @@ class RegistroEmpresa(AuditStampedModel):
         verbose_name_plural = "Registros de Empresas"
         ordering = ['-created_at']
         indexes = [models.Index(fields=['estado'])]
+
+
