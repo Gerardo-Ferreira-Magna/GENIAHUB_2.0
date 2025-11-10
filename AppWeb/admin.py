@@ -10,21 +10,48 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.contrib.sites.models import Site
 from django.conf import settings
+from django import forms
 
 # ----------------------------
 # USUARIO
 # ----------------------------
+
+class UsuarioAdminForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = "__all__"
+        widgets = {
+            "sobre_mi": forms.Textarea(attrs={"rows": 4}),
+            "habilidades": forms.Textarea(attrs={"rows": 2}),
+            "experiencia": forms.Textarea(attrs={"rows": 4}),
+            "industrias_interes": forms.Textarea(attrs={"rows": 2}),
+            "tecnologias_preferidas": forms.Textarea(attrs={"rows": 2}),
+        }
+
+
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
     model = Usuario
-    list_display = ('email', 'nombre', 'apellido_paterno', 'rol', 'rut', 'is_staff', 'is_active')
-    list_filter = ('rol', 'is_staff', 'is_active', 'is_superuser')
+    list_display = (
+        'email', 'nombre', 'apellido_paterno', 'rol',
+        'carrera', 'sede', 'is_staff', 'is_active'
+    )
+    list_filter = ('rol', 'is_staff', 'is_active', 'is_superuser', 'carrera', 'sede')
     search_fields = ('email', 'nombre', 'apellido_paterno', 'apellido_materno', 'rut')
     ordering = ('-date_joined',)
 
     fieldsets = (
         ('Información Personal', {
-            'fields': ('nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'email', 'password', 'rol')
+            'fields': (
+                'nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'email', 'password', 'rol',
+                'carrera', 'sede'
+            )
+        }),
+        ('Perfil Académico y Profesional', {
+            'fields': (
+                'sobre_mi', 'habilidades', 'experiencia',
+                'industrias_interes', 'tecnologias_preferidas'
+            )
         }),
         ('Permisos y Accesos', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
@@ -39,6 +66,7 @@ class UsuarioAdmin(UserAdmin):
             'classes': ('wide',),
             'fields': (
                 'email', 'nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'rol',
+                'carrera', 'sede',
                 'password1', 'password2', 'is_active', 'is_staff', 'is_superuser'
             ),
         }),

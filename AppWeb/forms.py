@@ -112,3 +112,29 @@ class RegistroEmpresaForm(forms.ModelForm):
                 'accept': '.pdf,.doc,.docx'
             }),
         }
+
+
+class PerfilForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = [
+            "sobre_mi",
+            "habilidades",
+            "experiencia",
+            "industrias_interes",
+            "tecnologias_preferidas",
+        ]
+        widgets = {
+            "sobre_mi": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "habilidades": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+            "experiencia": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "industrias_interes": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+            "tecnologias_preferidas": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+        }
+        labels = {
+            "sobre_mi": "Sobre mí",
+            "habilidades": "Habilidades (separadas por comas)",
+            "experiencia": "Experiencia laboral / académica",
+            "industrias_interes": "Industrias de interés (separadas por comas)",
+            "tecnologias_preferidas": "Tecnologías preferidas (separadas por comas)",
+        }

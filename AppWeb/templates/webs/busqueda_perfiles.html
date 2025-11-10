@@ -1,0 +1,144 @@
+{% extends 'webs/base.html' %}
+{% load static %}
+{% block title %}GENIAHUB | Búsqueda de Perfiles{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h3 class="fw-bold text-primary mb-2"><i class="bi bi-search me-2 text-primary"></i> Búsqueda de Perfiles</h3>
+  <p class="text-muted mb-4">Encuentra y revisa los perfiles de estudiantes registrados en la plataforma.</p>
+
+  <!-- 🔍 Buscador -->
+  <form method="get" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Buscar por nombre, habilidad o carrera..."
+             value="{{ query }}">
+      <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+    </div>
+
+    <!-- 🎛️ Filtros -->
+    <div class="row mt-3">
+      <div class="col-md-4">
+        <select name="carrera" class="form-select">
+          <option value="">Todas las carreras</option>
+          {% for c in carreras %}
+            <option value="{{ c }}" {% if c == carrera_filtro %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <select name="habilidad" class="form-select">
+          <option value="">Todas las habilidades</option>
+          {% for h in habilidades %}
+            <option value="{{ h }}" {% if h == habilidad_filtro %}selected{% endif %}>{{ h }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <button type="submit" class="btn btn-outline-primary me-2"><i class="bi bi-filter"></i> Aplicar filtros</button>
+        <a href="{% url 'busqueda_perfiles' %}" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Limpiar</a>
+      </div>
+    </div>
+  </form>
+
+  <!-- 🧠 Rejilla de resultados -->
+  <div class="row g-4">
+    {% for est in estudiantes %}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card bg-dark text-light border-0 shadow-sm rounded-4 perfil-card h-100"
+           data-bs-toggle="modal" data-bs-target="#perfilModal{{ est.id }}">
+        <div class="card-body text-center p-4">
+          <i class="bi bi-person-circle text-light opacity-75" style="font-size:4.5rem;"></i>
+          <h5 class="fw-semibold mt-3 mb-1 text-white">{{ est.nombre }}</h5>
+          <p class="text-secondary small mb-2">{{ est.carrera|default:"Sin carrera" }}</p>
+          <p class="text-secondary small">{{ est.sede|default:"Sin sede" }}</p>
+          {% if est.habilidades3 %}
+            {% for h in est.habilidades3 %}
+              <span class="badge bg-secondary me-1">{{ h }}</span>
+            {% endfor %}
+          {% else %}
+            <span class="badge bg-secondary">Sin habilidades</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal del perfil completo -->
+    <div class="modal fade" id="perfilModal{{ est.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border-0 rounded-4">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title fw-semibold">
+              <i class="bi bi-person-lines-fill me-2"></i>{{ est.nombre }}
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-1"><strong>Correo:</strong> {{ est.email }}</p>
+            <p class="mb-3"><strong>RUT:</strong> {{ est.rut }}</p>
+
+            <h6 class="text-info mt-2">Carrera y Sede</h6>
+            <p>
+              <span class="text-light">{{ est.carrera|default:"Sin carrera" }}</span><br>
+              <small class="text-secondary">{{ est.sede|default:"Sin sede" }}</small>
+            </p>
+
+            <h6 class="text-info mt-3">Sobre mí</h6>
+            <p>{{ est.sobre_mi|default:"Sin descripción." }}</p>
+
+            <h6 class="text-info mt-3">Habilidades</h6>
+            {% if est.habilidades %}
+              {% for h in est.habilidades %}
+                <span class="badge bg-secondary me-1 mb-1">{{ h }}</span>
+              {% endfor %}
+            {% else %}
+              <p class="text-secondary">Sin habilidades registradas.</p>
+            {% endif %}
+
+            <h6 class="text-info mt-3">Experiencia</h6>
+            <p>{{ est.experiencia|default:"Sin experiencia registrada." }}</p>
+
+            <h6 class="text-info mt-3">Industrias de interés</h6>
+            {% if est.industrias %}
+              {% for ind in est.industrias %}
+                <span class="badge bg-success me-1 mb-1">{{ ind }}</span>
+              {% endfor %}
+            {% else %}
+              <p class="text-secondary">Sin industrias registradas.</p>
+            {% endif %}
+
+            <h6 class="text-info mt-3">Tecnologías preferidas</h6>
+            {% if est.tecnologias %}
+              {% for tech in est.tecnologias %}
+                <span class="badge bg-primary me-1 mb-1">{{ tech }}</span>
+              {% endfor %}
+            {% else %}
+              <p class="text-secondary">Sin tecnologías registradas.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <div class="col-12 text-center py-5">
+        <p class="text-muted">No se encontraron perfiles con los filtros seleccionados.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 🎨 Estilos -->
+<style>
+.perfil-card {
+  transition: transform .2s ease, box-shadow .2s ease;
+  cursor: pointer;
+}
+.perfil-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}
+
+
+
+

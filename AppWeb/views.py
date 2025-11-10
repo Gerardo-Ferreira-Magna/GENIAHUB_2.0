@@ -1,6 +1,3 @@
-# ============================================================
-# 📦 IMPORTS
-# ============================================================
 
 # --- Python estándar ---
 import json  # Usado en usuario_update_api
@@ -38,6 +35,9 @@ from .forms import RegistroForm, LoginForm, RegistroEmpresaForm
 from .models import RegistroEmpresa
 from django.shortcuts import render
 from .models import RegistroEmpresa
+from .forms import PerfilForm
+from .models import Usuario, Carrera
+
 
 # ============================================================
 # VISTAS PÚBLICAS BÁSICAS
@@ -692,3 +692,136 @@ def usuario_create_api(request):
 
     return JsonResponse({"ok": True, "message": "Usuario creado correctamente", "usuario_id": u.id})
 
+
+@login_required
+def perfil_estudiante(request):
+    user = request.user
+    habilidades = user.habilidades.split(",") if user.habilidades else []
+    industrias = user.industrias_interes.split(",") if user.industrias_interes else []
+    tecnologias = user.tecnologias_preferidas.split(",") if user.tecnologias_preferidas else []
+
+    return render(request, "webs/perfil_estudiante.html", {
+        "usuario": user,
+        "habilidades": [h.strip() for h in habilidades if h.strip()],
+        "industrias": [i.strip() for i in industrias if i.strip()],
+        "tecnologias": [t.strip() for t in tecnologias if t.strip()],
+    })
+
+
+@login_required
+def editar_perfil(request):
+    if request.method == "POST":
+        user = request.user
+        user.sobre_mi = request.POST.get("sobre_mi", "")
+        user.habilidades = request.POST.get("habilidades", "")
+        user.experiencia = request.POST.get("experiencia", "")
+        user.industrias_interes = request.POST.get("industrias_interes", "")
+        user.tecnologias_preferidas = request.POST.get("tecnologias_preferidas", "")
+        user.save()
+        return JsonResponse({"ok": True})
+    return JsonResponse({"ok": False}, status=400)
+
+
+@login_required
+def busqueda_perfiles(request):
+    """Vista principal para docentes (server-rendered, tarjetas oscuras)."""
+    if request.user.rol != "DOC" and not request.user.is_superuser:
+        messages.warning(request, "⚠️ Solo los docentes pueden acceder a esta vista.")
+        return redirect("panel")
+
+    # Filtros simples (opcionales, desde GET)
+    q = request.GET.get("q", "").strip()
+    carrera_filtro = request.GET.get("carrera", "").strip()
+    habilidad_filtro = request.GET.get("habilidad", "").strip()
+
+    qs = Usuario.objects.filter(rol="EST").select_related("carrera")
+
+    if q:
+        qs = qs.filter(
+            Q(nombre__icontains=q) |
+            Q(apellido_paterno__icontains=q) |
+            Q(apellido_materno__icontains=q) |
+            Q(sobre_mi__icontains=q) |
+            Q(habilidades__icontains=q) |
+            Q(tecnologias_preferidas__icontains=q)
+        )
+    if carrera_filtro:
+        qs = qs.filter(carrera__nombre__icontains=carrera_filtro)
+    if habilidad_filtro:
+        qs = qs.filter(habilidades__icontains=habilidad_filtro)
+
+    qs = qs.order_by("apellido_paterno", "nombre")
+
+    estudiantes = []
+    for e in qs:
+        habs = [h.strip() for h in (e.habilidades or "").split(",") if h.strip()]
+        inds = [i.strip() for i in (e.industrias_interes or "").split(",") if i.strip()]
+        tech = [t.strip() for t in (e.tecnologias_preferidas or "").split(",") if t.strip()]
+        estudiantes.append({
+            "id": e.id,
+            "nombre": f"{e.nombre} {e.apellido_paterno}",
+            "email": e.email,
+            "rut": e.rut,
+            "carrera": e.carrera.nombre if e.carrera else "Sin carrera",
+            "sobre_mi": e.sobre_mi or "",
+            "experiencia": e.experiencia or "",
+            "habilidades": habs,
+            "habilidades3": habs[:3],
+            "industrias": inds,
+            "tecnologias": tech,
+        })
+
+    # Para combos
+    carreras = sorted({c.nombre for c in Carrera.objects.all()})
+    habilidades = sorted({h for e in estudiantes for h in e["habilidades"]})
+
+    return render(request, "webs/busqueda_perfiles.html", {
+        "estudiantes": estudiantes,          # ⬅️ ahora sí
+        "carreras": carreras,
+        "habilidades": habilidades,
+        "query": q,
+        "carrera_filtro": carrera_filtro,
+        "habilidad_filtro": habilidad_filtro,
+    })
+
+
+@login_required
+def buscar_perfiles_ajax(request):
+    """Devuelve perfiles de estudiantes en JSON."""
+    if request.user.rol not in ["DOC", "ADM"]:
+        return JsonResponse({"error": "No autorizado"}, status=403)
+
+    query = request.GET.get("q", "")
+    carrera = request.GET.get("carrera", "")
+    habilidad = request.GET.get("habilidad", "")
+
+    estudiantes = Usuario.objects.filter(rol="EST")
+
+    if query:
+        estudiantes = estudiantes.filter(
+            Q(nombre__icontains=query)
+            | Q(apellido_paterno__icontains=query)
+            | Q(habilidades__icontains=query)
+            | Q(tecnologias_preferidas__icontains=query)
+            | Q(sobre_mi__icontains=query)
+        )
+    if carrera:
+        estudiantes = estudiantes.filter(carrera__nombre__icontains=carrera)
+    if habilidad:
+        estudiantes = estudiantes.filter(habilidades__icontains=habilidad)
+
+    data = []
+    for e in estudiantes:
+        data.append({
+            "id": e.id,
+            "nombre": f"{e.nombre} {e.apellido_paterno}",
+            "carrera": e.carrera.nombre if hasattr(e, 'carrera') and e.carrera else "Sin carrera",
+            "habilidades": [h.strip() for h in (e.habilidades or "").split(",") if h.strip()],
+            "email": e.email,
+            "sobre_mi": e.sobre_mi or "",
+            "experiencia": e.experiencia or "",
+            "industrias": e.industrias_interes or "",
+            "tecnologias": e.tecnologias_preferidas or "",
+        })
+
+    return JsonResponse({"resultados": data})

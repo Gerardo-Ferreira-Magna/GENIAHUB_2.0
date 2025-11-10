@@ -28,6 +28,12 @@ urlpatterns = [
     path("api/registro-empresa/exists/", views.verificar_solicitud, name="verificar_solicitud"),
     path("api/registro-empresa/create/", views.crear_solicitud, name="crear_solicitud"),
     path('api/usuario/create/', views.usuario_create_api, name='usuario_create_api'),
+    path("perfil/estudiante/", views.perfil_estudiante, name="perfil_estudiante"),
+    path("perfil/estudiante/", views.perfil_estudiante, name="perfil_estudiante"),
+    path("perfil/estudiante/<int:pk>/", views.perfil_estudiante, name="perfil_estudiante_detalle"),
+    path("perfil/editar/", views.editar_perfil, name="perfil_editar"),
+    path("perfiles/", views.busqueda_perfiles, name="busqueda_perfiles"),
+    path("api/perfiles/buscar/", views.buscar_perfiles_ajax, name="buscar_perfiles_ajax"),
 ]
 
 

@@ -77,6 +77,27 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
+    sobre_mi = models.TextField(blank=True, null=True, verbose_name="Sobre mí")
+    habilidades = models.TextField(blank=True, null=True, verbose_name="Habilidades (separadas por comas)")
+    experiencia = models.TextField(blank=True, null=True, verbose_name="Experiencia o descripción laboral")
+    industrias_interes = models.TextField(blank=True, null=True, verbose_name="Industrias de interés (separadas por comas)")
+    tecnologias_preferidas = models.TextField(blank=True, null=True, verbose_name="Tecnologías preferidas (separadas por comas)")
+
+    carrera = models.ForeignKey(
+        'Carrera',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuarios'
+    )
+
+    sede = models.ForeignKey(
+        'Sede',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuarios'
+    )
 
     objects = UsuarioManager()
 

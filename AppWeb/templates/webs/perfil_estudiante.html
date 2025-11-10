@@ -1,0 +1,220 @@
+{% extends 'webs/base.html' %}
+{% load static %}
+{% block title %}GENIAHUB | Perfil de Usuario{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Columna izquierda -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 rounded-4 mb-4 bg-dark text-light">
+        <div class="card-body text-center">
+          <i class="bi bi-person-circle text-secondary" style="font-size:6rem;"></i>
+          <h4 class="fw-bold mt-3">{{ usuario.nombre }} {{ usuario.apellido_paterno }}</h4>
+          <p class="text-muted">{{ usuario.get_rol_display }}</p>
+          <p class="text-warning small mb-1"><i class="bi bi-envelope"></i> {{ usuario.email }}</p>
+          <p class="text-warning small"><i class="bi bi-building"></i> {{ usuario.sede.nombre|default:"Sin sede" }}</p>
+
+          {% if request.user == usuario %}
+          <button class="btn btn-outline-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
+            <i class="bi bi-pencil-square"></i> Editar Perfil
+          </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 bg-dark text-light">
+        <div class="card-body">
+          <h6 class="fw-semibold text-primary"><i class="bi bi-link-45deg"></i> Enlaces</h6>
+          <ul class="list-unstyled mt-3 small">
+            <li><i class="bi bi-globe me-2"></i> <a href="#" class="text-decoration-none">Portfolio personal</a></li>
+            <li><i class="bi bi-github me-2"></i> <a href="#" class="text-decoration-none">GitHub</a></li>
+            <li><i class="bi bi-linkedin me-2"></i> <a href="#" class="text-decoration-none">LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="col-lg-8">
+      <!-- SOBRE MÍ -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body">
+          <h5 class="fw-semibold text-primary mb-3">Sobre mí</h5>
+          <p id="text-sobre-mi">{{ usuario.sobre_mi|default:"No ha agregado una descripción aún." }}</p>
+        </div>
+      </div>
+
+      <!-- HABILIDADES -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body">
+          <h5 class="fw-semibold text-primary mb-3">Habilidades y Competencias</h5>
+          <div id="text-habilidades">
+            {% if habilidades %}
+              {% for skill in habilidades %}
+                <span class="badge bg-light text-dark border me-1 mb-2">{{ skill }}</span>
+              {% endfor %}
+            {% else %}
+              <p class="text-muted">No ha registrado habilidades.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPERIENCIA -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body">
+          <h5 class="fw-semibold text-primary mb-3">Experiencia</h5>
+          <p id="text-experiencia">{{ usuario.experiencia|default:"No ha agregado experiencia aún." }}</p>
+        </div>
+      </div>
+
+      <!-- PREFERENCIAS -->
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <h5 class="fw-semibold text-primary mb-3">Preferencias de Proyecto</h5>
+
+          <div class="mb-2">
+            <h6 class="text-muted">Industrias de Interés</h6>
+            <div id="text-industria">
+              {% if industrias %}
+                {% for ind in industrias %}
+                  <span class="badge bg-success-subtle text-success border me-1 mb-2">{{ ind }}</span>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted">No ha registrado industrias de interés.</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div>
+            <h6 class="text-muted">Tecnologías Preferidas</h6>
+            <div id="text-tecnologias">
+              {% if tecnologias %}
+                {% for tech in tecnologias %}
+                  <span class="badge bg-primary-subtle text-primary border me-1 mb-2">{{ tech }}</span>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted">No ha registrado tecnologías preferidas.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🧩 MODAL DE EDICIÓN -->
+<div class="modal fade" id="editarPerfilModal" tabindex="-1" aria-labelledby="editarPerfilModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header bg-primary text-white rounded-top-4">
+        <h5 class="modal-title fw-semibold" id="editarPerfilModalLabel">
+          <i class="bi bi-pencil-square me-2"></i>Editar Perfil
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <form method="post" id="perfilForm">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="id_sobre_mi" class="form-label fw-semibold">Sobre mí</label>
+            <textarea name="sobre_mi" id="id_sobre_mi" class="form-control" rows="3">{{ usuario.sobre_mi }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_habilidades" class="form-label fw-semibold">Habilidades</label>
+            <textarea name="habilidades" id="id_habilidades" class="form-control" rows="2">{{ usuario.habilidades }}</textarea>
+            <div class="form-text">Separar por comas (ej: Python, SQL, Power BI)</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_experiencia" class="form-label fw-semibold">Experiencia</label>
+            <textarea name="experiencia" id="id_experiencia" class="form-control" rows="3">{{ usuario.experiencia }}</textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="id_industrias_interes" class="form-label fw-semibold">Industrias de interés</label>
+              <textarea name="industrias_interes" id="id_industrias_interes" class="form-control" rows="2">{{ usuario.industrias_interes }}</textarea>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_tecnologias_preferidas" class="form-label fw-semibold">Tecnologías preferidas</label>
+              <textarea name="tecnologias_preferidas" id="id_tecnologias_preferidas" class="form-control" rows="2">{{ usuario.tecnologias_preferidas }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ TOAST -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999;">
+  <div id="perfilToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body fw-semibold">
+        ✅ Perfil actualizado correctamente.
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
+
+<!-- 🧠 Script -->
+<script>
+document.getElementById("perfilForm")?.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+
+  const response = await fetch("{% url 'perfil_editar' %}", {
+    method: "POST",
+    headers: { "X-CSRFToken": formData.get("csrfmiddlewaretoken") },
+    body: formData
+  });
+
+  const modal = bootstrap.Modal.getInstance(document.getElementById("editarPerfilModal"));
+  if (response.ok) {
+    const data = Object.fromEntries(formData.entries());
+    modal.hide();
+
+    // Toast éxito
+    const toast = new bootstrap.Toast(document.getElementById("perfilToast"));
+    toast.show();
+
+    // Actualizar textos
+    document.getElementById("text-sobre-mi").innerText = data.sobre_mi || "No ha agregado una descripción aún.";
+    document.getElementById("text-experiencia").innerText = data.experiencia || "No ha agregado experiencia aún.";
+
+    // Actualizar habilidades
+    const habilidades = data.habilidades.split(',').map(h => h.trim()).filter(Boolean);
+    const contH = document.getElementById("text-habilidades");
+    contH.innerHTML = habilidades.length
+      ? habilidades.map(h => `<span class="badge bg-light text-dark border me-1 mb-2">${h}</span>`).join('')
+      : '<p class="text-muted">No ha registrado habilidades.</p>';
+
+    // Actualizar industrias
+    const industrias = data.industrias_interes.split(',').map(i => i.trim()).filter(Boolean);
+    const contI = document.getElementById("text-industria");
+    contI.innerHTML = industrias.length
+      ? industrias.map(i => `<span class="badge bg-success-subtle text-success border me-1 mb-2">${i}</span>`).join('')
+      : '<p class="text-muted">No ha registrado industrias de interés.</p>';
+
+    // Actualizar tecnologías
+    const tecnologias = data.tecnologias_preferidas.split(',').map(t => t.trim()).filter(Boolean);
+    const contT = document.getElementById("text-tecnologias");
+    contT.innerHTML = tecnologias.length
+      ? tecnologias.map(t => `<span class="badge bg-primary-subtle text-primary border me-1 mb-2">${t}</span>`).join('')
+      : '<p class="text-muted">No ha registrado tecnologías preferidas.</p>';
+  } else {
+    alert("❌ Error al actualizar el perfil.");
+  }
+});
+</script>
+{% endblock %}
