@@ -491,34 +491,148 @@ function ghAddMsg(role, text) {
 }
 
 /* Interacción básica */
-ghSend.addEventListener("click", () => {
+/* === RESPUESTAS PERMITIDAS === */
+let ghRespuestas = {
+  "que es geniahub": `
+    🧠 <strong>GENIAHUB</strong> es una plataforma académica y empresarial que conecta 
+    estudiantes, docentes y empresas para desarrollar proyectos reales apoyados con IA.
+  `,
+  "fundadores": `
+    👥 GENIAHUB fue creado por un equipo de Ingenieros en Informática con apoyo de Inteligencia Artificial.
+  `,
+  "ia": `
+    🤖 GENIAHUB utiliza IA para mejorar la toma de decisiones, analizar información y apoyar proyectos académicos y empresariales.
+  `
+};
+
+/* === FUNCIONES PARA MOSTRAR BOTONES DINÁMICOS === */
+function ghBotonesPreguntas() {
+  let html = `<div style="margin-top:10px;">`;
+
+  for (let key in ghRespuestas) {
+    html += `
+      <button class="btn btn-sm btn-outline-primary w-100 mb-1" 
+              onclick="ghPreguntaRapida('${key}')">
+        ${formatearPregunta(key)}
+      </button>
+    `;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+/* Texto bonito para los botones */
+function formatearPregunta(key) {
+  if (key === "que es geniahub") return "¿Qué es GENIAHUB?";
+  if (key === "fundadores") return "Fundadores";
+  if (key === "ia") return "Uso de IA";
+  return key;
+}
+
+/* Click en los botones */
+function ghPreguntaRapida(key) {
+  ghAddMsg("user", "🧑‍💻 " + formatearPregunta(key));
+
+  // responder en 400ms
+  setTimeout(() => {
+
+    ghAddMsg("bot", ghRespuestas[key]);
+
+    // eliminar la pregunta contestada
+    delete ghRespuestas[key];
+
+    // si aún quedan preguntas:
+    if (Object.keys(ghRespuestas).length > 0) {
+
+      ghAddMsg("bot", `
+        🔎 ¿Deseas saber algo más?<br>
+        ${ghBotonesPreguntas()}
+        <br><br>
+        🔐 <a href="/login/" class="btn btn-primary btn-sm mt-2">Iniciar sesión</a>
+      `);
+
+    } else {
+
+      ghAddMsg("bot", `
+        😊 ¡Ya respondí todas tus preguntas permitidas!<br><br>
+        🔐 <a href="/login/" class="btn btn-primary btn-sm mt-2">Iniciar sesión en GENIAHUB</a>
+      `);
+
+    }
+
+  }, 400); // ← ← ESTE CIERRE FALTABA
+} // ← ← ESTE CIERRE TAMBIÉN FALTABA
+
+/* === PROCESAMIENTO DE PREGUNTA ESCRITA === */
+function ghProcesarPregunta(texto) {
+  texto = texto.toLowerCase().trim();
+
+  // SALUDOS
+  if (texto.includes("hola") || texto.includes("buenas") || texto.includes("que tal")) {
+    return `
+      👋 ¡Hola! ¿Cómo estás?<br>
+      Por ahora solo puedo responder estas preguntas:<br>
+      ${ghBotonesPreguntas()}
+    `;
+  }
+
+  // Buscar respuesta
+  for (let key in ghRespuestas) {
+    if (texto.includes(key)) {
+      let respuesta = ghRespuestas[key];
+      delete ghRespuestas[key]; // quitarla de la lista
+
+      let sugerencias = Object.keys(ghRespuestas).length
+  ? `
+      <br><br>🔎 ¿Quieres saber algo más?<br>
+      ${ghBotonesPreguntas()}
+      <br><br>🔐 <a href="/login/" class="btn btn-primary btn-sm mt-2">
+      Iniciar sesión</a>
+    `
+  : `
+      <br><br>😊 ¡Ya respondí todas tus preguntas permitidas!<br>
+      <br>
+      🔐 <a href="/login/" class="btn btn-primary btn-sm">
+      Iniciar sesión en GENIAHUB</a>
+    `;
+
+      return respuesta + sugerencias;
+    }
+  }
+
+  // Si no entiende
+  return `
+    🤖 Por ahora solo puedo responder estas preguntas:<br>
+    ${ghBotonesPreguntas()}
+  `;
+}
+
+/* === PERMITIR TECLA ENTER === */
+ghInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    ghEnviar();
+  }
+});
+
+/* === FUNCIÓN GENERAL DE ENVÍO === */
+function ghEnviar() {
   const userMsg = ghInput.value.trim();
   if (!userMsg) return;
+
   ghAddMsg("user", "🧑‍💻 " + userMsg);
   ghInput.value = "";
 
   setTimeout(() => {
-    let respuesta = "🤖 No entiendo muy bien. ¿Podrías reformularlo?";
-    const lower = userMsg.toLowerCase();
-
-    if (lower.includes("hola") || lower.includes("buenas")) {
-      respuesta = "👋 ¡Hola! Soy el asistente de GENIA HUB. Puedo contarte sobre la plataforma o proyectos disponibles.";
-    } else if (lower.includes("genia hub") || lower.includes("aplicación") || lower.includes("plataforma")) {
-      respuesta = "💡 GENIA HUB es una plataforma de innovación donde docentes y estudiantes comparten proyectos tecnológicos. ¿Quieres saber más?";
-    } else if (lower.includes("sí") || lower.includes("mas información") || lower.includes("más info")) {
-      respuesta = "🔐 Para darte más información detallada, por favor inicia sesión en tu cuenta.<br><a href='/login/' style='color:#0d6efd;text-decoration:none;'>🔗 Iniciar sesión</a>";
-    } else if (lower.includes("gracias")) {
-      respuesta = "😊 ¡De nada! Estoy aquí para ayudarte.";
-    }
-
+    const respuesta = ghProcesarPregunta(userMsg);
     ghAddMsg("bot", respuesta);
-  }, 600);
-});
+  }, 400);
+}
 
-/* Iniciar tooltip al cargar */
-window.addEventListener("load", () => {
-  setTimeout(ghIniciarMensajes, 2500);
-});
+/* Cuando se presiona el botón enviar */
+ghSend.addEventListener("click", ghEnviar);
+
 </script>
 
   </body>

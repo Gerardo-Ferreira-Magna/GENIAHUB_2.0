@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, authenticate
 from .models import Usuario
 from .models import RegistroEmpresa
+from .models import Proyecto
 
 # --------------------------
 # FORMULARIO DE REGISTRO
@@ -137,4 +138,27 @@ class PerfilForm(forms.ModelForm):
             "experiencia": "Experiencia laboral / académica",
             "industrias_interes": "Industrias de interés (separadas por comas)",
             "tecnologias_preferidas": "Tecnologías preferidas (separadas por comas)",
+        }
+
+
+class ProyectoForm(forms.ModelForm):
+    class Meta:
+        model = Proyecto
+        fields = [
+            "titulo",
+            "resumen",
+            "descripcion",
+            "tipo",
+            "estado",
+            "anio",
+            "carrera",
+            "sede",
+            "palabras_clave",
+            "documento_pdf",
+            "es_publico",
+        ]
+
+        widgets = {
+            "resumen": forms.Textarea(attrs={"rows": 3}),
+            "descripcion": forms.Textarea(attrs={"rows": 5}),
         }

@@ -37,6 +37,8 @@ from django.shortcuts import render
 from .models import RegistroEmpresa
 from .forms import PerfilForm
 from .models import Usuario, Carrera
+from .forms import ProyectoForm
+from .models import Carrera, Sede, Proyecto, Usuario
 
 
 # ============================================================
@@ -825,3 +827,36 @@ def buscar_perfiles_ajax(request):
         })
 
     return JsonResponse({"resultados": data})
+
+
+@login_required
+def crear_proyecto(request):
+    # SOLO DOCENTES Y ADMIN
+    if request.user.rol not in ["DOC", "ADM"]:
+        messages.error(request, "No tienes permisos para crear proyectos.")
+        return redirect("proyectos")
+
+    if request.method == "POST":
+        form = ProyectoForm(request.POST, request.FILES)
+        if form.is_valid():
+            proyecto = form.save(commit=False)
+
+            # Auditoría
+            proyecto.autor = request.user
+            proyecto.created_by = request.user
+            proyecto.updated_by = request.user
+
+            proyecto.save()
+
+            messages.success(request, "Proyecto creado exitosamente.")
+            return redirect("proyectos")
+    else:
+        form = ProyectoForm()
+
+    context = {
+        "form": form,
+        "carreras": Carrera.objects.all(),
+        "sedes": Sede.objects.all(),
+    }
+
+    return render(request, "webs/creacion_proyecto.html", context)

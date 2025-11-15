@@ -34,6 +34,7 @@ urlpatterns = [
     path("perfil/editar/", views.editar_perfil, name="perfil_editar"),
     path("perfiles/", views.busqueda_perfiles, name="busqueda_perfiles"),
     path("api/perfiles/buscar/", views.buscar_perfiles_ajax, name="buscar_perfiles_ajax"),
+    path("creacion_proyecto/", views.crear_proyecto, name="crear_proyecto"),
 ]
 
 
