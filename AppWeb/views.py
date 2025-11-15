@@ -27,6 +27,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 
 # --- Modelos y Formularios ---
 from .models import Usuario, RegistroEmpresa
@@ -831,7 +832,6 @@ def buscar_perfiles_ajax(request):
 
 @login_required
 def crear_proyecto(request):
-    # SOLO DOCENTES Y ADMIN
     if request.user.rol not in ["DOC", "ADM"]:
         messages.error(request, "No tienes permisos para crear proyectos.")
         return redirect("proyectos")
@@ -839,7 +839,12 @@ def crear_proyecto(request):
     if request.method == "POST":
         form = ProyectoForm(request.POST, request.FILES)
         if form.is_valid():
+
             proyecto = form.save(commit=False)
+
+            # Convertimos la fecha del form al AÑO
+            fecha = form.cleaned_data["fecha_proyecto"]
+            proyecto.anio = fecha.year
 
             # Auditoría
             proyecto.autor = request.user
@@ -847,16 +852,65 @@ def crear_proyecto(request):
             proyecto.updated_by = request.user
 
             proyecto.save()
-
             messages.success(request, "Proyecto creado exitosamente.")
             return redirect("proyectos")
+        else:
+            print(form.errors)   # Para debug
+
     else:
         form = ProyectoForm()
 
     context = {
         "form": form,
-        "carreras": Carrera.objects.all(),
-        "sedes": Sede.objects.all(),
     }
-
     return render(request, "webs/creacion_proyecto.html", context)
+
+
+@login_required
+def proyecto_editar_modal(request):
+    if request.method != "POST":
+        messages.error(request, "Método no permitido.")
+        return redirect("panel")
+
+    proyecto_id = request.POST.get("proyecto_id")
+
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+    # Validar permisos
+    if request.user != proyecto.autor and request.user.rol not in ["ADM"]:
+        messages.error(request, "No tienes permisos para editar este proyecto.")
+        return redirect("panel")
+
+    # Actualizar campos recibidos
+    proyecto.titulo = request.POST.get("titulo")
+    proyecto.resumen = request.POST.get("resumen")
+    proyecto.descripcion = request.POST.get("descripcion")
+    proyecto.estado = request.POST.get("estado")
+
+    # Regenerar slug si cambia título
+    proyecto.slug = slugify(f"{proyecto.titulo}-{proyecto.anio}")
+
+    proyecto.save()
+
+    messages.success(request, "Proyecto actualizado correctamente.")
+    return redirect("panel")
+
+
+@login_required
+def proyecto_eliminar_modal(request):
+    if request.method != "POST":
+        messages.error(request, "Método no permitido.")
+        return redirect("panel")
+
+    proyecto_id = request.POST.get("proyecto_id")
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+    # Validar permisos
+    if request.user != proyecto.autor and request.user.rol not in ["ADM"]:
+        messages.error(request, "No tienes permisos para eliminar este proyecto.")
+        return redirect("panel")
+
+    proyecto.delete()
+
+    messages.success(request, "Proyecto eliminado exitosamente.")
+    return redirect("panel")

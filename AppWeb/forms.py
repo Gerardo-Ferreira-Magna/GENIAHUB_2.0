@@ -142,6 +142,12 @@ class PerfilForm(forms.ModelForm):
 
 
 class ProyectoForm(forms.ModelForm):
+
+    fecha_proyecto = forms.DateField(
+        required=True,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"})
+    )
+
     class Meta:
         model = Proyecto
         fields = [
@@ -150,15 +156,23 @@ class ProyectoForm(forms.ModelForm):
             "descripcion",
             "tipo",
             "estado",
-            "anio",
             "carrera",
             "sede",
             "palabras_clave",
             "documento_pdf",
             "es_publico",
+            # NOTA: "anio" se calculará desde fecha_proyecto
         ]
 
         widgets = {
-            "resumen": forms.Textarea(attrs={"rows": 3}),
-            "descripcion": forms.Textarea(attrs={"rows": 5}),
+            "titulo": forms.TextInput(attrs={"class": "form-control"}),
+            "tipo": forms.Select(attrs={"class": "form-select"}),
+            "estado": forms.Select(attrs={"class": "form-select"}),
+            "resumen": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "descripcion": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
+            "carrera": forms.Select(attrs={"class": "form-select"}),
+            "sede": forms.Select(attrs={"class": "form-select"}),
+            "palabras_clave": forms.TextInput(attrs={"class": "form-control"}),
+            "documento_pdf": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "es_publico": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }

@@ -7,121 +7,114 @@
 <div class="container mt-4">
 
     <h2 class="fw-bold mb-4">
-        <i class="bi bi-folder-plus text-primary"></i> Crear Nuevo Proyecto
+        <i class="bi bi-folder-plus text-primary"></i>
+        Crear Nuevo Proyecto
     </h2>
 
     <form action="" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4">
         {% csrf_token %}
 
-        <!-- ============================
+        <!-- ===============================
              INFORMACIÓN GENERAL
-        ============================= -->
+        ================================ -->
         <h5 class="fw-bold mb-3 text-primary">Información General</h5>
+
         <div class="row g-3">
 
             <div class="col-12">
                 <label class="form-label fw-semibold">Título del Proyecto</label>
-                <input type="text" name="titulo" class="form-control" required>
+                {{ form.titulo }}
             </div>
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Tipo de Proyecto</label>
-                <select name="tipo" class="form-select" required>
-                    <option value="EST">Estudiantil</option>
-                    <option value="DOC">Docente</option>
-                    <option value="EMP">Empresarial</option>
-                </select>
+                {{ form.tipo }}
             </div>
 
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Año</label>
-                <input type="number" name="anio" class="form-control" placeholder="2025" min="2000" required>
+                <label class="form-label fw-semibold">Fecha del Proyecto</label>
+                {{ form.fecha_proyecto }}
             </div>
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Estado</label>
-                <select name="estado" class="form-select" required>
-                    <option value="BOR">Borrador</option>
-                    <option value="REV">En revisión</option>
-                    <option value="APR">Aprobado</option>
-                    <option value="ACT">En ejecución</option>
-                    <option value="DET">Detenido</option>
-                    <option value="FIN">Finalizado</option>
-                    <option value="PUB">Publicado</option>
-                </select>
+                {{ form.estado }}
             </div>
 
             <div class="col-12">
                 <label class="form-label fw-semibold">Resumen Ejecutivo</label>
-                <textarea name="resumen" class="form-control" rows="3" required></textarea>
+                {{ form.resumen }}
             </div>
 
             <div class="col-12">
                 <label class="form-label fw-semibold">Descripción Completa</label>
-                <textarea name="descripcion" class="form-control" rows="5" required></textarea>
+                {{ form.descripcion }}
             </div>
+
         </div>
 
         <hr class="my-4">
 
-        <!-- ============================
+        <!-- ===============================
              DATOS ADICIONALES
-        ============================= -->
+        ================================ -->
         <h5 class="fw-bold mb-3 text-primary">Datos Adicionales</h5>
 
         <div class="row g-3">
+
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Carrera (opcional)</label>
-                <select name="carrera" class="form-select">
-                    <option value="">-- Seleccione --</option>
-                    {% for c in carreras %}
-                    <option value="{{ c.id }}">{{ c.nombre }} - {{ c.sede.codigo }}</option>
-                    {% endfor %}
-                </select>
+                <label class="form-label fw-semibold">Carrera</label>
+                {{ form.carrera }}
             </div>
 
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Sede (opcional)</label>
-                <select name="sede" class="form-select">
-                    <option value="">-- Seleccione --</option>
-                    {% for s in sedes %}
-                    <option value="{{ s.id }}">{{ s.nombre }}</option>
-                    {% endfor %}
-                </select>
+                <label class="form-label fw-semibold">Sede</label>
+                {{ form.sede }}
             </div>
 
             <div class="col-12">
                 <label class="form-label fw-semibold">Palabras clave</label>
-                <input type="text" name="palabras_clave" class="form-control" placeholder="Ej: IA, logística, automatización">
+                {{ form.palabras_clave }}
             </div>
 
             <div class="col-12">
-                <label class="form-label fw-semibold">Documento PDF (opcional)</label>
-                <input type="file" name="documento_pdf" class="form-control" accept=".pdf">
+                <label class="form-label fw-semibold">Documento PDF</label>
+                {{ form.documento_pdf }}
             </div>
+
         </div>
 
         <hr class="my-4">
 
-        <!-- ============================
+        <!-- ===============================
              VISIBILIDAD
-        ============================= -->
+        ================================ -->
         <h5 class="fw-bold mb-3 text-primary">Visibilidad</h5>
 
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" name="es_publico" id="es_publico">
-            <label class="form-check-label fw-semibold" for="es_publico">Proyecto público en GENIAHUB</label>
+            {{ form.es_publico }}
+            <label class="form-check-label fw-semibold">
+                Proyecto público
+            </label>
         </div>
 
+        <!-- ===============================
+             BOTONES
+        ================================ -->
         <div class="d-flex justify-content-end mt-4">
             <a href="{% url 'proyectos' %}" class="btn btn-outline-secondary me-2">
                 Cancelar
             </a>
+
             <button type="submit" class="btn btn-primary px-4">
-                <i class="bi bi-check-circle"></i> Crear Proyecto
+                <i class="bi bi-check-circle"></i>
+                Crear Proyecto
             </button>
         </div>
+
     </form>
+
 </div>
 
 {% endblock %}
+

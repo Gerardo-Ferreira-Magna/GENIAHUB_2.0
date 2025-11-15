@@ -5,31 +5,30 @@
 
 {% block content %}
 
-<!-- Fuente -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/estilo_panel.css' %}">
-
-
-
-
 
 <div class="container-fluid px-4 py-4">
 
   <!-- Encabezado -->
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <h2 class="fw-bold section-title mb-2 text-primary"><i class="bi bi-clipboard-check me-2 text-primary"></i>Panel de Proyectos</h2>
-    <button class="btn btn-primary rounded-pill px-4">
+    <h2 class="fw-bold section-title mb-2 text-primary">
+      <i class="bi bi-clipboard-check me-2 text-primary"></i>Panel de Proyectos
+    </h2>
+
+    <a href="{% url 'creacion_proyecto' %}" class="btn btn-primary rounded-pill px-4">
       <i class="bi bi-plus-circle me-2"></i>Nuevo Proyecto
-    </button>
+    </a>
   </div>
 
-  <!-- Tabla de Proyectos -->
+  <!-- Mostrar cantidad de proyectos -->
+  <p class="text-muted">Total de proyectos: {{ proyectos|length }}</p>
+
   <div class="card p-3 mb-5">
+
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-      <h5 class="fw-bold mb-0">Proyectos Activos</h5>
-      <div class="d-flex align-items-center">
-        <input id="searchInput" type="text" class="form-control form-control-sm" placeholder="Buscar proyecto o docente...">
-      </div>
+      <h5 class="fw-bold mb-0">Proyectos Registrados</h5>
+      <input id="searchInput" type="text" class="form-control form-control-sm" placeholder="Buscar proyecto o docente...">
     </div>
 
     <div class="table-responsive">
@@ -38,134 +37,304 @@
           <tr>
             <th>#</th>
             <th>Proyecto</th>
-            <th>Lider Proyecto</th>
+            <th>Líder Proyecto</th>
             <th>Estado</th>
             <th>Progreso</th>
-            <th>Fecha de Inicio</th>
-            <th>Entrega</th>
-            
+            <th>Creación</th>
+            <th>Última actualización</th>
             <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr>
-            <td>01</td><td>Proyecto Alpha</td><td>María López</td>
-            <td><span class="badge bg-success">Completado</span></td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:100%"></div></div></td>
-            <td>01 Sep 2025</td><td>05 Oct 2025</td>
-            <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></td>
+
+          {% for p in proyectos %}
+          <tr class="fila-proyecto">
+            <td>{{ forloop.counter|stringformat:"02d" }}</td>
+
+            <td>{{ p.titulo }}</td>
+
+            <td>
+              {{ p.autor.nombre }} {{ p.autor.apellido_paterno }}
+            </td>
+
+            <td>
+              {% if p.estado == "ACT" %}
+                <span class="badge bg-primary">Activo</span>
+              {% elif p.estado == "APR" %}
+                <span class="badge bg-success">Aprobado</span>
+              {% elif p.estado == "REV" %}
+                <span class="badge bg-info text-dark">En revisión</span>
+              {% elif p.estado == "DET" %}
+                <span class="badge bg-warning text-dark">Detenido</span>
+              {% elif p.estado == "FIN" %}
+                <span class="badge bg-secondary">Finalizado</span>
+              {% else %}
+                <span class="badge bg-dark">Borrador</span>
+              {% endif %}
+            </td>
+
+            <td>
+              <div class="progress">
+                <div class="progress-bar bg-primary" style="width:40%"></div>
+              </div>
+            </td>
+
+            <td>{{ p.created_at|date:"d M Y" }}</td>
+            <td>{{ p.updated_at|date:"d M Y" }}</td>
+
+            <td>
+            <button 
+                class="btn btn-sm btn-outline-primary btn-ver"
+                data-titulo="{{ p.titulo }}"
+                data-autor="{{ p.autor.nombre }} {{ p.autor.apellido_paterno }}"
+                data-estado="{{ p.get_estado_display }}"
+                data-resumen="{{ p.resumen }}"
+                data-descripcion="{{ p.descripcion }}"
+            ><i class="bi bi-eye"></i></button>
+
+            <button 
+                class="btn btn-sm btn-outline-secondary btn-editar"
+                data-id="{{ p.id }}"
+                data-titulo="{{ p.titulo }}"
+                data-estado="{{ p.estado }}"
+                data-resumen="{{ p.resumen }}"
+                data-descripcion="{{ p.descripcion }}"
+            ><i class="bi bi-pencil"></i></button>
+
+            <button 
+                class="btn btn-sm btn-outline-danger btn-eliminar"
+                data-id="{{ p.id }}"
+                data-titulo="{{ p.titulo }}"
+            ><i class="bi bi-trash"></i></button>
+          </td>
+
           </tr>
+          {% empty %}
           <tr>
-            <td>02</td><td>Proyecto Beta</td><td>Gerardo Ferreira</td>
-            <td><span class="badge bg-warning text-dark">En Progreso</span></td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:70%"></div></div></td>
-            <td>05 Sep 2025</td><td>20 Oct 2025</td>
-            <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></td>
+            <td colspan="8" class="text-center text-muted py-4 fila-vacia">
+              <i class="bi bi-inbox fs-1"></i><br>
+              No hay proyectos registrados aún.
+            </td>
           </tr>
-          <tr>
-            <td>03</td><td>Proyecto Gamma</td><td>Juan Pérez</td>
-            <td><span class="badge bg-secondary">Pendiente</span></td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:30%"></div></div></td>
-            <td>10 Sep 2025</td><td>15 Nov 2025</td>
-            <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></td>
-          </tr>
-          <tr>
-            <td>04</td><td>Proyecto Delta</td><td>Andrea Soto</td>
-            <td><span class="badge bg-info text-dark">En Revisión</span></td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:55%"></div></div></td>
-            <td>15 Sep 2025</td><td>30 Oct 2025</td>
-            <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></td>
-          </tr>
-          <tr>
-            <td>05</td><td>Proyecto Epsilon</td><td>Luis González</td>
-            <td><span class="badge bg-primary">Activo</span></td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:45%"></div></div></td>
-            <td>18 Sep 2025</td><td>10 Nov 2025</td>
-            <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></td>
-          </tr>
-          <tr>
-            <td>06</td><td>Proyecto Zeta</td><td>Paula Méndez</td>
-            <td><span class="badge bg-danger">Retrasado</span></td>
-            <td><div class="progress"><div class="progress-bar bg-primary" style="width:25%"></div></div></td>
-            <td>20 Sep 2025</td><td>12 Nov 2025</td>
-            <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></td>
-          </tr>
+          {% endfor %}
+
         </tbody>
       </table>
     </div>
 
-    <!-- Paginación -->
-    <nav><ul class="pagination pagination-sm justify-content-end mt-3" id="pagination"></ul></nav>
+    <nav>
+      <ul class="pagination pagination-sm justify-content-end mt-3" id="pagination"></ul>
+    </nav>
   </div>
 
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Detalle del Proyecto</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <h4 id="detalleTitulo"></h4>
+        <p><strong>Autor:</strong> <span id="detalleAutor"></span></p>
+        <p><strong>Estado:</strong> <span id="detalleEstado"></span></p>
+        <p><strong>Resumen:</strong></p>
+        <p id="detalleResumen"></p>
+
+        <hr>
+
+        <p><strong>Descripción:</strong></p>
+        <p id="detalleDescripcion"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal fade" id="modalEditar" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title">Editar Proyecto</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formEditar" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <input type="hidden" name="proyecto_id" id="editId">
+
+          <label class="form-label fw-semibold">Título</label>
+          <input id="editTitulo" name="titulo" class="form-control">
+
+          <label class="form-label fw-semibold mt-3">Estado</label>
+          <select id="editEstado" name="estado" class="form-select">
+            <option value="BOR">Borrador</option>
+            <option value="REV">En revisión</option>
+            <option value="APR">Aprobado</option>
+            <option value="ACT">En ejecución</option>
+            <option value="DET">Detenido</option>
+            <option value="FIN">Finalizado</option>
+            <option value="PUB">Publicado</option>
+          </select>
+
+          <label class="form-label fw-semibold mt-3">Resumen</label>
+          <textarea id="editResumen" name="resumen" class="form-control" rows="3"></textarea>
+
+          <label class="form-label fw-semibold mt-3">Descripción</label>
+          <textarea id="editDescripcion" name="descripcion" class="form-control" rows="5"></textarea>
+
+          <button class="btn btn-primary mt-3 w-100">Guardar Cambios</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ELIMINAR -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Eliminar Proyecto</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p>¿Estás seguro que deseas eliminar:</p>
+        <h5 id="eliminarTitulo" class="text-danger fw-bold"></h5>
+
+        <form id="formEliminar" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="proyecto_id" id="deleteId">
+          <button class="btn btn-danger w-100 mt-3">Sí, eliminar</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 <script>
-  const rowsPerPage = 10;
-  let currentPage = 1;
-  const table = document.getElementById("projectsTable");
-  const rows = table.querySelectorAll("tbody tr");
-  const pagination = document.getElementById("pagination");
-  const searchInput = document.getElementById("searchInput");
 
-  function displayTable() {
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    rows.forEach((row, i) => {
-      row.style.display = i >= start && i < end ? "" : "none";
-    });
-  }
+// SOLO filas reales
+const rows = document.querySelectorAll("tr.fila-proyecto");
+const rowsPerPage = 10;
+let currentPage = 1;
+const pagination = document.getElementById("pagination");
+const searchInput = document.getElementById("searchInput");
 
-  function updatePagination() {
-    const totalPages = Math.ceil(rows.length / rowsPerPage);
-    pagination.innerHTML = "";
-    for (let i = 1; i <= totalPages; i++) {
-      const li = document.createElement("li");
-      li.className = `page-item ${i === currentPage ? "active" : ""}`;
-      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      li.addEventListener("click", e => {
-        e.preventDefault();
-        currentPage = i;
-        displayTable();
-        updatePagination();
-      });
-      pagination.appendChild(li);
-    }
-  }
+function displayTable() {
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
 
-  searchInput.addEventListener("keyup", () => {
-    const search = searchInput.value.toLowerCase();
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(search) ? "" : "none";
-    });
+  rows.forEach((row, i) => {
+    row.style.display = (i >= start && i < end) ? "" : "none";
   });
+}
 
-  const userSearchInput = document.getElementById("userSearchInput");
-  const userRows = document.querySelectorAll("#usersTable tbody tr");
-  userSearchInput.addEventListener("keyup", () => {
-    const search = userSearchInput.value.toLowerCase();
-    userRows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(search) ? "" : "none";
+function updatePagination() {
+  const totalPages = Math.ceil(rows.length / rowsPerPage);
+  pagination.innerHTML = "";
+
+  if (totalPages <= 1) return;
+
+  for (let i = 1; i <= totalPages; i++) {
+    const li = document.createElement("li");
+    li.className = `page-item ${i === currentPage ? "active" : ""}`;
+    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+
+    li.addEventListener("click", e => {
+      e.preventDefault();
+      currentPage = i;
+      displayTable();
+      updatePagination();
     });
-  });
 
-  displayTable();
-  updatePagination();
+    pagination.appendChild(li);
+  }
+}
+
+searchInput.addEventListener("keyup", () => {
+  const search = searchInput.value.toLowerCase();
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(search) ? "" : "none";
+  });
+});
+
+displayTable();
+updatePagination();
+
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetalle"));
+  const modalEditar  = new bootstrap.Modal(document.getElementById("modalEditar"));
+  const modalEliminar = new bootstrap.Modal(document.getElementById("modalEliminar"));
+
+  /* ===============================
+     VER DETALLE
+  ================================*/
+  document.querySelectorAll(".btn-ver").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("detalleTitulo").textContent = btn.dataset.titulo;
+      document.getElementById("detalleAutor").textContent = btn.dataset.autor;
+      document.getElementById("detalleEstado").textContent = btn.dataset.estado;
+      document.getElementById("detalleResumen").textContent = btn.dataset.resumen;
+      document.getElementById("detalleDescripcion").textContent = btn.dataset.descripcion;
+
+      modalDetalle.show();
+    });
+  });
+
+  /* ===============================
+     EDITAR
+  ================================*/
+  document.querySelectorAll(".btn-editar").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("editId").value = btn.dataset.id;
+      document.getElementById("editTitulo").value = btn.dataset.titulo;
+      document.getElementById("editEstado").value = btn.dataset.estado;
+      document.getElementById("editResumen").value = btn.dataset.resumen;
+      document.getElementById("editDescripcion").value = btn.dataset.descripcion;
+      modalEditar.show();
+    });
+  });
+
+  /* ===============================
+     ELIMINAR
+  ================================*/
+  document.querySelectorAll(".btn-eliminar").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("deleteId").value = btn.dataset.id;
+      document.getElementById("eliminarTitulo").textContent = btn.dataset.titulo;
+      modalEliminar.show();
+    });
+  });
+
+});
+</script>
+
+
 {% endblock %}
+
 
 
 
