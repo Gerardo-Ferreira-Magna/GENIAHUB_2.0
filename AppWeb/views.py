@@ -27,6 +27,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 
 # --- Modelos y Formularios ---
 from .models import Usuario, RegistroEmpresa
@@ -37,6 +38,8 @@ from django.shortcuts import render
 from .models import RegistroEmpresa
 from .forms import PerfilForm
 from .models import Usuario, Carrera
+from .forms import ProyectoForm
+from .models import Carrera, Sede, Proyecto, Usuario
 
 
 # ============================================================
@@ -54,10 +57,6 @@ def nosotros(request):
 def tareas(request):
     """Vista de tareas (en desarrollo)."""
     return render(request, "webs/tareas.html")
-
-def panel(request):
-    """Vista panel (general, posiblemente duplicada con la versión autenticada)."""
-    return render(request, "webs/panel.html")
 
 
 # ============================================================
@@ -191,25 +190,66 @@ def cambiar_estado_solicitud(request, pk, nuevo_estado):
 # 📚 PROYECTOS (DEMOS / VISTA PÚBLICA)
 # ============================================================
 
+@login_required
 def proyectos(request):
-    """Proyectos de ejemplo con sugerencias IA (datos mock)."""
-    proyectos = [
-        {"id": 1, "nombre": "GENIA HUB - Plataforma de Innovación Académica", "docente": "Gerardo Ferreira", "estado": "En Desarrollo",
-         "estado_icono": "bi-unlock-fill", "estado_color": "success", "fecha_modificacion": "Oct 15",
-         "imagen_url": "/static/img/proyecto_geniahub.jpg", "categoria": "Informática",
-         "descripcion": "Plataforma web que centraliza proyectos académicos y empresariales usando IA para emparejar estudiantes y empresas."},
-        # ... (mantener tus proyectos existentes)
-    ]
 
+    # JOIN reales con select_related
+    proyectos = (
+        Proyecto.objects
+        .select_related("autor", "carrera", "sede")
+        .order_by("-updated_at")
+    )
+
+    proyectos_list = []
+
+    # Mapeo de estados → colores e íconos
+    estado_map = {
+        "BOR": ("secondary", "bi-pencil"),
+        "REV": ("info", "bi-search"),
+        "APR": ("success", "bi-check2-circle"),
+        "ACT": ("primary", "bi-lightning-charge"),
+        "DET": ("warning", "bi-pause-circle"),
+        "FIN": ("dark", "bi-flag-checkered"),
+        "PUB": ("success", "bi-megaphone"),
+        "ARC": ("secondary", "bi-archive"),
+    }
+
+    for p in proyectos:
+
+        estado_color, estado_icono = estado_map.get(
+            p.estado,
+            ("secondary", "bi-question-circle")
+        )
+
+        proyectos_list.append({
+            "id": p.id,
+            "nombre": p.titulo,
+            "descripcion": p.descripcion,
+            "estado": p.get_estado_display(),
+            "estado_color": estado_color,
+            "estado_icono": estado_icono,
+            "docente": f"{p.autor.nombre} {p.autor.apellido_paterno}",
+            "categoria": p.carrera.nombre if p.carrera else "Sin categoría",
+            "fecha_modificacion": p.updated_at.strftime("%d-%m-%Y"),
+        })
+
+    # Recomendaciones placeholder (funciona igual)
     recomendaciones_ia = [
-        {"titulo": "Proyectos relacionados con tus habilidades", "descripcion": "Basado en tu perfil técnico (Python, Django, BI).", "icono": "bi-stars"},
-        {"titulo": "Proyectos con mayor demanda", "descripcion": "Estos proyectos tienen más vacantes disponibles.", "icono": "bi-fire"},
-        {"titulo": "Proyectos interdisciplinarios", "descripcion": "Combinan IA con logística o sostenibilidad.", "icono": "bi-diagram-3"}
+        {
+            "titulo": "Proyectos recomendados",
+            "descripcion": "Sugerencias basadas en tus intereses.",
+            "icono": "bi-stars"
+        },
+        {
+            "titulo": "Docentes activos",
+            "descripcion": "Docentes con proyectos recientes.",
+            "icono": "bi-person-badge"
+        },
     ]
 
     return render(request, "webs/proyectos.html", {
-        "proyectos": proyectos,
-        "recomendaciones_ia": recomendaciones_ia
+        "proyectos": proyectos_list,
+        "recomendaciones_ia": recomendaciones_ia,
     })
 
 
@@ -263,10 +303,52 @@ def logout_view(request):
 # ⚙️ PANEL DE ADMINISTRACIÓN DE USUARIOS
 # ============================================================
 
-@login_required(login_url='login')
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Proyecto
+
+
+@login_required
 def panel(request):
-    """Panel general del usuario autenticado."""
-    return render(request, 'webs/panel.html', {'usuario': request.user})
+    """Panel de proyectos: 
+       - Admin ve todos los proyectos
+       - Docente ve solo los suyos
+    """
+
+    # === FILTRO POR ROL ===
+    if request.user.rol == "ADM":
+        proyectos = Proyecto.objects.all().select_related("autor").order_by("-created_at")
+    else:
+        proyectos = Proyecto.objects.filter(
+            autor=request.user
+        ).select_related("autor").order_by("-created_at")
+
+    # === CONTADORES PARA TARJETAS ===
+    total_proyectos = proyectos.count()
+    activos = proyectos.filter(estado="ACT").count()
+    revision = proyectos.filter(estado="REV").count()
+    aprobados = proyectos.filter(estado="APR").count()
+    finalizados = proyectos.filter(estado="FIN").count()
+    detenidos = proyectos.filter(estado="DET").count()
+    borradores = proyectos.filter(estado="BOR").count()
+
+    # === CONTEXTO ===
+    contexto = {
+        "proyectos": proyectos,
+        "usuario": request.user,
+
+        # Tarjetas resumen
+        "total_proyectos": total_proyectos,
+        "activos": activos,
+        "revision": revision,
+        "aprobados": aprobados,
+        "finalizados": finalizados,
+        "detenidos": detenidos,
+        "borradores": borradores,
+    }
+
+    return render(request, "webs/panel.html", contexto)
+
 
 
 def staff_required(view_func):
@@ -825,3 +907,87 @@ def buscar_perfiles_ajax(request):
         })
 
     return JsonResponse({"resultados": data})
+
+
+@login_required
+def crear_proyecto(request):
+    if request.user.rol not in ["DOC", "ADM"]:
+        messages.error(request, "No tienes permisos para crear proyectos.")
+        return redirect("proyectos")
+
+    if request.method == "POST":
+        form = ProyectoForm(request.POST, request.FILES)
+        if form.is_valid():
+
+            proyecto = form.save(commit=False)
+
+            # Convertimos la fecha del form al AÑO
+            fecha = form.cleaned_data["fecha_proyecto"]
+            proyecto.anio = fecha.year
+
+            # Auditoría
+            proyecto.autor = request.user
+            proyecto.created_by = request.user
+            proyecto.updated_by = request.user
+
+            proyecto.save()
+            messages.success(request, "Proyecto creado exitosamente.")
+            return redirect("proyectos")
+        else:
+            print(form.errors)   # Para debug
+
+    else:
+        form = ProyectoForm()
+
+    context = {
+        "form": form,
+    }
+    return render(request, "webs/creacion_proyecto.html", context)
+
+
+@login_required
+@require_POST
+def proyecto_editar_modal(request):
+    proyecto_id = request.POST.get("proyecto_id")
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+    # Permisos
+    if request.user != proyecto.autor and request.user.rol != "ADM":
+        return JsonResponse({"ok": False, "error": "No autorizado"}, status=403)
+
+    proyecto.titulo = request.POST.get("titulo")
+    proyecto.resumen = request.POST.get("resumen")
+    proyecto.descripcion = request.POST.get("descripcion")
+    proyecto.estado = request.POST.get("estado")
+
+    # Regenerar slug
+    proyecto.slug = slugify(f"{proyecto.titulo}-{proyecto.anio}")
+
+    proyecto.save()
+
+    return JsonResponse({
+        "ok": True,
+        "message": "Proyecto actualizado correctamente.",
+        "titulo": proyecto.titulo,
+        "estado": proyecto.estado,
+        "resumen": proyecto.resumen,
+        "descripcion": proyecto.descripcion
+    })
+
+
+@login_required
+@require_POST
+def proyecto_eliminar_modal(request):
+    proyecto_id = request.POST.get("proyecto_id")
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+    # Permisos
+    if request.user != proyecto.autor and request.user.rol != "ADM":
+        return JsonResponse({"ok": False, "error": "No tienes permisos."}, status=403)
+
+    proyecto.delete()
+
+    return JsonResponse({
+        "ok": True,
+        "message": f"Proyecto '{proyecto.titulo}' eliminado correctamente."
+    })

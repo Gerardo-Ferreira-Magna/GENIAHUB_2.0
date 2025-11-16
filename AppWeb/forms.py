@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, authenticate
 from .models import Usuario
 from .models import RegistroEmpresa
+from .models import Proyecto
 
 # --------------------------
 # FORMULARIO DE REGISTRO
@@ -137,4 +138,41 @@ class PerfilForm(forms.ModelForm):
             "experiencia": "Experiencia laboral / académica",
             "industrias_interes": "Industrias de interés (separadas por comas)",
             "tecnologias_preferidas": "Tecnologías preferidas (separadas por comas)",
+        }
+
+
+class ProyectoForm(forms.ModelForm):
+
+    fecha_proyecto = forms.DateField(
+        required=True,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"})
+    )
+
+    class Meta:
+        model = Proyecto
+        fields = [
+            "titulo",
+            "resumen",
+            "descripcion",
+            "tipo",
+            "estado",
+            "carrera",
+            "sede",
+            "palabras_clave",
+            "documento_pdf",
+            "es_publico",
+            # NOTA: "anio" se calculará desde fecha_proyecto
+        ]
+
+        widgets = {
+            "titulo": forms.TextInput(attrs={"class": "form-control"}),
+            "tipo": forms.Select(attrs={"class": "form-select"}),
+            "estado": forms.Select(attrs={"class": "form-select"}),
+            "resumen": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "descripcion": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
+            "carrera": forms.Select(attrs={"class": "form-select"}),
+            "sede": forms.Select(attrs={"class": "form-select"}),
+            "palabras_clave": forms.TextInput(attrs={"class": "form-control"}),
+            "documento_pdf": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "es_publico": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }

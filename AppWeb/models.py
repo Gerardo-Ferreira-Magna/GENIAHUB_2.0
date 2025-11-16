@@ -219,8 +219,19 @@ class Proyecto(AuditStampedModel):
         return f"{self.titulo} ({self.anio})"
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(f"{self.titulo}-{self.anio}")
+    # Generar slug base
+        base_slug = slugify(f"{self.titulo}-{self.anio}")
+
+        slug = base_slug
+        contador = 1
+
+        # Verificar si existe slug duplicado
+        while Proyecto.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            slug = f"{base_slug}-{contador}"
+            contador += 1
+
+        self.slug = slug
+
         super().save(*args, **kwargs)
 
     class Meta:
