@@ -190,25 +190,66 @@ def cambiar_estado_solicitud(request, pk, nuevo_estado):
 # 📚 PROYECTOS (DEMOS / VISTA PÚBLICA)
 # ============================================================
 
+@login_required
 def proyectos(request):
-    """Proyectos de ejemplo con sugerencias IA (datos mock)."""
-    proyectos = [
-        {"id": 1, "nombre": "GENIA HUB - Plataforma de Innovación Académica", "docente": "Gerardo Ferreira", "estado": "En Desarrollo",
-         "estado_icono": "bi-unlock-fill", "estado_color": "success", "fecha_modificacion": "Oct 15",
-         "imagen_url": "/static/img/proyecto_geniahub.jpg", "categoria": "Informática",
-         "descripcion": "Plataforma web que centraliza proyectos académicos y empresariales usando IA para emparejar estudiantes y empresas."},
-        # ... (mantener tus proyectos existentes)
-    ]
 
+    # JOIN reales con select_related
+    proyectos = (
+        Proyecto.objects
+        .select_related("autor", "carrera", "sede")
+        .order_by("-updated_at")
+    )
+
+    proyectos_list = []
+
+    # Mapeo de estados → colores e íconos
+    estado_map = {
+        "BOR": ("secondary", "bi-pencil"),
+        "REV": ("info", "bi-search"),
+        "APR": ("success", "bi-check2-circle"),
+        "ACT": ("primary", "bi-lightning-charge"),
+        "DET": ("warning", "bi-pause-circle"),
+        "FIN": ("dark", "bi-flag-checkered"),
+        "PUB": ("success", "bi-megaphone"),
+        "ARC": ("secondary", "bi-archive"),
+    }
+
+    for p in proyectos:
+
+        estado_color, estado_icono = estado_map.get(
+            p.estado,
+            ("secondary", "bi-question-circle")
+        )
+
+        proyectos_list.append({
+            "id": p.id,
+            "nombre": p.titulo,
+            "descripcion": p.descripcion,
+            "estado": p.get_estado_display(),
+            "estado_color": estado_color,
+            "estado_icono": estado_icono,
+            "docente": f"{p.autor.nombre} {p.autor.apellido_paterno}",
+            "categoria": p.carrera.nombre if p.carrera else "Sin categoría",
+            "fecha_modificacion": p.updated_at.strftime("%d-%m-%Y"),
+        })
+
+    # Recomendaciones placeholder (funciona igual)
     recomendaciones_ia = [
-        {"titulo": "Proyectos relacionados con tus habilidades", "descripcion": "Basado en tu perfil técnico (Python, Django, BI).", "icono": "bi-stars"},
-        {"titulo": "Proyectos con mayor demanda", "descripcion": "Estos proyectos tienen más vacantes disponibles.", "icono": "bi-fire"},
-        {"titulo": "Proyectos interdisciplinarios", "descripcion": "Combinan IA con logística o sostenibilidad.", "icono": "bi-diagram-3"}
+        {
+            "titulo": "Proyectos recomendados",
+            "descripcion": "Sugerencias basadas en tus intereses.",
+            "icono": "bi-stars"
+        },
+        {
+            "titulo": "Docentes activos",
+            "descripcion": "Docentes con proyectos recientes.",
+            "icono": "bi-person-badge"
+        },
     ]
 
     return render(request, "webs/proyectos.html", {
-        "proyectos": proyectos,
-        "recomendaciones_ia": recomendaciones_ia
+        "proyectos": proyectos_list,
+        "recomendaciones_ia": recomendaciones_ia,
     })
 
 
