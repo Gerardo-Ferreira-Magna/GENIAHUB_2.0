@@ -169,7 +169,7 @@
     <!-- PANEL DERECHO -->
     <div class="col-lg-4">
       <div class="card p-3 mb-4 shadow-sm border-0 bg-dark">
-        <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-robot me-2 text-primary"></i>Recomendaciones Inteligentes</h6>
+        <h6 class="fw-bold mb-3 text-warning"><i class="bi bi-robot me-2 text-warning"></i>Recomendaciones Inteligentes</h6>
         {% for rec in recomendaciones_ia %}
         <div class="d-flex align-items-start mb-3 text-white">
           <div class="icon-circle bg-light text-primary me-3">
@@ -178,7 +178,7 @@
           <div>
             <strong>{{ rec.titulo }}</strong>
             <p class="small text-white mb-1">{{ rec.descripcion }}</p>
-            <button class="btn btn-sm btn-outline-primary rounded-pill btn-recomendar">
+            <button class="btn btn-sm btn-outline-warning rounded-pill btn-recomendar">
               <i class="bi bi-lightbulb me-1"></i>Obtener recomendación
             </button>
           </div>
