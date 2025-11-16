@@ -58,10 +58,6 @@ def tareas(request):
     """Vista de tareas (en desarrollo)."""
     return render(request, "webs/tareas.html")
 
-def panel(request):
-    """Vista panel (general, posiblemente duplicada con la versión autenticada)."""
-    return render(request, "webs/panel.html")
-
 
 # ============================================================
 # 🏢 REGISTRO DE EMPRESA SIN LOGIN
@@ -266,10 +262,52 @@ def logout_view(request):
 # ⚙️ PANEL DE ADMINISTRACIÓN DE USUARIOS
 # ============================================================
 
-@login_required(login_url='login')
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Proyecto
+
+
+@login_required
 def panel(request):
-    """Panel general del usuario autenticado."""
-    return render(request, 'webs/panel.html', {'usuario': request.user})
+    """Panel de proyectos: 
+       - Admin ve todos los proyectos
+       - Docente ve solo los suyos
+    """
+
+    # === FILTRO POR ROL ===
+    if request.user.rol == "ADM":
+        proyectos = Proyecto.objects.all().select_related("autor").order_by("-created_at")
+    else:
+        proyectos = Proyecto.objects.filter(
+            autor=request.user
+        ).select_related("autor").order_by("-created_at")
+
+    # === CONTADORES PARA TARJETAS ===
+    total_proyectos = proyectos.count()
+    activos = proyectos.filter(estado="ACT").count()
+    revision = proyectos.filter(estado="REV").count()
+    aprobados = proyectos.filter(estado="APR").count()
+    finalizados = proyectos.filter(estado="FIN").count()
+    detenidos = proyectos.filter(estado="DET").count()
+    borradores = proyectos.filter(estado="BOR").count()
+
+    # === CONTEXTO ===
+    contexto = {
+        "proyectos": proyectos,
+        "usuario": request.user,
+
+        # Tarjetas resumen
+        "total_proyectos": total_proyectos,
+        "activos": activos,
+        "revision": revision,
+        "aprobados": aprobados,
+        "finalizados": finalizados,
+        "detenidos": detenidos,
+        "borradores": borradores,
+    }
+
+    return render(request, "webs/panel.html", contexto)
+
 
 
 def staff_required(view_func):
@@ -867,50 +905,48 @@ def crear_proyecto(request):
 
 
 @login_required
+@require_POST
 def proyecto_editar_modal(request):
-    if request.method != "POST":
-        messages.error(request, "Método no permitido.")
-        return redirect("panel")
-
     proyecto_id = request.POST.get("proyecto_id")
-
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
 
-    # Validar permisos
-    if request.user != proyecto.autor and request.user.rol not in ["ADM"]:
-        messages.error(request, "No tienes permisos para editar este proyecto.")
-        return redirect("panel")
+    # Permisos
+    if request.user != proyecto.autor and request.user.rol != "ADM":
+        return JsonResponse({"ok": False, "error": "No autorizado"}, status=403)
 
-    # Actualizar campos recibidos
     proyecto.titulo = request.POST.get("titulo")
     proyecto.resumen = request.POST.get("resumen")
     proyecto.descripcion = request.POST.get("descripcion")
     proyecto.estado = request.POST.get("estado")
 
-    # Regenerar slug si cambia título
+    # Regenerar slug
     proyecto.slug = slugify(f"{proyecto.titulo}-{proyecto.anio}")
 
     proyecto.save()
 
-    messages.success(request, "Proyecto actualizado correctamente.")
-    return redirect("panel")
+    return JsonResponse({
+        "ok": True,
+        "message": "Proyecto actualizado correctamente.",
+        "titulo": proyecto.titulo,
+        "estado": proyecto.estado,
+        "resumen": proyecto.resumen,
+        "descripcion": proyecto.descripcion
+    })
 
 
 @login_required
+@require_POST
 def proyecto_eliminar_modal(request):
-    if request.method != "POST":
-        messages.error(request, "Método no permitido.")
-        return redirect("panel")
-
     proyecto_id = request.POST.get("proyecto_id")
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
 
-    # Validar permisos
-    if request.user != proyecto.autor and request.user.rol not in ["ADM"]:
-        messages.error(request, "No tienes permisos para eliminar este proyecto.")
-        return redirect("panel")
+    # Permisos
+    if request.user != proyecto.autor and request.user.rol != "ADM":
+        return JsonResponse({"ok": False, "error": "No tienes permisos."}, status=403)
 
     proyecto.delete()
 
-    messages.success(request, "Proyecto eliminado exitosamente.")
-    return redirect("panel")
+    return JsonResponse({
+        "ok": True,
+        "message": f"Proyecto '{proyecto.titulo}' eliminado correctamente."
+    })
