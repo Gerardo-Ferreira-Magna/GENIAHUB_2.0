@@ -38,6 +38,8 @@ from .forms import ProyectoForm
 from .models import Usuario, Carrera, Sede, Proyecto, RegistroEmpresa
 from .forms import SolicitudEmpresaForm
 from .models import SolicitudEmpresa
+from django.utils import timezone
+from django.http import HttpResponseForbidden
 
 
 # ============================================================
@@ -1006,27 +1008,151 @@ def proyecto_eliminar_modal(request):
 
 @login_required
 def solicitud_empresa_crear(request):
-
-    form = ProyectoForm()
+    from django.utils import timezone
 
     if request.method == "POST":
         form = ProyectoForm(request.POST, request.FILES)
 
         if form.is_valid():
             proyecto = form.save(commit=False)
-            
-            # 🔒 Valores fijos
+
+            # Datos fijos del flujo empresa
+            proyecto.tipo = "EMP"
+            proyecto.estado = "BOR"
+
+            # Autor del proyecto
             proyecto.autor = request.user
-            proyecto.tipo = "EMP"          # Proyecto Empresa
-            proyecto.estado = "BOR"        # Borrador
-            proyecto.sede = request.user.sede
-            proyecto.anio = form.cleaned_data["fecha_proyecto"].year
+
+            # Auditoría obligatoria
+            proyecto.created_by = request.user
+            proyecto.updated_by = request.user
+
+            # Sede automática
+            if request.user.sede_id:
+                proyecto.sede = request.user.sede
+
+            # Año desde la fecha
+            fecha = form.cleaned_data.get("fecha_proyecto")
+            if fecha:
+                proyecto.anio = fecha.year
 
             proyecto.save()
 
-            messages.success(request, "Solicitud de proyecto creada correctamente.")
+            messages.success(request, "Solicitud creada correctamente.")
             return redirect("proyectos")
 
-    return render(request, "webs/solicitud_empresa.html", {
-        "form": form
-    })
+        else:
+            print("ERRORES DEL FORM:", form.errors)
+
+    else:
+        form = ProyectoForm(initial={
+            "tipo": "EMP",
+            "estado": "BOR",
+            "fecha_proyecto": timezone.now().date(),
+            "sede": request.user.sede_id,
+        })
+
+    return render(request, "webs/solicitud_empresa.html", {"form": form})
+
+
+@login_required
+def empresa_estado_solicitud(request):
+
+    # ADMIN ve todo
+    if request.user.rol == "ADM":
+        solicitudes = SolicitudEmpresa.objects.all()
+
+    # EMPRESA ve solo las suyas
+    elif request.user.rol == "EMP":
+        solicitudes = SolicitudEmpresa.objects.filter(empresa=request.user)
+
+    # OTROS no pueden ver
+    else:
+        solicitudes = SolicitudEmpresa.objects.none()
+
+    solicitudes = solicitudes.select_related(
+            "empresa",
+            "asignacion",
+            "asignacion__docente_responsable"
+        ).prefetch_related(
+            "asignacion__estudiantes"
+        )
+
+    contexto = {
+        "solicitudes": solicitudes,
+        "total": solicitudes.count(),
+        "recibidas": solicitudes.filter(estado="REC").count(),
+        "revision": solicitudes.filter(estado="REV").count(),
+        "aprobadas": solicitudes.filter(estado="APR").count(),
+        "asignadas": solicitudes.filter(estado="ASI").count(),
+        "finalizadas": solicitudes.filter(estado="FIN").count(),
+    }
+
+    return render(request, "webs/empresa_estado_solicitud.html", contexto)
+
+
+@login_required
+def crear_solicitud_empresa(request):
+
+    if request.user.rol != "EMP":
+        messages.error(request, "Solo las empresas pueden enviar solicitudes.")
+        return redirect("index")
+
+    if request.method == "POST":
+        form = SolicitudEmpresaForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            solicitud = form.save(commit=False)
+
+            solicitud.empresa = request.user
+            solicitud.created_by = request.user
+            solicitud.updated_by = request.user
+
+            solicitud.save()
+
+            messages.success(request, "Solicitud enviada correctamente.")
+            return redirect("empresa_estado_solicitud")
+
+        else:
+            print("ERRORES FORM:", form.errors)
+
+    else:
+        form = SolicitudEmpresaForm()
+
+    return render(request, "webs/solicitud_empresa.html", {"form": form})
+
+
+@login_required
+def proyectos_tabla(request):
+
+    # =======================
+    # SOLO proyectos empresariales
+    # =======================
+    proyectos = Proyecto.objects.select_related("autor").filter(tipo="EMP")
+
+    # =======================
+    # KPIs SOLO EMPRESA
+    # =======================
+    total_emp = proyectos.count()
+    aprobados_emp = proyectos.filter(estado="APR").count()
+    revision_emp = proyectos.filter(estado="REV").count()
+    finalizados_emp = proyectos.filter(estado="FIN").count()
+    detenidos_emp = proyectos.filter(estado="DET").count()
+
+    contexto = {
+        "proyectos": proyectos.order_by("-created_at"),
+
+        # Estados para el filtro del select
+        "proyecto_estados": Proyecto.ESTADO,
+
+        # KPI SOLO EMPRESA
+        "total_emp": total_emp,
+        "aprobados_emp": aprobados_emp,
+        "revision_emp": revision_emp,
+        "finalizados_emp": finalizados_emp,
+        "detenidos_emp": detenidos_emp,
+    }
+
+    return render(request, "webs/proyectos_tabla.html", contexto)
+
+

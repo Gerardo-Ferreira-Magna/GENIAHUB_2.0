@@ -1,0 +1,252 @@
+{% extends "webs/base.html" %}
+{% load static %}
+
+{% block title %}GENIAHUB | Estado de Solicitudes{% endblock %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  .resumen-mini-card { transition: .3s; }
+  .resumen-mini-card:hover { transform: translateY(-3px); box-shadow: 0 3px 12px rgba(0,0,0,0.15); }
+  .card-animate { opacity: 0; transform: translateY(15px); transition: opacity .6s, transform .6s; }
+  .card-animate.show { opacity: 1; transform: translateY(0); }
+</style>
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-building-check me-2"></i>Estado de Solicitudes de Empresa
+        </h2>
+    </div>
+
+    <!-- TARJETAS RESUMEN -->
+    <div class="row g-3 resumen-cards mb-4">
+
+        <div class="col-6 col-md-2">
+            <div class="card resumen-mini-card p-3 text-center">
+                <h6 class="text-muted mb-1">Total</h6>
+                <h2 class="fw-bold">{{ total }}</h2>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <div class="card resumen-mini-card p-3 text-center">
+                <h6 class="text-muted mb-1">Recibidas</h6>
+                <h2 class="fw-bold">{{ recibidas }}</h2>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <div class="card resumen-mini-card p-3 text-center">
+                <h6 class="text-muted mb-1">En Revisión</h6>
+                <h2 class="fw-bold">{{ revision }}</h2>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <div class="card resumen-mini-card p-3 text-center">
+                <h6 class="text-muted mb-1">Aprobadas</h6>
+                <h2 class="fw-bold">{{ aprobadas }}</h2>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <div class="card resumen-mini-card p-3 text-center">
+                <h6 class="text-muted mb-1">Asignadas</h6>
+                <h2 class="fw-bold">{{ asignadas }}</h2>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <div class="card resumen-mini-card p-3 text-center">
+                <h6 class="text-muted mb-1">Finalizadas</h6>
+                <h2 class="fw-bold">{{ finalizadas }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTROS -->
+    <div class="card p-3 mb-4 shadow-sm">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Buscar texto</label>
+                <input id="searchInput" type="text" class="form-control" placeholder="Buscar por título o empresa...">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Estado</label>
+                <select id="filterEstado" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="REC">Recibida</option>
+                    <option value="REV">En revisión</option>
+                    <option value="APR">Aprobada</option>
+                    <option value="ASI">Asignada</option>
+                    <option value="FIN">Finalizada</option>
+                    <option value="REJ">Rechazada</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Desde</label>
+                <input id="fechaDesde" type="date" class="form-control">
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Hasta</label>
+                <input id="fechaHasta" type="date" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card p-3 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tablaSolicitudes">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-warning">#</th>
+                        <th class="text-warning">Título</th>
+                        <th class="text-warning">Empresa</th>
+                        <th class="text-warning">Líder</th>
+                        <th class="text-warning">Estado</th>
+                        <th class="text-warning">Progreso</th>
+                        <th class="text-warning">Detalle</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for s in solicitudes %}
+                    <tr class="fila-solicitud"
+                        data-estado="{{ s.estado }}"
+                        data-fecha="{{ s.created_at|date:'Y-m-d' }}"
+                    >
+
+                        <td>{{ forloop.counter|stringformat:"02d" }}</td>
+
+                        <td>{{ s.titulo }}</td>
+
+                        <td>{{ s.empresa.nombre }} {{ s.empresa.apellido_paterno }}</td>
+
+                        <td>
+                            {% if s.asignacion %}
+                                {{ s.asignacion.docente_responsable.nombre }} {{ s.asignacion.docente_responsable.apellido_paterno }}
+                            {% else %}
+                                <span class="text-muted">Sin asignar</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="badge bg-primary">{{ s.get_estado_display }}</span>
+                        </td>
+
+                        <td>
+                            {% if s.asignacion %}
+                                <div class="progress">
+                                    <div class="progress-bar bg-success"
+                                         style="width:
+                                         {% if s.asignacion.estado == 'ACE' %}10%
+                                         {% elif s.asignacion.estado == 'PRO' %}60%
+                                         {% elif s.asignacion.estado == 'FIN' %}100%
+                                         {% else %}5%
+                                         {% endif %}
+                                         ;">
+                                        {% if s.asignacion.estado == 'ACE' %}10%
+                                        {% elif s.asignacion.estado == 'PRO' %}60%
+                                        {% elif s.asignacion.estado == 'FIN' %}100%
+                                        {% else %}5%
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <button
+                                class="btn btn-sm btn-outline-primary btn-detalle"
+                                data-titulo="{{ s.titulo }}"
+                                data-empresa="{{ s.empresa.nombre }} {{ s.empresa.apellido_paterno }}"
+                                data-lider="{% if s.asignacion %}{{ s.asignacion.docente_responsable.nombre }} {{ s.asignacion.docente_responsable.apellido_paterno }}{% else %}Sin asignar{% endif %}"
+                                data-participantes="{% if s.asignacion %}{% for est in s.asignacion.estudiantes.all %}{{ est.nombre }} {{ est.apellido_paterno }}, {% endfor %}{% else %}Sin estudiantes{% endif %}"
+                                data-estado="{{ s.get_estado_display }}"
+                                data-descripcion="{{ s.descripcion }}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalDetalle"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Detalle de Solicitud</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <h4 id="mdTitulo"></h4>
+        <p><strong>Empresa:</strong> <span id="mdEmpresa"></span></p>
+        <p><strong>Líder:</strong> <span id="mdLider"></span></p>
+        <p><strong>Participantes:</strong> <span id="mdParticipantes"></span></p>
+        <p><strong>Estado:</strong> <span id="mdEstado"></span></p>
+
+        <hr>
+
+        <p><strong>Descripción:</strong></p>
+        <p id="mdDescripcion"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Animación tarjetas
+    const cards = document.querySelectorAll(".resumen-mini-card");
+    cards.forEach((c, i) => {
+        c.classList.add("card-animate");
+        setTimeout(() => c.classList.add("show"), 120 * i);
+    });
+
+    // modal
+    document.querySelectorAll(".btn-detalle").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.getElementById("mdTitulo").innerText = btn.dataset.titulo;
+            document.getElementById("mdEmpresa").innerText = btn.dataset.empresa;
+            document.getElementById("mdLider").innerText = btn.dataset.lider;
+            document.getElementById("mdParticipantes").innerText = btn.dataset.participantes;
+            document.getElementById("mdEstado").innerText = btn.dataset.estado;
+            document.getElementById("mdDescripcion").innerText = btn.dataset.descripcion;
+        });
+    });
+
+});
+</script>
+
+{% endblock %}
+

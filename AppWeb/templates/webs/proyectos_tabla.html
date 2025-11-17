@@ -1,0 +1,210 @@
+{% extends 'webs/base.html' %}
+{% load static %}
+
+{% block title %}GENIAHUB | Proyectos de Empresa{% endblock %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- TARJETAS KPI --- */
+    .kpi-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 14px;
+        transition: .35s ease;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .kpi-icon {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 20px;
+    }
+
+    /* --- ANIMACIÓN KPI --- */
+    .kpi-animate {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity .55s ease, transform .55s ease;
+    }
+
+    .kpi-animate.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- ENCABEZDO -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-building me-2"></i>Estado de Proyectos
+        </h2>
+        <small class="text-muted"></small>
+    </div>
+
+    <!-- TARJETAS KPI -->
+    <div class="row g-3 mb-4">
+
+        <!-- TOTAL EMP -->
+        <div class="col-md-2 col-6">
+            <div class="kpi-card kpi-animate p-3 shadow-sm">
+                <i class="bi bi-kanban-fill text-primary kpi-icon"></i>
+                <h6 class="text-muted mb-1">Total Empresa</h6>
+                <h2 class="fw-bold">{{ total_emp }}</h2>
+            </div>
+        </div>
+
+        <!-- APROBADOS -->
+        <div class="col-md-2 col-6">
+            <div class="kpi-card kpi-animate p-3 shadow-sm">
+                <i class="bi bi-check-circle-fill text-success kpi-icon"></i>
+                <h6 class="text-muted mb-1">Aprobados</h6>
+                <h2 class="fw-bold">{{ aprobados_emp }}</h2>
+            </div>
+        </div>
+
+        <!-- EN REVISIÓN -->
+        <div class="col-md-2 col-6">
+            <div class="kpi-card kpi-animate p-3 shadow-sm">
+                <i class="bi bi-search text-info kpi-icon"></i>
+                <h6 class="text-muted mb-1">Revisión</h6>
+                <h2 class="fw-bold">{{ revision_emp }}</h2>
+            </div>
+        </div>
+
+        <!-- FINALIZADOS -->
+        <div class="col-md-2 col-6">
+            <div class="kpi-card kpi-animate p-3 shadow-sm">
+                <i class="bi bi-flag-fill text-secondary kpi-icon"></i>
+                <h6 class="text-muted mb-1">Finalizados</h6>
+                <h2 class="fw-bold">{{ finalizados_emp }}</h2>
+            </div>
+        </div>
+
+        <!-- DETENIDOS -->
+        <div class="col-md-2 col-6">
+            <div class="kpi-card kpi-animate p-3 shadow-sm">
+                <i class="bi bi-pause-circle-fill text-warning kpi-icon"></i>
+                <h6 class="text-muted mb-1">Detenidos</h6>
+                <h2 class="fw-bold">{{ detenidos_emp }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTROS -->
+    <div class="card p-3 mb-4 shadow-sm">
+        <div class="row g-2 align-items-end">
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Buscar texto</label>
+                <input id="searchText" type="text" class="form-control" placeholder="Buscar...">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Estado</label>
+                <select id="filterEstado" class="form-select">
+                    <option value="">Todos</option>
+                    {% for val, txt in proyecto_estados %}
+                        <option value="{{ val }}">{{ txt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Desde</label>
+                <input id="fechaDesde" type="date" class="form-control">
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Hasta</label>
+                <input id="fechaHasta" type="date" class="form-control">
+            </div>
+
+            <div class="col-md-2 text-end">
+                <button id="limpiarFiltros" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-eraser me-1"></i> Limpiar
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card p-3 shadow-sm mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tablaProyectos">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-warning">#</th>
+                        <th class="text-warning">Título</th>
+                        <th class="text-warning">Empresa</th>
+                        <th class="text-warning">Estado</th>
+                        <th class="text-warning">Año</th>
+                        <th class="text-warning">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in proyectos %}
+                        {% if p.tipo == "EMP" %}   {# SOLO EMPRESA #}
+                        <tr class="fila-proyecto"
+                            data-nombre="{{ p.titulo|lower }}"
+                            data-autor="{{ p.autor.nombre|lower }}"
+                            data-estado="{{ p.estado }}"
+                            data-fecha="{{ p.created_at|date:'Y-m-d' }}"
+                        >
+                            <td>{{ forloop.counter|stringformat:'02d' }}</td>
+                            <td>{{ p.titulo }}</td>
+                            <td>{{ p.autor.nombre }} {{ p.autor.apellido_paterno }}</td>
+                            <td><span class="badge bg-primary">{{ p.get_estado_display }}</span></td>
+                            <td>{{ p.anio }}</td>
+
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary btn-detalle"
+                                    data-titulo="{{ p.titulo }}"
+                                    data-autor="{{ p.autor.nombre }} {{ p.autor.apellido_paterno }}"
+                                    data-estado="{{ p.get_estado_display }}"
+                                    data-resumen="{{ p.resumen }}"
+                                    data-descripcion="{{ p.descripcion }}">
+                                    <i class="bi bi-eye"></i> Ver
+                                </button>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODALES (se mantienen igual) -->
+{{ block.super_modal_code_here }}
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // ANIMACIÓN TARJETAS KPI
+    document.querySelectorAll(".kpi-animate").forEach((card, index) => {
+        setTimeout(() => card.classList.add("show"), index * 180);
+    });
+
+});
+</script>
+
+{% endblock %}
+
+

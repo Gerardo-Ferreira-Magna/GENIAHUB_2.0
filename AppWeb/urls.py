@@ -38,6 +38,9 @@ urlpatterns = [
     path("proyecto/editar/", views.proyecto_editar_modal, name="proyecto_editar_modal"),
     path("proyecto/eliminar/", views.proyecto_eliminar_modal, name="proyecto_eliminar_modal"),
     path("solicitud_empresa/", views.solicitud_empresa_crear, name="solicitud_empresa_crear"),
+    path("empresa/estado-solicitud/", views.empresa_estado_solicitud, name="empresa_estado_solicitud"),
+    path("proyectos/tabla/", views.proyectos_tabla, name="proyectos_tabla"),
+
 ]
 
 
