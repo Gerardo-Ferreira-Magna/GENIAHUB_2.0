@@ -36,6 +36,8 @@ from django.shortcuts import render
 from .forms import PerfilForm
 from .forms import ProyectoForm
 from .models import Usuario, Carrera, Sede, Proyecto, RegistroEmpresa
+from .forms import SolicitudEmpresaForm
+from .models import SolicitudEmpresa
 
 
 # ============================================================
@@ -999,4 +1001,32 @@ def proyecto_eliminar_modal(request):
     return JsonResponse({
         "ok": True,
         "message": f"Proyecto '{proyecto.titulo}' eliminado correctamente."
+    })
+
+
+@login_required
+def solicitud_empresa_crear(request):
+
+    form = ProyectoForm()
+
+    if request.method == "POST":
+        form = ProyectoForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            proyecto = form.save(commit=False)
+            
+            # 🔒 Valores fijos
+            proyecto.autor = request.user
+            proyecto.tipo = "EMP"          # Proyecto Empresa
+            proyecto.estado = "BOR"        # Borrador
+            proyecto.sede = request.user.sede
+            proyecto.anio = form.cleaned_data["fecha_proyecto"].year
+
+            proyecto.save()
+
+            messages.success(request, "Solicitud de proyecto creada correctamente.")
+            return redirect("proyectos")
+
+    return render(request, "webs/solicitud_empresa.html", {
+        "form": form
     })
