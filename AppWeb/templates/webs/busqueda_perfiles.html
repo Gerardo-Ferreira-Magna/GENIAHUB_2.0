@@ -49,11 +49,11 @@
         <div class="card-body text-center p-4">
           <i class="bi bi-person-circle text-light opacity-75" style="font-size:4.5rem;"></i>
           <h5 class="fw-semibold mt-3 mb-1 text-white">{{ est.nombre }}</h5>
-          <p class="text-secondary small mb-2">{{ est.carrera|default:"Sin carrera" }}</p>
-          <p class="text-secondary small">{{ est.sede|default:"Sin sede" }}</p>
+          <p class="text-warning small mb-2">{{ est.carrera|default:"Sin carrera" }}</p>
+          <p class="text-warning small">{{ est.sede|default:"Sin Sede" }}</p>
           {% if est.habilidades3 %}
             {% for h in est.habilidades3 %}
-              <span class="badge bg-secondary me-1">{{ h }}</span>
+              <span class="badge bg-success me-1">{{ h }}</span>
             {% endfor %}
           {% else %}
             <span class="badge bg-secondary">Sin habilidades</span>
@@ -79,7 +79,7 @@
             <h6 class="text-info mt-2">Carrera y Sede</h6>
             <p>
               <span class="text-light">{{ est.carrera|default:"Sin carrera" }}</span><br>
-              <small class="text-secondary">{{ est.sede|default:"Sin sede" }}</small>
+              <small class="text-white">{{ est.sede|default:"Sin Sede" }}</small>
             </p>
 
             <h6 class="text-info mt-3">Sobre mí</h6>
@@ -88,7 +88,7 @@
             <h6 class="text-info mt-3">Habilidades</h6>
             {% if est.habilidades %}
               {% for h in est.habilidades %}
-                <span class="badge bg-secondary me-1 mb-1">{{ h }}</span>
+                <span class="badge bg-success me-1 mb-1">{{ h }}</span>
               {% endfor %}
             {% else %}
               <p class="text-secondary">Sin habilidades registradas.</p>

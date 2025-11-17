@@ -13,7 +13,16 @@
           <h4 class="fw-bold mt-3">{{ usuario.nombre }} {{ usuario.apellido_paterno }}</h4>
           <p class="text-muted">{{ usuario.get_rol_display }}</p>
           <p class="text-warning small mb-1"><i class="bi bi-envelope"></i> {{ usuario.email }}</p>
-          <p class="text-warning small"><i class="bi bi-building"></i> {{ usuario.sede.nombre|default:"Sin sede" }}</p>
+            {% if usuario.rol == "EST" or usuario.rol == "DOC" or usuario.rol == "ADM" %}
+              <p class="text-warning small">
+                  <i class="bi bi-building"></i>
+                  {% if usuario.sede %}
+                      {{ usuario.sede.nombre }}
+                  {% else %}
+                      <span class="text-warning">Sin sede asignada</span>
+                  {% endif %}
+              </p>
+            {% endif %}
 
           {% if request.user == usuario %}
           <button class="btn btn-outline-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
@@ -52,7 +61,7 @@
           <div id="text-habilidades">
             {% if habilidades %}
               {% for skill in habilidades %}
-                <span class="badge bg-light text-dark border me-1 mb-2">{{ skill }}</span>
+                <span class="badge bg-warning text-dark border me-1 mb-2">{{ skill }}</span>
               {% endfor %}
             {% else %}
               <p class="text-muted">No ha registrado habilidades.</p>

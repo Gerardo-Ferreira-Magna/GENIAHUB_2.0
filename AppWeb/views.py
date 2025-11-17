@@ -30,16 +30,12 @@ from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 
 # --- Modelos y Formularios ---
-from .models import Usuario, RegistroEmpresa
 from .models_audit import AuditLog
 from .forms import RegistroForm, LoginForm, RegistroEmpresaForm
-from .models import RegistroEmpresa
 from django.shortcuts import render
-from .models import RegistroEmpresa
 from .forms import PerfilForm
-from .models import Usuario, Carrera
 from .forms import ProyectoForm
-from .models import Carrera, Sede, Proyecto, Usuario
+from .models import Usuario, Carrera, Sede, Proyecto, RegistroEmpresa
 
 
 # ============================================================
@@ -777,7 +773,12 @@ def usuario_create_api(request):
 
 @login_required
 def perfil_estudiante(request):
-    user = request.user
+    user = (
+        Usuario.objects
+        .select_related("sede", "carrera")
+        .get(pk=request.user.pk)
+    )
+
     habilidades = user.habilidades.split(",") if user.habilidades else []
     industrias = user.industrias_interes.split(",") if user.industrias_interes else []
     tecnologias = user.tecnologias_preferidas.split(",") if user.tecnologias_preferidas else []
@@ -811,12 +812,15 @@ def busqueda_perfiles(request):
         messages.warning(request, "⚠️ Solo los docentes pueden acceder a esta vista.")
         return redirect("panel")
 
-    # Filtros simples (opcionales, desde GET)
+    # Filtros
     q = request.GET.get("q", "").strip()
     carrera_filtro = request.GET.get("carrera", "").strip()
     habilidad_filtro = request.GET.get("habilidad", "").strip()
 
-    qs = Usuario.objects.filter(rol="EST").select_related("carrera")
+    qs = (
+        Usuario.objects.filter(rol="EST")
+        .select_related("carrera", "sede")   # <-- ¡IMPORTANTE!
+    )
 
     if q:
         qs = qs.filter(
@@ -829,22 +833,26 @@ def busqueda_perfiles(request):
         )
     if carrera_filtro:
         qs = qs.filter(carrera__nombre__icontains=carrera_filtro)
+
     if habilidad_filtro:
         qs = qs.filter(habilidades__icontains=habilidad_filtro)
 
     qs = qs.order_by("apellido_paterno", "nombre")
 
+    # Construcción de los datos
     estudiantes = []
     for e in qs:
         habs = [h.strip() for h in (e.habilidades or "").split(",") if h.strip()]
         inds = [i.strip() for i in (e.industrias_interes or "").split(",") if i.strip()]
         tech = [t.strip() for t in (e.tecnologias_preferidas or "").split(",") if t.strip()]
+
         estudiantes.append({
             "id": e.id,
             "nombre": f"{e.nombre} {e.apellido_paterno}",
             "email": e.email,
             "rut": e.rut,
             "carrera": e.carrera.nombre if e.carrera else "Sin carrera",
+            "sede": e.sede.nombre if e.sede else "Sin sede",   # <<<<<< 🔥 AQUI EL FIX
             "sobre_mi": e.sobre_mi or "",
             "experiencia": e.experiencia or "",
             "habilidades": habs,
@@ -853,18 +861,19 @@ def busqueda_perfiles(request):
             "tecnologias": tech,
         })
 
-    # Para combos
+    # Para los filtros del formulario
     carreras = sorted({c.nombre for c in Carrera.objects.all()})
     habilidades = sorted({h for e in estudiantes for h in e["habilidades"]})
 
     return render(request, "webs/busqueda_perfiles.html", {
-        "estudiantes": estudiantes,          # ⬅️ ahora sí
+        "estudiantes": estudiantes,
         "carreras": carreras,
         "habilidades": habilidades,
         "query": q,
         "carrera_filtro": carrera_filtro,
         "habilidad_filtro": habilidad_filtro,
     })
+
 
 
 @login_required

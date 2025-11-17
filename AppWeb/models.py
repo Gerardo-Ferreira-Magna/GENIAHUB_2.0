@@ -177,7 +177,7 @@ class Proyecto(AuditStampedModel):
 
     titulo = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-    resumen = models.TextField(max_length=500, help_text="Resumen ejecutivo")
+    resumen = models.TextField(max_length=700, help_text="Resumen ejecutivo")
     descripcion = models.TextField()
 
     tipo = models.CharField(max_length=3, choices=TIPO_PROYECTO, db_index=True)

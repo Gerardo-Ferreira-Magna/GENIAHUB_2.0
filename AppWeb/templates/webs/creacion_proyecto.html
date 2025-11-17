@@ -21,6 +21,15 @@
 
         <div class="row g-3">
 
+            <!-- ✅ CREADO POR (NUEVO) -->
+            <div class="col-12">
+                <p class="text-muted mb-1">
+                    <strong>Creado por:</strong>
+                    {{ request.user.nombre }} {{ request.user.apellido_paterno }}
+                    (<span class="text-primary">{{ request.user.email }}</span>)
+                </p>
+            </div>
+
             <div class="col-12">
                 <label class="form-label fw-semibold">Título del Proyecto</label>
                 {{ form.titulo }}
@@ -41,14 +50,38 @@
                 {{ form.estado }}
             </div>
 
+            <!-- RESUMEN EJECUTIVO -->
             <div class="col-12">
                 <label class="form-label fw-semibold">Resumen Ejecutivo</label>
                 {{ form.resumen }}
+                <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted">Máx. 700 caracteres</small>
+                    <small class="text-secondary" id="countResumen">0 / 700</small>
+                </div>
+
+                <!-- Botón IA -->
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                        data-bs-toggle="modal" data-bs-target="#modalIA"
+                        onclick="setIAField('resumen')">
+                    <i class="bi bi-stars me-1"></i> Generar con IA
+                </button>
             </div>
 
+            <!-- DESCRIPCIÓN COMPLETA -->
             <div class="col-12">
                 <label class="form-label fw-semibold">Descripción Completa</label>
                 {{ form.descripcion }}
+                <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted">Máx. 1500 caracteres</small>
+                    <small class="text-secondary" id="countDescripcion">0 / 1500</small>
+                </div>
+
+                <!-- Botón IA -->
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                        data-bs-toggle="modal" data-bs-target="#modalIA"
+                        onclick="setIAField('descripcion')">
+                    <i class="bi bi-magic me-1"></i> Generar con IA
+                </button>
             </div>
 
         </div>
@@ -67,9 +100,17 @@
                 {{ form.carrera }}
             </div>
 
+            <!-- ✅ SEDE AUTOMÁTICA (TEXTO + CAMPO OCULTO) -->
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Sede</label>
-                {{ form.sede }}
+                <input type="text"
+                       class="form-control"
+                       value="{{ request.user.sede.nombre|default:'Sin sede asignada' }}"
+                       disabled>
+                <!-- mantenemos el campo del form oculto para que viaje al backend -->
+                <div class="d-none">
+                    {{ form.sede }}
+                </div>
             </div>
 
             <div class="col-12">
@@ -116,5 +157,96 @@
 
 </div>
 
+<!-- ===============================
+     MODAL IA
+=============================== -->
+<div class="modal fade" id="modalIA" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-robot me-2"></i>Asistente IA</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="mb-2 text-muted">Se generará texto basado en el título del proyecto.</p>
+
+        <button class="btn btn-primary w-100" onclick="generarIA()">
+            <i class="bi bi-stars me-1"></i> Generar contenido
+        </button>
+
+        <div id="iaLoading" class="text-center mt-3 d-none">
+          <div class="spinner-border"></div>
+          <p class="text-muted mt-2">Generando…</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
+
+<!-- ===============================
+     SCRIPT JS
+=============================== -->
+<script>
+let iaField = null;
+
+function setIAField(field) {
+    iaField = field;
+}
+
+function generarIA() {
+    const titulo = document.querySelector("#id_titulo").value.trim();
+    if (!titulo) {
+        alert("Primero escribe un título.");
+        return;
+    }
+
+    document.getElementById("iaLoading").classList.remove("d-none");
+
+    fetch("/api/generar_texto_ia/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ titulo })
+    })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById("iaLoading").classList.add("d-none");
+
+        if (iaField === "resumen" && data.resumen) {
+            document.querySelector("#id_resumen").value = data.resumen;
+        } else if (iaField === "descripcion" && data.descripcion) {
+            document.querySelector("#id_descripcion").value = data.descripcion;
+        }
+
+        contarCaracteres();
+        bootstrap.Modal.getInstance(document.getElementById("modalIA")).hide();
+    })
+    .catch(err => {
+        document.getElementById("iaLoading").classList.add("d-none");
+        alert("Error al generar texto.");
+        console.error(err);
+    });
+}
+
+// Contadores
+function contarCaracteres() {
+    const r = document.querySelector("#id_resumen");
+    const d = document.querySelector("#id_descripcion");
+
+    if (r) document.querySelector("#countResumen").textContent = `${r.value.length} / 700`;
+    if (d) document.querySelector("#countDescripcion").textContent = `${d.value.length} / 1500`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    contarCaracteres();
+    document.addEventListener("input", contarCaracteres);
+});
+</script>
+
 
