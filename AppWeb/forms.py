@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, authenticate
-from .models import Usuario
+from .models import Usuario, SolicitudEmpresa
 from .models import RegistroEmpresa
 from .models import Proyecto
 
@@ -175,4 +175,40 @@ class ProyectoForm(forms.ModelForm):
             "palabras_clave": forms.TextInput(attrs={"class": "form-control"}),
             "documento_pdf": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "es_publico": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+
+class SolicitudEmpresaForm(forms.ModelForm):
+    resumen = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "class": "form-control char-limit-700",
+            "rows": 3,
+            "maxlength": 700
+        })
+    )
+
+    descripcion = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "class": "form-control char-limit-1500",
+            "rows": 5,
+            "maxlength": 1500
+        })
+    )
+
+    class Meta:
+        model = SolicitudEmpresa
+        fields = [
+            "titulo",
+            "descripcion",
+            "sector",
+            "fecha_limite",
+            "palabras_clave",
+            "archivo_adjunto",
+        ]
+        widgets = {
+            "titulo": forms.TextInput(attrs={"class": "form-control"}),
+            "sector": forms.TextInput(attrs={"class": "form-control"}),
+            "fecha_limite": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "palabras_clave": forms.TextInput(attrs={"class": "form-control"}),
+            "archivo_adjunto": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }

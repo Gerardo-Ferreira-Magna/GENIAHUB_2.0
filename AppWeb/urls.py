@@ -36,7 +36,8 @@ urlpatterns = [
     path("api/perfiles/buscar/", views.buscar_perfiles_ajax, name="buscar_perfiles_ajax"),
     path("creacion_proyecto/", views.crear_proyecto, name="creacion_proyecto"),
     path("proyecto/editar/", views.proyecto_editar_modal, name="proyecto_editar_modal"),
-    path("proyecto/eliminar/", views.proyecto_eliminar_modal, name="proyecto_eliminar_modal")
+    path("proyecto/eliminar/", views.proyecto_eliminar_modal, name="proyecto_eliminar_modal"),
+    path("solicitud_empresa/", views.solicitud_empresa_crear, name="solicitud_empresa_crear"),
 ]
 
 
