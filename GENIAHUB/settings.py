@@ -4,6 +4,13 @@ from pathlib import Path
 import os
 from django.utils import timezone
 import dj_database_url
+from dotenv import load_dotenv
+
+
+# Cargar variables desde .env
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%1qcci-a)qqtp6+!%e-)s_d(uqo=&tl-581lw_323as844drne'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -88,6 +95,7 @@ DATABASES = {
 }
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -106,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-cl'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago'
 
 USE_I18N = True
 

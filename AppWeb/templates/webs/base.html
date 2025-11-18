@@ -1,323 +1,504 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}GENIAHUB | Dashboard{% endblock title %}</title>
 
     <!-- Fuentes y librerías -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
 
     {% block extra_css %}
     <style>
-        /* ======== CONFIGURACIÓN GLOBAL ======== */
-        html, body {
-            font-family: 'Poppins', sans-serif;
-            overflow-x: hidden !important;
-            scroll-behavior: smooth;
-        }
+      /* ======== CONFIGURACIÓN GLOBAL ======== */
+      html,
+      body {
+        font-family: "Poppins", sans-serif;
+        overflow-x: hidden !important;
+        scroll-behavior: smooth;
+      }
 
-        .main-container {
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: all 0.3s ease;
-        }
+      .main-container {
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+        transition: all 0.3s ease;
+      }
 
-        /* ======== SIDEBAR ======== */
+      /* ======== SIDEBAR ======== */
+      .sidebar {
+        width: 250px;
+        background-color: #212429;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .sidebar.collapsed {
+        width: 60px;
+      }
+
+      .sidebar.collapsed:hover {
+        width: 250px;
+      }
+
+      /* Ocultar texto y elementos cuando está colapsado */
+      .sidebar.collapsed .nav-text,
+      .sidebar.collapsed .h-color,
+      .sidebar.collapsed .count-badge {
+        display: none !important;
+      }
+
+      /* Mostrar texto cuando está expandido o en hover */
+      .sidebar:not(.collapsed) .nav-text,
+      .sidebar:not(.collapsed) .h-color,
+      .sidebar:not(.collapsed) .count-badge,
+      .sidebar.collapsed:hover .nav-text,
+      .sidebar.collapsed:hover .h-color,
+      .sidebar.collapsed:hover .count-badge {
+        display: inline !important;
+      }
+
+      /* ======== CONTENIDO PRINCIPAL ======== */
+      .content {
+        flex: 1;
+        width: 100%;
+        overflow-x: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .dashboard-content {
+        padding-bottom: 50px;
+      }
+
+      /* ======== LINKS Y BOTONES ======== */
+      .sidebar ul li a {
+        color: #ccc;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        padding-left: 15px !important;
+        transition: all 0.2s ease;
+      }
+
+      .sidebar.collapsed ul li a {
+        padding-left: 17px !important;
+      }
+
+      .sidebar ul li a:hover {
+        background-color: #444;
+        color: #fff;
+        border-radius: 5px;
+        transform: translateX(3px);
+      }
+
+      .sidebar ul li.active a {
+        background-color: #0d6efd;
+        border-radius: 5px;
+        color: #fff;
+      }
+
+      /* ======== PIN ======== */
+      #pin-sidebar-btn {
+        transition: all 0.3s;
+      }
+
+      #pin-sidebar-btn.fixed i {
+        color: var(--bs-info);
+        transform: rotate(45deg);
+      }
+
+      /* ======== SEPARADOR ======== */
+      .h-color {
+        border-top: 1px solid #666;
+        opacity: 0.5;
+      }
+
+      /* ======== FLECHA DE COLAPSO ======== */
+      .nav-link[aria-expanded="true"] .arrow,
+      a[aria-expanded="true"] .arrow {
+        transform: rotate(90deg);
+        color: var(--bs-warning) !important;
+      }
+
+      .nav-link[aria-expanded="false"] .arrow,
+      a[aria-expanded="false"] .arrow {
+        transform: rotate(0deg);
+        color: var(--bs-warning) !important;
+      }
+
+      /* ======== RESPONSIVO ======== */
+      @media (max-width: 768px) {
         .sidebar {
-            width: 250px;
-            background-color: #212429;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-            position: relative;
+          margin-left: -250px;
+          position: fixed;
+          height: 100%;
+          z-index: 1000;
         }
 
-        .sidebar.collapsed {
-            width: 60px;
+        .sidebar.active {
+          margin-left: 0;
+          width: 250px;
         }
 
-        .sidebar.collapsed:hover {
-            width: 250px;
+        .sidebar.active .nav-text,
+        .sidebar.active .header-box h3,
+        .sidebar.active .h-color,
+        .sidebar.active .count-badge {
+          display: inline !important;
         }
 
-        /* Ocultar texto y elementos cuando está colapsado */
-        .sidebar.collapsed .nav-text,
-        .sidebar.collapsed .h-color,
-        .sidebar.collapsed .count-badge {
-            display: none !important;
-        }
-
-        /* Mostrar texto cuando está expandido o en hover */
-        .sidebar:not(.collapsed) .nav-text,
-        .sidebar:not(.collapsed) .h-color,
-        .sidebar:not(.collapsed) .count-badge,
-        .sidebar.collapsed:hover .nav-text,
-        .sidebar.collapsed:hover .h-color,
-        .sidebar.collapsed:hover .count-badge {
-            display: inline !important;
-        }
-
-        /* ======== CONTENIDO PRINCIPAL ======== */
-        .content {
-            flex: 1;
-            width: 100%;
-            overflow-x: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .dashboard-content {
-            padding-bottom: 50px;
-        }
-
-        /* ======== LINKS Y BOTONES ======== */
-        .sidebar ul li a {
-            color: #ccc;
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-            padding-left: 15px !important;
-            transition: all 0.2s ease;
-        }
-
-        .sidebar.collapsed ul li a {
-            padding-left: 17px !important;
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #444;
-            color: #fff;
-            border-radius: 5px;
-            transform: translateX(3px);
-        }
-
-        .sidebar ul li.active a {
-            background-color: #0d6efd;
-            border-radius: 5px;
-            color: #fff;
-        }
-
-        /* ======== PIN ======== */
         #pin-sidebar-btn {
-            transition: all 0.3s;
+          display: none !important;
         }
 
-        #pin-sidebar-btn.fixed i {
-            color: var(--bs-info);
-            transform: rotate(45deg);
+        .content {
+          width: 100%;
+          flex: 1;
         }
-
-        /* ======== SEPARADOR ======== */
-        .h-color {
-            border-top: 1px solid #666;
-            opacity: 0.5;
-        }
-
-        /* ======== FLECHA DE COLAPSO ======== */
-        .nav-link[aria-expanded="true"] .arrow,
-        a[aria-expanded="true"] .arrow {
-            transform: rotate(90deg);
-            color: var(--bs-warning) !important;
-        }
-
-        .nav-link[aria-expanded="false"] .arrow,
-        a[aria-expanded="false"] .arrow {
-            transform: rotate(0deg);
-            color: var(--bs-warning) !important;
-        }
-
-        /* ======== RESPONSIVO ======== */
-        @media (max-width: 768px) {
-            .sidebar {
-                margin-left: -250px;
-                position: fixed;
-                height: 100%;
-                z-index: 1000;
-            }
-
-            .sidebar.active {
-                margin-left: 0;
-                width: 250px;
-            }
-
-            .sidebar.active .nav-text,
-            .sidebar.active .header-box h3,
-            .sidebar.active .h-color,
-            .sidebar.active .count-badge {
-                display: inline !important;
-            }
-
-            #pin-sidebar-btn {
-                display: none !important;
-            }
-
-            .content {
-                width: 100%;
-                flex: 1;
-            }
-        }
+      }
     </style>
     {% endblock extra_css %}
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="main-container d-flex">
-        
-        <!-- ======== SIDEBAR ======== -->
-        <div class="sidebar collapsed" id="side_nav">
-            <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between align-items-center">
-                <h3 class="fs-4">
-                    <span class="text-warning">G</span>
-                    <span class="nav-text text-warning">ENIAHUB</span>
-                </h3>
+      <!-- ======== SIDEBAR ======== -->
+      <div class="sidebar collapsed" id="side_nav">
+        <div
+          class="header-box px-2 pt-3 pb-4 d-flex justify-content-between align-items-center"
+        >
+          <h3 class="fs-4">
+            <span class="text-warning">G</span>
+            <span class="nav-text text-warning">ENIAHUB</span>
+          </h3>
 
-                <button id="pin-sidebar-btn" class="btn p-0 d-none d-md-block text-white" title="Fijar Menú">
-                    <i class="bi bi-pin-angle" style="font-size: 1.2rem;"></i>
-                </button>
+          <button
+            id="pin-sidebar-btn"
+            class="btn p-0 d-none d-md-block text-white"
+            title="Fijar Menú"
+          >
+            <i class="bi bi-pin-angle" style="font-size: 1.2rem"></i>
+          </button>
 
-                <button class="btn d-md-none d-block close-btn px-1 py-0 text-white">
-                    <i class="bi bi-list"></i>
-                </button>
-            </div>
-
-            <ul class="list-unstyled px-2">
-                <li class="active">
-                    <a class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-house-door"></i> <span class="nav-text">Inicio</span>
-                    </a>
-                </li>
-
-                {% if request.user.is_authenticated and request.user.is_staff %}
-                <li>
-                    <a href="{% url 'admin:index' %}" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-person-lock"></i> <span class="nav-text">Admin Django</span>
-                    </a>
-                </li>
-                {% endif %}
-
-                <li>
-                    <a href="#" class="text-decoration-none px-3 py-2 d-block">
-                        <i class="bi bi-bar-chart"></i> <span class="nav-text">Dashboard</span>
-                    </a>
-                </li>
-
-                {% if request.user.is_authenticated and request.user.is_staff %}
-                <li>
-                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
-                       data-bs-toggle="collapse" href="#submenuPanelAdmin"
-                       role="button" aria-expanded="false" aria-controls="submenuPanelAdmin">
-                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Panel Admin</span></span>
-                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
-                    </a>
-
-                    <ul class="collapse list-unstyled ps-4" id="submenuPanelAdmin">
-                        <li><a href="{% url 'auditoria_dashboard' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Auditoría</span></a></li>
-                        <li><a href="{% url 'usuarios_panel' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Usuarios</span></a></li>
-                        <li><a href="{% url 'panel_solicitudes' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Solicitud Empresa</span></a></li>
-                    </ul>
-                </li>
-                {% endif %}
-
-                <li>
-                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
-                       data-bs-toggle="collapse" href="#submenuProyectos"
-                       role="button" aria-expanded="false" aria-controls="submenuProyectos">
-                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Docente</span></span>
-                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
-                    </a>
-
-                    <ul class="collapse list-unstyled ps-4" id="submenuProyectos">
-                    <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Proyectos</span></a></li>
-                        <li><a href="{% url 'panel' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Panel Proyectos</span></a></li>
-                        <li><a href="{% url 'creacion_proyecto' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Nuevo Proyecto</span></a></li>
-                        <li><a href="{% url 'busqueda_perfiles' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Perfiles</span></a></li>
-                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Solicitudes</span></a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
-                       data-bs-toggle="collapse" href="#submenuEstudiante"
-                       role="button" aria-expanded="false" aria-controls="submenuEstudiante">
-                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Estudiante</span></span>
-                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
-                    </a>
-
-                    <ul class="collapse list-unstyled ps-4" id="submenuEstudiante">
-                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Proyectos</span></a></li>
-                        <li><a href="{% url 'tareas' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Tareas</span></a></li>
-                        <li><a href="{% url 'perfil_estudiante' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mi Perfil</span></a></li>
-                        <li><a href="#" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Postulaciones</span></a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
-                       data-bs-toggle="collapse" href="#submenuEmpresa"
-                       role="button" aria-expanded="false" aria-controls="submenuEmpresa">
-                        <span><i class="bi bi-clipboard2-check"></i> <span class="nav-text">Empresa</span></span>
-                        <span class="arrow text-secondary" style="font-size: 1.9rem; font-weight: bold;">›</span>
-                    </a>
-
-                    <ul class="collapse list-unstyled ps-4" id="submenuEmpresa">
-                        <li><a href="{% url 'proyectos' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Mis Proyectos</span></a></li>
-                        <li><a href="{% url 'solicitud_empresa_crear' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Solicitud Proyecto</span></a></li>
-                        <li><a href="{% url 'proyectos_tabla' %}" class="text-decoration-none px-3 py-1 d-block"><span class="nav-text">• Estado Solicitud</span></a></li>
-                    </ul>
-                </li>
-
-            </ul>
-
-            <hr class="h-color mx-2">
-
-            <ul class="list-unstyled px-2">
-                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-sliders"></i> <span class="nav-text">Configuración</span></a></li>
-                <li><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-bell"></i> <span class="nav-text">Notificaciones</span></a></li>
-                <li><a class="text-decoration-none px-3 py-2 d-block"><i class="bi bi-layout-wtf"></i> <span class="nav-text">Versión 1.1</span></a></li>
-            </ul>
+          <button class="btn d-md-none d-block close-btn px-1 py-0 text-white">
+            <i class="bi bi-list"></i>
+          </button>
         </div>
 
-        <!-- ======== CONTENIDO ======== -->
-        <div class="content">
-            <nav class="navbar navbar-expand-md navbar-light bg-light">
-                <div class="container-fluid">
-                    <div class="d-flex justify-content-between d-md-none d-block">
-                        <button class="btn px-1 py-0 open-btn me-2"><i class="bi bi-list"></i></button>
-                        <a class="navbar-brand fs-4" href="#"><span class="bg-dark rounded px-2 py-0 text-white">GH</span></a>
-                    </div>
+        <ul class="list-unstyled px-2">
+          <li class="active">
+            <a class="text-decoration-none px-3 py-2 d-block">
+              <i class="bi bi-house-door"></i>
+              <span class="nav-text">Inicio</span>
+            </a>
+          </li>
 
-                    <button class="navbar-toggler p-0 border-0" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="bi bi-list"></i>
-                    </button>
+          {% if request.user.is_authenticated and request.user.is_staff %}
+          <li>
+            <a
+              href="{% url 'admin:index' %}"
+              class="text-decoration-none px-3 py-2 d-block"
+            >
+              <i class="bi bi-person-lock"></i>
+              <span class="nav-text">Admin Django</span>
+            </a>
+          </li>
+          {% endif %}
 
-                    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-                        <ul class="navbar-nav mb-2 mb-lg-0">
-                            {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">(Hola, {{ request.usuario.nombre }})</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" href="{% url 'logout' %}">Cerrar Sesión</a>
-                            </li>
-                            {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#">Login</a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+          <li>
+            <a href="#" class="text-decoration-none px-3 py-2 d-block">
+              <i class="bi bi-layout-wtf"></i>
+              <span class="nav-text">Agente IA</span>
+            </a>
+          </li>
 
-            <div class="dashboard-content p-4">
-                {% block content %}
-                {% endblock content %}
+          {% if request.user.is_authenticated and request.user.is_staff %}
+          <li>
+            <a
+              class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+              data-bs-toggle="collapse"
+              href="#submenuPanelAdmin"
+              role="button"
+              aria-expanded="false"
+              aria-controls="submenuPanelAdmin"
+            >
+              <span
+                ><i class="bi bi-clipboard2-check"></i>
+                <span class="nav-text">Panel Admin</span></span
+              >
+              <span
+                class="arrow text-secondary"
+                style="font-size: 1.9rem; font-weight: bold"
+                >›</span
+              >
+            </a>
+
+            <ul class="collapse list-unstyled ps-4" id="submenuPanelAdmin">
+              <li>
+                <a
+                  href="{% url 'auditoria_dashboard' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Auditoría</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'usuarios_panel' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Usuarios</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'panel_solicitudes' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Solicitud Empresa</span></a
+                >
+              </li>
+            </ul>
+          </li>
+          {% endif %}
+
+          <li>
+            <a
+              class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+              data-bs-toggle="collapse"
+              href="#submenuProyectos"
+              role="button"
+              aria-expanded="false"
+              aria-controls="submenuProyectos"
+            >
+              <span
+                ><i class="bi bi-clipboard2-check"></i>
+                <span class="nav-text">Docente</span></span
+              >
+              <span
+                class="arrow text-secondary"
+                style="font-size: 1.9rem; font-weight: bold"
+                >›</span
+              >
+            </a>
+
+            <ul class="collapse list-unstyled ps-4" id="submenuProyectos">
+              <li>
+                <a
+                  href="{% url 'proyectos' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Proyectos</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'panel' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Panel Proyectos</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'creacion_proyecto' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Nuevo Proyecto</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'busqueda_perfiles' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Perfiles</span></a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Solicitudes</span></a
+                >
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <a
+              class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+              data-bs-toggle="collapse"
+              href="#submenuEstudiante"
+              role="button"
+              aria-expanded="false"
+              aria-controls="submenuEstudiante"
+            >
+              <span
+                ><i class="bi bi-clipboard2-check"></i>
+                <span class="nav-text">Estudiante</span></span
+              >
+              <span
+                class="arrow text-secondary"
+                style="font-size: 1.9rem; font-weight: bold"
+                >›</span
+              >
+            </a>
+
+            <ul class="collapse list-unstyled ps-4" id="submenuEstudiante">
+              <li>
+                <a
+                  href="{% url 'proyectos' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Mis Proyectos</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'tareas' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Mis Tareas</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'perfil_estudiante' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Mi Perfil</span></a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Postulaciones</span></a
+                >
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <a
+              class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between align-items-center"
+              data-bs-toggle="collapse"
+              href="#submenuEmpresa"
+              role="button"
+              aria-expanded="false"
+              aria-controls="submenuEmpresa"
+            >
+              <span
+                ><i class="bi bi-clipboard2-check"></i>
+                <span class="nav-text">Empresa</span></span
+              >
+              <span
+                class="arrow text-secondary"
+                style="font-size: 1.9rem; font-weight: bold"
+                >›</span
+              >
+            </a>
+
+            <ul class="collapse list-unstyled ps-4" id="submenuEmpresa">
+              <li>
+                <a
+                  href="{% url 'proyectos' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Mis Proyectos</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'solicitud_empresa_crear' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Solicitud Proyecto</span></a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'proyectos_tabla' %}"
+                  class="text-decoration-none px-3 py-1 d-block"
+                  ><span class="nav-text">• Estado Solicitud</span></a
+                >
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+        <hr class="h-color mx-2" />
+
+        <ul class="list-unstyled px-2">
+          <li>
+            <a href="#" class="text-decoration-none px-3 py-2 d-block"
+              ><i class="bi bi-layout-wtf"></i>
+              <span class="nav-text">Dashboard</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="text-decoration-none px-3 py-2 d-block"
+              ><i class="bi bi-sliders"></i>
+              <span class="nav-text">Configuración</span></a
+            >
+          </li>
+          <li>
+            <a class="text-decoration-none px-3 py-2 d-block"
+              ><i class="bi bi-layout-wtf"></i>
+              <span class="nav-text">Versión 1.1</span></a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- ======== CONTENIDO ======== -->
+      <div class="content">
+        <nav class="navbar navbar-expand-md navbar-light bg-dark">
+          <div class="container-fluid">
+            <div class="d-flex justify-content-between d-md-none d-block">
+              <button class="btn px-1 py-0 open-btn me-2">
+                <i class="bi bi-list"></i>
+              </button>
+              <a class="navbar-brand fs-4" href="#"
+                ><span class="bg-dark rounded px-2 py-0 text-white">GH</span></a
+              >
             </div>
+
+            <button
+              class="navbar-toggler p-0 border-0"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <i class="bi bi-list"></i>
+            </button>
+
+            <div
+              class="collapse navbar-collapse justify-content-end"
+              id="navbarSupportedContent">
+              <ul class="navbar-nav mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                <li class="nav-item me-5">
+                  <a class="nav-link text-warning" href="#">Hola - {{ request.user.nombre|upper }}</a>
+                </li>
+                <li class="nav-item ms-auto">
+                  <a href="{% url 'logout' %}" class="btn btn-outline-warning d-flex align-items-center">
+                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                  </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                  <a class="nav-link active" href="#">Login</a>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="dashboard-content p-4">
+          {% block content %} {% endblock content %}
         </div>
+      </div>
     </div>
 
     <!-- ======== SCRIPTS ======== -->
@@ -325,50 +506,50 @@
 
     {% block extra_js %}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.getElementById('side_nav');
-            const openBtn = document.querySelector('.open-btn');
-            const closeBtn = document.querySelector('.close-btn');
-            const pinBtn = document.getElementById('pin-sidebar-btn');
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("side_nav");
+        const openBtn = document.querySelector(".open-btn");
+        const closeBtn = document.querySelector(".close-btn");
+        const pinBtn = document.getElementById("pin-sidebar-btn");
 
-            // Verificar si es móvil
-            function isMobile() {
-                return window.innerWidth <= 768;
+        // Verificar si es móvil
+        function isMobile() {
+          return window.innerWidth <= 768;
+        }
+
+        // Botón de Pin/Fijación (Escritorio)
+        if (pinBtn) {
+          if (!sidebar.classList.contains("collapsed")) {
+            pinBtn.classList.add("fixed");
+          }
+
+          pinBtn.addEventListener("click", function () {
+            sidebar.classList.toggle("collapsed");
+            pinBtn.classList.toggle("fixed");
+            if (!sidebar.classList.contains("collapsed")) {
+              sidebar.classList.remove("active");
             }
+          });
+        }
 
-            // Botón de Pin/Fijación (Escritorio)
-            if (pinBtn) {
-                if (!sidebar.classList.contains('collapsed')) {
-                    pinBtn.classList.add('fixed');
-                }
+        // Menú móvil
+        if (openBtn) {
+          openBtn.addEventListener("click", function () {
+            sidebar.classList.add("active");
+            sidebar.classList.remove("collapsed");
+          });
+        }
 
-                pinBtn.addEventListener('click', function () {
-                    sidebar.classList.toggle('collapsed');
-                    pinBtn.classList.toggle('fixed');
-                    if (!sidebar.classList.contains('collapsed')) {
-                        sidebar.classList.remove('active');
-                    }
-                });
+        if (closeBtn) {
+          closeBtn.addEventListener("click", function () {
+            sidebar.classList.remove("active");
+            if (!isMobile() && pinBtn && !pinBtn.classList.contains("fixed")) {
+              sidebar.classList.add("collapsed");
             }
-
-            // Menú móvil
-            if (openBtn) {
-                openBtn.addEventListener('click', function () {
-                    sidebar.classList.add('active');
-                    sidebar.classList.remove('collapsed');
-                });
-            }
-
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function () {
-                    sidebar.classList.remove('active');
-                    if (!isMobile() && pinBtn && !pinBtn.classList.contains('fixed')) {
-                        sidebar.classList.add('collapsed');
-                    }
-                });
-            }
-        });
+          });
+        }
+      });
     </script>
     {% endblock extra_js %}
-</body>
+  </body>
 </html>
