@@ -40,6 +40,11 @@ urlpatterns = [
     path("solicitud_empresa/", views.solicitud_empresa_crear, name="solicitud_empresa_crear"),
     path("empresa/estado-solicitud/", views.empresa_estado_solicitud, name="empresa_estado_solicitud"),
     path("proyectos/tabla/", views.proyectos_tabla, name="proyectos_tabla"),
+    path("asistente-ia/", views.asistente_ia, name="asistente_ia"),
+    path("asistente-ia/api/", views.asistente_ia_api, name="asistente_ia_api"),
+    path("generar_pdf/", views.generar_pdf, name="generar_pdf"),
+    path("generar_ppt/", views.generar_ppt, name="generar_ppt"),
+    path("generar_excel/", views.generar_excel, name="generar_excel"),
 
 ]
 

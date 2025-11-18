@@ -1,6 +1,8 @@
 
 # --- Python estándar ---
-import json  # Usado en usuario_update_api
+import json
+import io
+
 
 # --- Django Core / HTTP / Utilidades ---
 from django.http import JsonResponse
@@ -40,7 +42,14 @@ from .forms import SolicitudEmpresaForm
 from .models import SolicitudEmpresa
 from django.utils import timezone
 from django.http import HttpResponseForbidden
-
+from openpyxl import Workbook
+from pptx import Presentation
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+import openai
+from AppWeb.asistente_ai import consultar_openai
+from django.views.decorators.csrf import csrf_exempt
+from .asistente_ai import consultar_openai
 
 # ============================================================
 # VISTAS PÚBLICAS BÁSICAS
@@ -1156,3 +1165,83 @@ def proyectos_tabla(request):
     return render(request, "webs/proyectos_tabla.html", contexto)
 
 
+@login_required
+def asistente_ia(request):
+    filtro = request.GET.get("buscar", "")
+
+    # usar Proyecto igual que en panel_proyectos
+    qs = Proyecto.objects.select_related("autor").order_by("-created_at")
+
+    if filtro:
+        qs = qs.filter(
+            Q(titulo__icontains=filtro) |
+            Q(resumen__icontains=filtro) |
+            Q(descripcion__icontains=filtro) |
+            Q(autor__nombre__icontains=filtro) |
+            Q(autor__apellido_paterno__icontains=filtro)
+        )
+
+    return render(request, "webs/asistente_ia.html", {
+        "proyectos": qs,
+        "buscar": filtro,
+    })
+
+
+@csrf_exempt
+def asistente_ia_api(request):
+    """API que recibe mensaje y responde con IA."""
+    if request.method == "POST":
+        data = json.loads(request.body)
+        mensaje = data.get("mensaje", "")
+        respuesta = consultar_openai(mensaje)
+        return JsonResponse({"respuesta": respuesta})
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+
+# ---- GENERAR PDF ----
+def generar_pdf(request):
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+    p.drawString(100, 750, "Informe generado con IA - GENIAHUB")
+    p.drawString(100, 720, "Proyecto: " + request.GET.get("titulo", "Sin título"))
+    p.drawString(100, 700, "Resumen: " + request.GET.get("resumen", "Sin resumen"))
+    p.save()
+
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='application/pdf')
+
+# ---- GENERAR POWERPOINT ----
+def generar_ppt(request):
+    prs = Presentation()
+    slide_layout = prs.slide_layouts[0]  # Título
+    slide = slide_layout
+    slide = prs.slides.add_slide(slide_layout)
+    
+    slide.shapes.title.text = "Presentación IA - GENIAHUB"
+    slide.placeholders[1].text = request.GET.get("resumen", "No hay contenido aún.")
+
+    output = io.BytesIO()
+    prs.save(output)
+    output.seek(0)
+
+    return HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.presentationml.presentation')
+
+# ---- GENERAR EXCEL ----
+def generar_excel(request):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Resumen IA"
+
+    ws.append(["Proyecto", request.GET.get("titulo", "Sin título")])
+    ws.append(["Descripción", request.GET.get("resumen", "No hay resumen")])
+    ws.append(["Generado por", "Asistente IA GENIAHUB"])
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return HttpResponse(
+        output,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
