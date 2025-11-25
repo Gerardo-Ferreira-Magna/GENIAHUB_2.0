@@ -1,0 +1,15 @@
+.hero-empresas {
+  background-image: url("../img/2.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: rgba(0, 0, 0, 0.45);
+  background-blend-mode: multiply;
+  color: white;  /* Texto legible sobre el fondo */
+}
+
+/* Mejora contraste del texto */
+.hero-empresas h1,
+.hero-empresas p {
+  color: #ffffff !important;
+}

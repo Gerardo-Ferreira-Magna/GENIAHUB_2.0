@@ -63,6 +63,11 @@ def nosotros(request):
     """Página 'Sobre nosotros'."""
     return render(request, "webs/nosotros.html")
 
+
+def empresa_landing(request):
+    return render(request, "webs/empresa_landing.html")
+
+
 def tareas(request):
     """Vista de tareas (en desarrollo)."""
     return render(request, "webs/tareas.html")
@@ -1245,3 +1250,96 @@ def generar_excel(request):
         output,
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+
+# ============================================================
+# SUBIR PROYECTO DE TÍTULO (solo ESTUDIANTES)
+# ============================================================
+@login_required
+def subir_proyecto_titulo(request):
+    """
+    Estudiante y ADMIN pueden CREAR proyecto.
+    Docente solo ve/edita si corresponde.
+    """
+
+    # ===============================
+    #   1) CREAR PROYECTO
+    # ===============================
+    if request.method == "POST" and (request.user.rol == "EST" or request.user.rol == "ADM"):  # 👑
+        form = ProyectoForm(request.POST, request.FILES)
+        if form.is_valid():
+
+            proyecto = form.save(commit=False)
+            proyecto.autor = request.user     # 👑 ahora también puede ser admin
+            proyecto.tipo = "EST"             # Tipo siempre EST (proyecto de título)
+            proyecto.estado = "BOR"           # Borrador inicial
+            proyecto.created_by = request.user
+            proyecto.updated_by = request.user
+
+            # Datos automáticos
+            proyecto.sede = request.user.sede if request.user.sede_id else None
+            proyecto.carrera = request.user.carrera if request.user.carrera_id else None
+
+            fecha = form.cleaned_data.get("fecha_proyecto")
+            proyecto.anio = fecha.year if fecha else timezone.now().year
+
+            proyecto.save()
+            messages.success(request, "📚 Proyecto creado correctamente.")
+            return redirect("subir_proyecto_titulo")
+
+        else:
+            print(form.errors)
+
+    # ===============================
+    #   2) FORM → EST o ADMIN
+    # ===============================
+    if request.user.rol in ["EST", "ADM"]:     # 👑
+        form = ProyectoForm()
+    else:
+        form = None
+
+    # ===============================
+    #   3) LISTA DE PROYECTOS
+    # ===============================
+    if request.user.rol == "EST":
+        proyectos = Proyecto.objects.filter(autor=request.user, tipo="EST")
+
+    elif request.user.rol == "ADM":
+        proyectos = Proyecto.objects.filter(tipo="EST").select_related("autor")  # 👑 ver todos
+
+    elif request.user.rol == "DOC":
+        proyectos = Proyecto.objects.filter(tipo="EST").select_related("autor")
+
+    else:
+        return HttpResponseForbidden("No tienes permisos")
+
+    return render(request, "webs/subir_proyecto_titulo.html", {
+        "form": form,
+        "proyectos": proyectos,
+        "request": request,
+    })
+
+
+@login_required
+@require_POST
+def proyecto_titulo_editar(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+
+    # === PERMISOS ===
+    puede_editar = (
+        request.user == proyecto.autor or
+        request.user.rol == "ADM" or
+        request.user.rol == "DOC"  # Aquí puedes agregar más condiciones
+    )
+    if not puede_editar:
+        return JsonResponse({"ok": False, "error": "No tienes permisos"}, status=403)
+
+    # === ACTUALIZAR ===
+    proyecto.titulo = request.POST.get("titulo", proyecto.titulo)
+    proyecto.resumen = request.POST.get("resumen", proyecto.resumen)
+    proyecto.descripcion = request.POST.get("descripcion", proyecto.descripcion)
+    proyecto.estado = request.POST.get("estado", proyecto.estado)
+    proyecto.updated_by = request.user
+    proyecto.save()
+
+    return JsonResponse({"ok": True, "message": "Proyecto actualizado"})

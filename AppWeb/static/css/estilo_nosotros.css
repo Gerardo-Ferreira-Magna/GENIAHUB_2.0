@@ -24,7 +24,7 @@
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  min-height: 60vh;
+  min-height: 30vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,7 +88,7 @@ footer::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.75);
+  /*background: rgba(0,0,0,0.75);*/
   z-index: -1;
 }
 footer h5,

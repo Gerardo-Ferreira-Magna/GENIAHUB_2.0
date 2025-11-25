@@ -1,0 +1,215 @@
+{% extends "webs/base.html" %}
+
+{% block title %}Proyecto de Título | GENIAHUB{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- =======================================
+         TÍTULO
+    ======================================== -->
+    <h2 class="fw-bold mb-4">
+        <i class="bi bi-mortarboard-fill text-primary"></i>
+        Proyecto de Título
+    </h2>
+
+    <!-- =======================================
+         FORM SOLO PARA ESTUDIANTE
+    ======================================== -->
+    {% if form %}
+    <form action="" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4 mb-4">
+        {% csrf_token %}
+
+        <h5 class="fw-bold mb-3 text-primary">Información General</h5>
+        <div class="row g-3">
+            <div class="col-12">
+                <p class="text-muted mb-1">
+                    <strong>Estudiante:</strong>
+                    {{ request.user.nombre }} {{ request.user.apellido_paterno }}
+                    (<span class="text-primary">{{ request.user.email }}</span>)
+                </p>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">Título del Proyecto</label>
+                {{ form.titulo }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Fecha del Proyecto</label>
+                {{ form.fecha_proyecto }}
+            </div>
+
+            <!-- Tipo & Estado ocultos (automáticos) -->
+            <div class="d-none">{{ form.tipo }}</div>
+            <div class="d-none">{{ form.estado }}</div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">Resumen Ejecutivo</label>
+                {{ form.resumen }}
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">Descripción Completa</label>
+                {{ form.descripcion }}
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- =======================================
+             DATOS ADICIONALES
+        ======================================== -->
+        <h5 class="fw-bold mb-3 text-primary">Datos Adicionales</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Carrera</label>
+                {{ form.carrera }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Sede</label>
+                <input class="form-control" disabled
+                    value="{{ request.user.sede.nombre|default:'Sin sede asignada' }}">
+                <div class="d-none">{{ form.sede }}</div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">Palabras clave</label>
+                {{ form.palabras_clave }}
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">Documento PDF</label>
+                {{ form.documento_pdf }}
+            </div>
+
+            <div class="form-check form-switch mt-3">
+                {{ form.es_publico }}
+                <label class="form-check-label fw-semibold">Proyecto público</label>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-upload"></i> Subir Proyecto
+            </button>
+        </div>
+    </form>
+    {% endif %}
+
+    <!-- =======================================
+         LISTA DE PROYECTOS TITULO
+    ======================================== -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white fw-bold">
+            Proyectos de Título Subidos
+        </div>
+
+        <div class="card-body">
+            {% if proyectos %}
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        {% if request.user.rol == "ADM" or request.user.rol == "DOC" %}
+                            <th>Estudiante</th>
+                        {% endif %}
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in proyectos %}
+                    <tr>
+                        <td>{{ p.titulo }}</td>
+                        <td><span class="badge bg-secondary">{{ p.get_estado_display }}</span></td>
+                        <td>{{ p.created_at|date:"d-m-Y" }}</td>
+
+                        {% if request.user.rol == "ADM" or request.user.rol == "DOC" %}
+                            <td>{{ p.autor.nombre }} {{ p.autor.apellido_paterno }}</td>
+                        {% endif %}
+
+                        <!-- PERMISOS PARA EDITAR -->
+                        <td class="text-end">
+                            {% if request.user.rol == "ADM" or request.user == p.autor or request.user.rol == "DOC" %}
+                                <button
+                                    class="btn btn-sm btn-warning"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalEditar"
+                                    onclick="cargarProyecto({{ p.id }}, '{{ p.titulo }}', '{{ p.resumen|escapejs }}', '{{ p.descripcion|escapejs }}')">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="text-muted">No hay proyectos subidos.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- =======================================
+     MODAL EDITAR PROYECTO
+======================================= -->
+<div class="modal fade" id="modalEditar" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+      <h5><i class="bi bi-pencil-square me-2"></i>Editar Proyecto</h5>
+      <form id="formEditar">
+        <input type="hidden" id="edit_id">
+
+        <label>Título</label>
+        <input id="edit_titulo" class="form-control mb-2">
+
+        <label>Resumen</label>
+        <textarea id="edit_resumen" class="form-control mb-2" rows="3"></textarea>
+
+        <label>Descripción</label>
+        <textarea id="edit_descripcion" class="form-control mb-2" rows="5"></textarea>
+
+        <div class="text-end mt-3">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" onclick="editarProyecto()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+<!-- =======================================
+     SCRIPT JS (Ajax)
+======================================= -->
+<script>
+function cargarProyecto(id, titulo, resumen, descripcion) {
+    document.getElementById("edit_id").value = id;
+    document.getElementById("edit_titulo").value = titulo;
+    document.getElementById("edit_resumen").value = resumen;
+    document.getElementById("edit_descripcion").value = descripcion;
+}
+
+function editarProyecto() {
+    const id = document.getElementById("edit_id").value;
+    const formData = new FormData(document.getElementById("formEditar"));
+
+    fetch(`/proyecto-titulo/editar/${id}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+        body: formData
+    })
+    .then(r => r.json())
+    .then(resp => {
+        if (resp.ok) location.reload();
+        else alert(resp.error);
+    })
+    .catch(err => console.error(err));
+}
+</script>
+

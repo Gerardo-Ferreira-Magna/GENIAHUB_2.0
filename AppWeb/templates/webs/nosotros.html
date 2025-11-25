@@ -5,84 +5,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiénes Somos</title>
+  <title>Quiénes Somos | GENIAHUB</title>
+
+  <!-- BOOTSTRAP -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- TU CSS ORIGINAL -->
   <link rel="stylesheet" href="{% static 'css/estilo_nosotros.css' %}">
 
   <style>
-    /* === NAVBAR BLUR (estilo vidrio Apple) === */
     .navbar {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       z-index: 1000;
-      background: rgba(15, 15, 15, 0.4); /* fondo semitransparente */
-      backdrop-filter: blur(10px); /* efecto blur */
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      transition: background 0.3s ease-in-out;
+      background: rgba(15,15,15,0.4);
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
     }
-
-    /* Cambia fondo al hacer scroll (opcional) */
     .navbar.scrolled {
-      background: rgba(15, 15, 15, 0.7);
-      backdrop-filter: blur(15px);
-    }
-
-    .navbar-toggler {
-      border-color: rgba(255,255,255,0.5);
-    }
-
-    .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30'
-      xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,1%29'
-      stroke-width='2' stroke-linecap='round' stroke-miterlimit='10'
-      d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-    }
-
-    body {
-      padding-top: 70px; /* espacio para navbar fija */
-    }
-
-    /* Efecto de transición suave */
-    @media (max-width: 991px) {
-      body {
-        padding-top: 65px;
-      }
+      background: rgba(15, 15, 15, 0.75);
     }
   </style>
 </head>
 
 <body>
 
-  <!-- NAVBAR -->
+  <!-- NAVBAR (NO SE TOCA) -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center" href="#">
         <i class="bi bi-kanban me-2"></i> GENIAHUB
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-              data-bs-target="#navbarNav" aria-controls="navbarNav"
-              aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
             <a class="nav-link" href="{% url 'index' %}">
-              <i class="bi bi-house-door-fill me-1"></i> Inicio
+              <i class="bi bi-house me-1"></i>Inicio
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" href="{% url 'nosotros' %}">
-              <i class="bi bi-people-fill me-1"></i> Fundadores
+              <i class="bi bi-people me-1"></i>Fundadores
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'empresa_landing' %}">
+              <i class="bi bi-buildings me-2"></i>Empresa
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'login' %}">
-              <i class="bi bi-box-arrow-in-right me-1"></i> Login
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
             </a>
           </li>
         </ul>
@@ -90,46 +70,64 @@
     </div>
   </nav>
 
-  <!-- HERO HEADER -->
-  <header class="hero-header text-center text-white">
-    <div class="container py-5">
-      <h1 class="display-3 fw-bolder">Fundadores</h1>
-      <p class="lead mt-3 fs-5">
-        Nuestra pasión por la <strong>excelencia</strong> y la <strong>innovación</strong> 
-        se refleja en cada miembro de este equipo.
+  <!-- HERO -->
+  <section class="text-center py-5 hero-header">
+    <div class="container" data-aos="fade-up">
+      <h1 class="fw-bold display-4">
+        Conectando el futuro del <br>
+        <span class="text-success">talento</span> y la  
+        <span class="text-primary">innovación</span>
+      </h1>
+      <p class="lead mt-3 text-white">
+        GENIAHUB impulsa la colaboración entre la industria y el talento universitario a través  
+        de proyectos potenciados con Inteligencia Artificial.
       </p>
     </div>
-  </header>
+  </section>
 
-  <!-- PRINCIPIOS -->
-  <section class="principios-fondo py-5">
-    <div class="container">
-      <h3 class="text-center display-6 fw-bold mb-5">Nuestros Principios Fundamentales</h3>
-      <div class="row row-cols-1 row-cols-lg-3 g-4">
-        <div class="col">
-          <div class="p-4 border-5 h-100">
-            <i class="bi bi-lightbulb-fill fs-2 text-warning mb-3"></i>
-            <h4 class="fw-bold">Innovación Constante</h4>
-            <p>
-              Estamos siempre en búsqueda de la próxima gran idea, utilizando tecnología de vanguardia para ofrecer soluciones de futuro.
+  <!-- MISIÓN / VISIÓN / VALORES -->
+  <section class="py-5 hero-header">
+    <div class="container text-center">
+      <h1><span class="text-success">Nuestra Misión, Visión y Valores</span></h1>
+      <p class="text-white mb-5">Los pilares que guían nuestro propósito como plataforma innovadora.</p>
+
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="p-5 shadow-sm rounded bg-white h-100">
+            <i class="bi bi-flag text-success fs-1 mb-3"></i>
+            <h5 class="fw-bold">Nuestra Misión</h5>
+            <p class="text-muted">
+              Conectar talento con empresas e impulsar proyectos innovadores con IA.
             </p>
           </div>
         </div>
-        <div class="col">
-          <div class="p-4 border-5 h-100">
-            <i class="bi bi-shield-fill-check fs-2 text-warning mb-3"></i>
-            <h4 class="fw-bold">Integridad Absoluta</h4>
-            <p>
-              La honestidad y la transparencia son los pilares de cada decisión. Construimos relaciones basadas en la confianza mutua.
+
+        <div class="col-md-3">
+          <div class="p-5 shadow-sm rounded bg-white h-100">
+            <i class="bi bi-eye-fill text-success fs-1 mb-3"></i>
+            <h5 class="fw-bold">Nuestra Visión</h5>
+            <p class="text-muted">
+              Ser el puente líder entre industria y academia en Latinoamérica.
             </p>
           </div>
         </div>
-        <div class="col">
-          <div class="p-4 border-5 h-100">
-            <i class="bi bi-check2-all fs-2 text-warning mb-3"></i>
-            <h4 class="fw-bold">Pasión por el Cliente</h4>
-            <p>
-              El éxito de nuestros clientes es nuestra prioridad. Buscamos superar sus expectativas con un servicio de alta calidad.
+
+        <div class="col-md-3">
+          <div class="p-4 shadow-sm rounded bg-white h-100">
+            <i class="bi bi-stars text-success fs-1 mb-3"></i>
+            <h5 class="fw-bold">Valores</h5>
+            <p class="text-muted">
+              Innovación, ética, tecnología y formación de futuro.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="p-4 shadow-sm rounded bg-white h-100">
+            <i class="bi bi-heart-fill text-success fs-1 mb-3"></i>
+            <h5 class="fw-bold">Compromiso</h5>
+            <p class="text-muted">
+              Impulsar oportunidades reales para estudiantes y empresas.
             </p>
           </div>
         </div>
@@ -140,71 +138,61 @@
   <!-- EQUIPO -->
   <div class="container my-5">
     <section id="equipo" class="text-center mb-5">
-      <h2 class="display-5 fw-bold mb-5 text-dark">Nosotros</h2><br><br><br>
+      <h2 class="display-5 fw-bold mb-5">El Equipo Detrás de GENIAHUB</h2>
       <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col d-flex">
-          <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
-            <div class="d-flex justify-content-center">
-              <img src="{% static 'img/Mauricio.jpg' %}" class="profile-circle" alt="Mauricio Retamal Rubio">
-            </div>
-            <div class="card-body pt-0 d-flex flex-column">
-              <h5 class="card-title fw-bold mt-3">Mauricio Retamal Rubio</h5>
-              <h6 class="card-subtitle mb-3 text-light">CEO y Fundador</h6>
-              <p class="card-text flex-grow-1">
-                Visionario en el sector. Lidera la estrategia con una mentalidad enfocada en la innovación y el crecimiento sostenible.
-              </p>
-              <div class="mt-auto">
-                <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
-                <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
-              </div>
+
+        <!-- Mauricio -->
+        <div class="col">
+          <div class="card card-profile h-100 shadow-lg border-0 bg-dark text-white">
+            <img src="{% static 'img/Mauricio.jpg' %}" class="profile-circle mx-auto" alt="Mauricio">
+            <div class="card-body">
+              <h5 class="fw-bold">Mauricio Retamal Rubio</h5>
+              <p class="text-light">Ingeniero Informático</p>
+              <p class="card-text flex-grow-1">Soy estudiante de Ingeniería en Informática con gran interés...</p>
             </div>
           </div>
         </div>
 
-        <div class="col d-flex">
-          <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
-            <div class="d-flex justify-content-center">
-              <img src="{% static 'img/Yesenia.jpg' %}" class="profile-circle" alt="Yesenia Catalan Rubio">
-            </div>
-            <div class="card-body pt-0 d-flex flex-column">
-              <h5 class="card-title fw-bold mt-3">Yesenia Catalan Rubio</h5>
-              <h6 class="card-subtitle mb-3 text-light">Directora de Marketing</h6>
-              <p class="card-text flex-grow-1">
-                Experta en estrategias digitales. Su creatividad impulsa la visibilidad y el posicionamiento de la marca.
-              </p>
-              <div class="mt-auto">
-                <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
-                <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
-              </div>
+        <!-- Yesenia -->
+        <div class="col">
+          <div class="card card-profile h-100 shadow-lg border-0 bg-dark text-white">
+            <img src="{% static 'img/Yesenia.jpg' %}" class="profile-circle mx-auto" alt="Yesenia">
+            <div class="card-body">
+              <h5 class="fw-bold">Yesenia Catalan Rubio</h5>
+              <p class="text-light">Ingeniera Informática</p>
+              <p class="card-text flex-grow-1">Soy un estudiante de Ingeniería en Informática con entusiasmo...</p>
             </div>
           </div>
         </div>
 
-        <div class="col d-flex">
-          <div class="card card-profile h-100 shadow-lg border-0 text-center bg-dark text-white">
-            <div class="d-flex justify-content-center">
-              <img src="{% static 'img/Gerardo.jpg' %}" class="profile-circle" alt="Gerardo Ferreira Magna">
-            </div>
-            <div class="card-body pt-0 d-flex flex-column">
-              <h5 class="card-title fw-bold mt-3">Gerardo Ferreira Magna</h5>
-              <h6 class="card-subtitle mb-3 text-light">Jefe de Desarrollo</h6>
-              <p class="card-text flex-grow-1">
-                Maestro en arquitectura de sistemas. Asegura que nuestra plataforma sea robusta, escalable y moderna.
-              </p>
-              <div class="mt-auto">
-                <a href="#" class="text-primary fs-4 me-3"><i class="bi bi-linkedin"></i></a>
-                <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
-              </div>
+        <!-- Gerardo -->
+        <div class="col">
+          <div class="card card-profile h-100 shadow-lg border-0 bg-dark text-white">
+            <img src="{% static 'img/Gerardo.jpg' %}" class="profile-circle mx-auto" alt="Gerardo">
+            <div class="card-body">
+              <h5 class="fw-bold">Gerardo Ferreira Magna</h5>
+              <p class="text-light">Ingeniero Informático</p>
+              <p class="card-text flex-grow-1">Estudio Ingeniería en Informática y me motiva participar...</p>
             </div>
           </div>
         </div>
+
       </div>
     </section>
-    <hr class="my-5">
   </div>
 
-  <!-- FOOTER -->
-  <footer class="bg-dark text-white pt-5 pb-4 mt-5">
+  <!-- CTA -->
+  <section class="py-5 hero-header text-white">
+    <div class="container text-center">
+      <h2 class="fw-bold">Únete a la Revolución del Talento</h2>
+      <p class="mt-2">Descubre proyectos innovadores y oportunidades reales con GENIAHUB.</p>
+      <a href="{% url 'proyectos' %}" class="btn btn-success btn-lg me-2">Explorar Proyectos</a>
+      <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">Unirme a la Plataforma</a>
+    </div>
+  </section>
+
+  <!-- FOOTER (NO SE TOCA) -->
+  <footer class="hero-empresas text-white pt-5 pb-4">
     <div class="container">
       <div class="row">
         <div class="col-lg-4 col-md-6 mb-4">
@@ -246,21 +234,13 @@
         <a href="#" class="text-white text-decoration-none ms-3 fs-7">Términos y Condiciones</a>
       </div>
     </div>
+
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Script scroll blur opcional -->
-  <script>
-    window.addEventListener('scroll', () => {
-      const navbar = document.querySelector('.navbar');
-      if (window.scrollY > 20) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-    });
-  </script>
 </body>
 </html>
+
+
 

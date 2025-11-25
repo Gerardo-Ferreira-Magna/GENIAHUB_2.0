@@ -8,6 +8,7 @@ urlpatterns = [
 
     path("", views.index, name="index"),
     path("nosotros/", views.nosotros, name="nosotros"),
+    path("empresa-landing/", views.empresa_landing, name="empresa_landing"),
     path("tareas/", views.tareas, name="tareas"),
     path("proyectos/", views.proyectos, name="proyectos"),
     path("registro/", views.registro, name="registro"),
@@ -45,6 +46,8 @@ urlpatterns = [
     path("generar_pdf/", views.generar_pdf, name="generar_pdf"),
     path("generar_ppt/", views.generar_ppt, name="generar_ppt"),
     path("generar_excel/", views.generar_excel, name="generar_excel"),
+    path("subir-proyecto-titulo/", views.subir_proyecto_titulo, name="subir_proyecto_titulo"),
+    path("proyecto-titulo/editar/<int:pk>/", views.proyecto_titulo_editar, name="proyecto_titulo_editar"),
 
 ]
 
